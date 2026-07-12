@@ -4,6 +4,7 @@
         xmlns:vm="clr-namespace:WindowsFileManager.ViewModels"
         xmlns:helpers="clr-namespace:WindowsFileManager.Helpers"
         Title="Folder File Control"
+        Icon="/Assets/app-icon.ico"
         Height="900" Width="1600"
         MinHeight="500" MinWidth="1000"
         WindowStartupLocation="CenterScreen">

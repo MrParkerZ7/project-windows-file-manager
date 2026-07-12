@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Name="DialogRoot"
         Title="Profile"
+        Icon="/Assets/app-icon.ico"
         Width="440" SizeToContent="Height"
         WindowStartupLocation="CenterOwner"
         WindowStyle="SingleBorderWindow"
