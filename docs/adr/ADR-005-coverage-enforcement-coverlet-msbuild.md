@@ -82,15 +82,21 @@ These are what the gate costs a contributor:
   `ExtensionFilter`, `MainWindow`, `ProfileNameDialog`, and the interop helpers. **"100% coverage" means 100%
   of what is in scope**, and the riskiest code in the app is not in scope. A contributor can silence the gate
   on real logic with a single attribute and nothing will flag it.
-- **Two competing coverage configs still ship, and the inert one looks authoritative.**
-  `coverlet.runsettings` remains on disk, and both workflows still pass
-  `--collect:"XPlat Code Coverage" --settings tests/WindowsFileManager.Tests/coverlet.runsettings`
-  ([`../../.github/workflows/ci.yml`](../../.github/workflows/ci.yml) lines 34–37;
-  [`../../.github/workflows/msix-pipeline.yml`](../../.github/workflows/msix-pipeline.yml) lines 74–77) —
-  but `coverlet.collector`, the package that consumes runsettings, is no longer referenced. The CI artifact
-  path `tests/**/TestResults/**/coverage.cobertura.xml` (ci.yml line 56) depends on that absent collector.
-  The runsettings' own `Include` list also omits `ViewModels`, so it describes a narrower scope than the one
-  actually enforced. Anyone editing `coverlet.runsettings` to change the gate will change nothing.
+- **`--no-build` silently defeats the gate — and did, on 2026-08-30.** coverlet.msbuild instruments the
+  referenced assemblies *during the build*. Both workflows ran `dotnet test -c Release --no-build`, so those
+  targets never executed and Core/Application reported **0%** while all 217 tests passed — tripping the 100%
+  threshold and turning `main` red on a docs-only commit. Reproduced locally with the identical command.
+  Fixed the same day by dropping `--no-build` from both workflows; the flag must not be reintroduced, and both
+  files now carry a comment saying so.
+- **A data collector was requested that this project does not ship.** Both workflows also passed
+  `--collect:"XPlat Code Coverage" --settings tests/WindowsFileManager.Tests/coverlet.runsettings`, but
+  `coverlet.collector` — the package that provides that collector and consumes runsettings — is not
+  referenced, so every run logged *"Could not find data collector 'XPlat Code Coverage'"*. Removed 2026-08-30.
+  The CI artifact path was `tests/**/TestResults/**/coverage.cobertura.xml`, the collector's output location;
+  it is now `tests/**/coverage/coverage.cobertura.xml`, where coverlet.msbuild actually writes.
+- **`coverlet.runsettings` remains on disk and is still inert.** Nothing consumes it, and its `Include` list
+  omits `ViewModels`, so it describes a narrower scope than the one actually enforced. Anyone editing it to
+  change the gate will change nothing. It is a deletion candidate, not a control surface.
 - **Weakening the gate is a one-line csproj edit** — lowering `Threshold`, dropping `branch` from
   `ThresholdType`, or wiring `-p:CollectCoverage=false` into CI. Nothing structural raises an alarm; the
   runsettings file would silently *not* compensate.

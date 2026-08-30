@@ -70,11 +70,13 @@ jobs:
       - name: Build (Release)
         run: dotnet build -c Release --no-restore
 
+      # Do NOT add --no-build: coverlet.msbuild instruments during the build,
+      # so --no-build makes Core/Application report 0% and trips the 100%
+      # threshold even when every test passes. --collect:"XPlat Code Coverage"
+      # is omitted deliberately — that collector ships in coverlet.collector,
+      # which this project does not reference. Same fix as ci.yml (2026-08-30).
       - name: Run tests
-        run: >
-          dotnet test -c Release --no-build
-          --collect:"XPlat Code Coverage"
-          --settings tests/WindowsFileManager.Tests/coverlet.runsettings
+        run: dotnet test -c Release --no-restore
 
       - name: Publish self-contained
         run: >

@@ -30,11 +30,19 @@ jobs:
         run: dotnet build -c Release --no-restore /p:TreatWarningsAsErrors=true
 
       # Gate 3: Test with coverage enforcement (100% line, branch, method)
+      #
+      # Do NOT add --no-build here. Coverage is enforced by coverlet.msbuild
+      # (see docs/adr/ADR-005-coverage-enforcement-coverlet-msbuild.md), which
+      # instruments the referenced assemblies during the build. With --no-build
+      # those targets never run, so Core/Application report 0% and the 100%
+      # threshold fails even though all 217 tests pass.
+      #
+      # --collect:"XPlat Code Coverage" is also absent deliberately: that data
+      # collector ships in coverlet.collector, which this project does not
+      # reference (only coverlet.msbuild). Asking for it logged
+      # "Could not find data collector 'XPlat Code Coverage'" on every run.
       - name: Test with coverage
-        run: >
-          dotnet test -c Release --no-build
-          --collect:"XPlat Code Coverage"
-          --settings tests/WindowsFileManager.Tests/coverlet.runsettings
+        run: dotnet test -c Release --no-restore
 
       # Gate 4: Dependency vulnerability audit
       - name: Dependency audit
@@ -53,4 +61,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
-          path: tests/**/TestResults/**/coverage.cobertura.xml
+          path: tests/**/coverage/coverage.cobertura.xml
