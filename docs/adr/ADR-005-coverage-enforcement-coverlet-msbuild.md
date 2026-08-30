@@ -1,0 +1,119 @@
+# ADR-005: 100% coverage enforced by `coverlet.msbuild` in the test csproj (moved off `coverlet.runsettings`)
+
+## Status
+
+Accepted — 2026-04-16 (commit `125a7b1` "feat: add quality gates, Exclude/Mismatch/Contains match types,
+column sorting, and tab panel switching")
+
+## Context
+
+From the Clean Architecture restructure (`7b59636`, 2026-04-04) the test project referenced
+`coverlet.collector` and shipped `tests/WindowsFileManager.Tests/coverlet.runsettings`, consumed via
+`dotnet test --collect:"XPlat Code Coverage" --settings …`. That file declares `<ThresholdType>line</ThresholdType>`
+and `<ThresholdStat>total</ThresholdStat>` but **no `<Threshold>` value at all**
+([`../../tests/WindowsFileManager.Tests/coverlet.runsettings`](../../tests/WindowsFileManager.Tests/coverlet.runsettings)
+lines 11–12). It therefore enforced nothing: coverage was collected and uploaded as an artifact, and a
+regression could not fail the build.
+
+The dated Project Note records the decision and the starting point honestly
+([`../../CLAUDE.md`](../../CLAUDE.md) § Project Notes):
+
+> **[2026-04-16]** Coverage enforcement moved from `coverlet.runsettings` (XPlat Code Coverage) to
+> `coverlet.msbuild` in test `.csproj` for threshold enforcement. Current coverage ~44% — needs
+> `automate-test` to reach 100%.
+
+The `125a7b1` commit body states the same intent: *"Add coverlet.msbuild with 100% line/branch/method
+threshold enforcement."*
+
+## Decision
+
+Move enforcement into MSBuild properties on the test project itself, so **any** `dotnet test` enforces it
+without a flag ([`../../tests/WindowsFileManager.Tests/WindowsFileManager.Tests.csproj`](../../tests/WindowsFileManager.Tests/WindowsFileManager.Tests.csproj)
+lines 11–27):
+
+```xml
+<CollectCoverage>true</CollectCoverage>
+<Threshold>100</Threshold>
+<ThresholdType>line,branch,method</ThresholdType>
+<ThresholdStat>total</ThresholdStat>
+<SkipAutoProps>true</SkipAutoProps>
+<IncludeTestAssembly>false</IncludeTestAssembly>
+<Include>[WindowsFileManager.Core]*,[WindowsFileManager.Application]*,[WindowsFileManager]WindowsFileManager.Helpers*,[WindowsFileManager]WindowsFileManager.ViewModels*</Include>
+<Exclude>[WindowsFileManager]*Views*,[WindowsFileManager]*Helpers.Win32Api*,[WindowsFileManager]XamlGeneratedNamespace*</Exclude>
+<ExcludeByFile>**/AssemblyInfo.cs,**/App.xaml.cs,**/*.g.cs,**/*.g.i.cs</ExcludeByFile>
+<ExcludeByAttribute>GeneratedCodeAttribute,CompilerGeneratedAttribute,ExcludeFromCodeCoverageAttribute</ExcludeByAttribute>
+```
+
+Consequences of that placement: `dotnet test` enforces the threshold; `dotnet test -p:CollectCoverage=false`
+is the documented local opt-out ([`../../CLAUDE.md`](../../CLAUDE.md) Quick Reference).
+
+`coverlet.collector` was removed from the test project two days later in commit `cce00c6` (2026-04-18,
+"test: restore 100% coverage — 90 new tests + coverlet config fix"), leaving `coverlet.msbuild` 6.0.2 as the
+only coverage package.
+
+**Measured state as of 2026-08-30:** 217 tests, 0 failed, 0 skipped; 100% line / 100% branch / 100% method
+across `WindowsFileManager.Core`, `WindowsFileManager.Application`, and the UI's ViewModels + Helpers.
+Infrastructure is out of scope by design ([ADR-004](ADR-004-ifilesystemservice-io-abstraction.md)). The
+`~44%` figure quoted in the Project Note above is historical; [`../../CLAUDE.md`](../../CLAUDE.md) carries a
+dated 2026-08-30 note recording it as superseded.
+
+## Consequences
+
+### Positive
+
+- The gate cannot be forgotten or mis-invoked. It travels with the project file, not with a CLI flag, so a
+  local `dotnet test` and a CI `dotnet test` enforce the same bar.
+- It covers **line, branch, and method** — not just lines — so an untested `else` or an unreferenced public
+  method fails the build.
+- It worked as intended: the ~44% starting point was driven to 100% and has stayed there.
+- `SkipAutoProps=true` and `IncludeTestAssembly=false` keep the denominator honest — trivial auto-property
+  accessors and the test assembly itself do not inflate the percentage.
+
+### Negative
+
+These are what the gate costs a contributor:
+
+- **Every new branch needs a test before the suite will pass locally.** A one-line guard clause is a test. A
+  defensive `catch` you cannot provoke is a blocked commit until the seam exists to provoke it. This is the
+  single largest tax on small changes in this repo.
+- **The escape hatch is one attribute, and it is already heavily used.**
+  `ExcludeFromCodeCoverageAttribute` is in `ExcludeByAttribute`, and `MainViewModel` — roughly 5,000 lines and
+  the most behaviour-dense file in the application — carries it (`MainViewModel.cs:25`), as do `ToggleItem`,
+  `ExtensionFilter`, `MainWindow`, `ProfileNameDialog`, and the interop helpers. **"100% coverage" means 100%
+  of what is in scope**, and the riskiest code in the app is not in scope. A contributor can silence the gate
+  on real logic with a single attribute and nothing will flag it.
+- **Two competing coverage configs still ship, and the inert one looks authoritative.**
+  `coverlet.runsettings` remains on disk, and both workflows still pass
+  `--collect:"XPlat Code Coverage" --settings tests/WindowsFileManager.Tests/coverlet.runsettings`
+  ([`../../.github/workflows/ci.yml`](../../.github/workflows/ci.yml) lines 34–37;
+  [`../../.github/workflows/msix-pipeline.yml`](../../.github/workflows/msix-pipeline.yml) lines 74–77) —
+  but `coverlet.collector`, the package that consumes runsettings, is no longer referenced. The CI artifact
+  path `tests/**/TestResults/**/coverage.cobertura.xml` (ci.yml line 56) depends on that absent collector.
+  The runsettings' own `Include` list also omits `ViewModels`, so it describes a narrower scope than the one
+  actually enforced. Anyone editing `coverlet.runsettings` to change the gate will change nothing.
+- **Weakening the gate is a one-line csproj edit** — lowering `Threshold`, dropping `branch` from
+  `ThresholdType`, or wiring `-p:CollectCoverage=false` into CI. Nothing structural raises an alarm; the
+  runsettings file would silently *not* compensate.
+- Running the full suite is slower than running tests alone, so the fast local loop is
+  `-p:CollectCoverage=false` — which means the gate is usually only felt at the end.
+
+### Neutral
+
+- `[WindowsFileManager]*Helpers.Win32Api*` in the `Exclude` list is **stale** — no `Win32Api` type exists in
+  the tree. Harmless, but it misdescribes the exclusion set.
+- Coverage output is written to `./coverage/coverage.cobertura.xml` relative to the test project by
+  `CoverletOutput` (csproj line 14).
+- The threshold statistic is `total`, not `minimum` — an individual file may sit below 100% only if another
+  compensates, which at a 100% target is a distinction without a difference.
+- The [`../../CHANGELOG.md`](../../CHANGELOG.md) v1.0.0 entry claims "100% test coverage on Core and
+  Application layers"; that release predates this gate, which was added the following day.
+
+## Links
+
+- [ADR-004](ADR-004-ifilesystemservice-io-abstraction.md) — why Infrastructure is out of scope
+- [ADR-009](ADR-009-treat-warnings-as-errors.md) — the sibling build gate added in the same commit
+- [ADR-002](ADR-002-hand-rolled-mvvm.md) — why `MainViewModel` is large enough to be excluded
+- [`../DEV.md`](../DEV.md) — how to run the suite with and without the threshold
+- Source: [`../../tests/WindowsFileManager.Tests/WindowsFileManager.Tests.csproj`](../../tests/WindowsFileManager.Tests/WindowsFileManager.Tests.csproj) ·
+  [`../../tests/WindowsFileManager.Tests/coverlet.runsettings`](../../tests/WindowsFileManager.Tests/coverlet.runsettings) ·
+  [`../../.github/workflows/ci.yml`](../../.github/workflows/ci.yml)

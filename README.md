@@ -1,6 +1,6 @@
 # Windows File Manager
 
-A .NET 8 WPF desktop application for managing files on Windows. The first feature is **duplicate file detection** — scan one or more folders, find identical files by content hash, and reclaim wasted disk space.
+A .NET 8 WPF desktop application for managing folders and files on Windows. It ships three tabs: **Folder** (search folders, clear repeated subfolders, flatten, link siblings), **Duplication** (find identical files by content hash and reclaim wasted disk space), and **History** (undo any destructive action it performed).
 
 ## Features
 
@@ -8,6 +8,7 @@ A .NET 8 WPF desktop application for managing files on Windows. The first featur
 - **SHA256 Content Hashing** — Three-stage filter (size grouping → hash computation → duplicate confirmation) for fast scanning
 - **Multi-Folder Scanning** — Add folders by typing paths or browsing, scan across multiple directories, detect cross-folder duplicates
 - **Overlapping Path Deduplication** — Adding both `D:\` and `D:\subfolder` won't produce false duplicates
+- **Regex Match Mode** — Optional toggle that groups by a filename regex capture instead of size + content hash; falls back to hash mode when the pattern is empty
 
 ### Filtering & Sorting
 - **Extension Filters** — Show/hide file types with per-extension toggle, show all / clear all
@@ -27,7 +28,7 @@ A .NET 8 WPF desktop application for managing files on Windows. The first featur
 ### Selection & Actions
 - **Smart Selection** — Select all, select newer, select older duplicates (keep best copy unselected)
 - **Move Files** — Move selected duplicates to a target folder (browse or type path)
-- **Delete Files** — Delete individual files or all files in a group with confirmation
+- **Recycle Files** — Send an individual file, or every file in a group, to the Recycle Bin after confirmation (undoable from the History tab)
 - **Open in Explorer** — Open file location in Windows Explorer
 - **Per-Group Selection** — Select All / Clear buttons per duplicate group
 
@@ -39,7 +40,26 @@ A .NET 8 WPF desktop application for managing files on Windows. The first featur
 
 ### Analytics & Monitoring
 - **Analytics Dashboard** — Total files, duplicates found, groups, scan time, wasted space %, top extensions, size distribution
-- **Resource Monitor** — Live CPU, memory, and thread count display
+- **Resource Monitor** — Live memory, CPU, and thread-count readouts in the status bars
+
+### Folder Management
+
+- **Folder Search** — Find folders by six match types (`Include`, `Match`, `Contains`, `Exclude`, `Mismatch`, `NotContain`) combined with AND logic, with an optional max-depth limit and stop/clear controls
+- **Clear Subfolders** — Discover repeated subfolder names across search results (with occurrence counts and parent locations), then bulk-send the selected ones to the Recycle Bin
+- **Flatten Folders** — Move nested files up to the folder root with `(2)` / `(3)` conflict renaming, an optional file-type filter, and optional removal of the emptied directories
+- **Link Sibling Folders** — Create `.lnk` shortcuts between sibling folders via `ShortcutHelper` (WScript.Shell COM)
+
+### Profiles
+
+- **Named Setting Bundles** — Multiple profiles, each holding its own target paths, filters, rules, and duplicate match mode
+- **Profile Commands** — Create, clone, switch, rename, and delete from the profile bar at the top of the window
+- **Persisted** — Profiles and the active profile name live in the same `settings.json` as the rest of the preferences
+
+### Action History & Undo
+
+- **History Tab** — Each destructive action is recorded as an `ActionHistoryEntry` in one of four kinds — `MoveFiles` (also used by Flatten), `RecycleFiles`, `RecycleDirectories`, `CreateShortcuts` — capped at the 30 most recent
+- **Undo** — Undo the last action or any specific entry: moved files are moved back, recycled items are restored from the Recycle Bin, created `.lnk` shortcuts are deleted
+- **History Analytics** — Per-kind operation and item counts across the recorded history
 
 ### UX Features
 - **Contextual Help** — `?` buttons with rich popup explanations for complex features, including clickable links to external docs (e.g., regex101.com)
@@ -52,27 +72,47 @@ A .NET 8 WPF desktop application for managing files on Windows. The first featur
 - **Cancellation Support** — Cancel long-running scans at any time
 - **Progress Reporting** — Live file count with throttled UI updates (every 100 files)
 
+## Documentation
+
+| Document | What it holds |
+|----------|---------------|
+| [ARCHITECTURE.md](ARCHITECTURE.md) | Module map, dependency rules, build outputs, ADR summary |
+| [docs/README.md](docs/README.md) | Documentation portal — the index of everything below |
+| [docs/CONTEXT.md](docs/CONTEXT.md) | Project background: problem, domain primer, key user flows, non-goals |
+| [docs/DEV.md](docs/DEV.md) | Local dev loop — prerequisites, build, run, test, package |
+| [docs/SECURITY.md](docs/SECURITY.md) | Guardrails: trust boundaries, destructive-operation rules, settings-file handling |
+| [docs/GLOSSARY.md](docs/GLOSSARY.md) | Domain terms used across the code (duplicate group, match type, profile, …) |
+| [docs/adr/](docs/adr/) | Architectural Decision Records — *why* each load-bearing choice was made |
+| [docs/specs/](docs/specs/) | Feature specs (`SPEC-NNN-*`) — the current-truth behavior contract per feature |
+| [docs/modules/](docs/modules/) | Per-module mechanics — how the code in each project works |
+| [CHANGELOG.md](CHANGELOG.md) | Release history (Keep a Changelog format) |
+| [CLAUDE.md](CLAUDE.md) | AI-agent instructions: conventions, quality gates, project notes |
+
+**Sync rule:** a change to a feature's behavior updates that feature's spec in `docs/specs/` in the same commit.
+
 ## Platform Support
 
 | Architecture | Status |
 |-------------|--------|
-| x64 (64-bit) | Supported |
-| x86 (32-bit) | Supported |
-| ARM64 | Supported |
+| x64 (64-bit) | Supported and shipped |
+| x86 (32-bit) | Not configured |
+| ARM64 | Not configured |
 
-Built with `AnyCPU` target — runs natively on all Windows architectures. .NET 8 provides ARM64 support out of the box.
+Only `win-x64` is built, packaged, and tested. `src/WindowsFileManager/WindowsFileManager.csproj` declares `<RuntimeIdentifiers>win-x64</RuntimeIdentifiers>`, `Package.appxmanifest` declares `ProcessorArchitecture="x64"`, and the MSIX pipeline publishes a self-contained `win-x64` package. There is no x86 or ARM64 RID, package, or CI job — adding one is a deliberate change, not an existing capability.
 
 ## Prerequisites
 
-- [.NET 8.0 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) or later
+- [.NET 8.0 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) (developed against 8.0.422)
 - Windows 10/11 (WPF requires Windows)
+
+> **`dotnet` must be on `PATH`.** With a portable/side-by-side SDK install the `dotnet` command is not registered globally, and every command below fails with "command not found". Prepend the SDK folder for the session first — e.g. `$env:PATH = "D:\_env_storeage\dotnet;$env:PATH"` in PowerShell. See [docs/DEV.md](docs/DEV.md).
 
 ## Getting Started
 
 ```bash
 # Clone the repository
 git clone <repo-url>
-cd app-window-file-manager
+cd project-windows-file-manager
 
 # Build
 dotnet build
@@ -80,8 +120,8 @@ dotnet build
 # Run the application
 dotnet run --project src/WindowsFileManager
 
-# Run tests with coverage
-dotnet test --collect:"XPlat Code Coverage" --settings tests/WindowsFileManager.Tests/coverlet.runsettings
+# Run tests — coverage collection and the 100% threshold are always on
+dotnet test
 ```
 
 ## Project Structure
@@ -89,7 +129,7 @@ dotnet test --collect:"XPlat Code Coverage" --settings tests/WindowsFileManager.
 The solution follows **Clean Architecture** with four modules:
 
 ```
-WindowsFileManager/
+project-windows-file-manager/
 ├── src/
 │   ├── WindowsFileManager.Core/           # Models + Interfaces (zero dependencies)
 │   │   ├── Models/
@@ -99,7 +139,12 @@ WindowsFileManager/
 │   │   │   ├── ScanResult.cs              # Scan output with statistics
 │   │   │   ├── ScanAnalytics.cs           # Computed analytics, extensions, size buckets
 │   │   │   ├── FilterRule.cs              # Dynamic filter rule with enable/disable
-│   │   │   └── AppSettings.cs             # Persisted user preferences
+│   │   │   ├── FolderSearchPattern.cs     # Folder search pattern + FolderMatchType enum
+│   │   │   ├── FolderSearchResult.cs      # One folder-search hit
+│   │   │   ├── SubfolderItem.cs           # Discovered subfolder + SubfolderLocation parents
+│   │   │   ├── ProfileSettings.cs         # One named profile's workflow state
+│   │   │   ├── ActionHistoryEntry.cs      # Undoable action + ActionHistoryKind / ActionHistoryMove
+│   │   │   └── AppSettings.cs             # Persisted user preferences (profiles, history, window state)
 │   │   └── Services/
 │   │       └── IFileSystemService.cs      # File system abstraction
 │   │
@@ -113,33 +158,52 @@ WindowsFileManager/
 │   │   └── Services/
 │   │       └── FileSystemService.cs       # System.IO file operations
 │   │
-│   └── WindowsFileManager/               # WPF UI layer (depends on all modules)
+│   └── WindowsFileManager/                # WPF UI layer (depends on all modules)
+│       ├── App.xaml / App.xaml.cs         # Application entry point
+│       ├── AssemblyInfo.cs                # Assembly-level attributes
+│       ├── Package.appxmanifest           # MSIX package manifest (identity, version, logos)
+│       ├── Assets/                        # app-icon.ico + Store logos (Square150, Square44, StoreLogo)
 │       ├── ViewModels/
 │       │   ├── ViewModelBase.cs           # INotifyPropertyChanged base
 │       │   ├── MainViewModel.cs           # Main window state + commands
 │       │   ├── ExtensionFilter.cs         # File type filter toggle
 │       │   └── ToggleItem.cs              # Enable/disable wrapper for paths & exclusions
 │       ├── Views/
-│       │   ├── MainWindow.xaml            # UI layout
-│       │   └── MainWindow.xaml.cs         # Window code-behind
+│       │   ├── MainWindow.xaml(.cs)       # Three-tab UI layout + window code-behind
+│       │   └── ProfileNameDialog.xaml(.cs) # Profile name entry dialog
 │       └── Helpers/
 │           ├── RelayCommand.cs            # ICommand implementation
 │           ├── Converters.cs              # Bool/Visibility, Percent/Width converters
 │           ├── FileTypeIconConverter.cs   # File extension → category icon converter
 │           ├── MiniPreviewConverter.cs    # File path → thumbnail (Shell + direct load)
 │           ├── FormattedTextBehavior.cs   # Rich text markup parser (<b>,<h>,<w>,<link>)
+│           ├── ShortcutHelper.cs          # .lnk folder shortcut creation via WScript.Shell
 │           └── TextBoxEnterKeyBehavior.cs # Enter key attached behavior
 │
 ├── tests/
-│   └── WindowsFileManager.Tests/          # Unit tests (105 tests, 100% line coverage)
-│       ├── Models/                        # Core model tests (AppSettings, FilterRule, etc.)
-│       ├── Services/                      # Application service tests with Moq (Scanner, Settings round-trip)
-│       └── Helpers/                       # UI helper tests (Converters, RelayCommand)
+│   └── WindowsFileManager.Tests/          # Unit tests (217 tests, 100% line/branch/method)
+│       ├── WindowsFileManager.Tests.csproj  # Coverage Include/Exclude + Threshold=100
+│       ├── coverlet.runsettings           # XPlat Code Coverage settings (used by CI)
+│       ├── GlobalUsings.cs                # Shared usings (xUnit, FluentAssertions, Moq)
+│       ├── xunit.runner.json              # xUnit runner configuration
+│       ├── Models/                        # Core model tests (AppSettings, FilterRule, SubfolderItem, …)
+│       ├── Services/                      # Application service tests with Moq (Scanner, Hash, Settings)
+│       └── Helpers/                       # UI-layer tests (Converters, RelayCommand, ViewModelBase)
 │
+├── docs/                                  # Project documentation — see the Documentation section above
+├── scripts/
+│   └── New-DevCertificate.ps1             # Self-signed dev certificate for MSIX signing
+├── .github/workflows/
+│   ├── ci.yml                             # Quality Gate pipeline (format → build → test → audit)
+│   └── msix-pipeline.yml                  # MSIX Store pipeline (Semgrep → package/sign → WACK)
+├── WindowsFileManager.sln                 # Solution — 5 projects in src/ + tests/ solution folders
 ├── Directory.Build.props                  # Shared analyzers (StyleCop, .NET Analyzers)
 ├── .editorconfig                          # Code style rules
 ├── stylecop.json                          # StyleCop configuration
-└── .github/workflows/ci.yml              # GitHub Actions CI pipeline
+├── .gitignore                             # Build output, coverage, IDE artifacts
+├── CHANGELOG.md                           # Release history
+├── CLAUDE.md                              # AI agent instructions
+└── README.md                              # This file
 ```
 
 ### Dependency Flow
@@ -178,33 +242,43 @@ All file system operations go through `IFileSystemService`, allowing complete mo
 ## Testing
 
 ```bash
-# Run all 105 tests with coverage report
+# Run all 217 tests — coverage and the 100% threshold are enforced by the test .csproj
+dotnet test
+
+# Same run, plus the XPlat cobertura report CI uploads as an artifact
 dotnet test --collect:"XPlat Code Coverage" \
   --settings tests/WindowsFileManager.Tests/coverlet.runsettings
 
-# Quick run without coverage
-dotnet test
+# Quick run without the coverage threshold (the only way to skip it)
+dotnet test -p:CollectCoverage=false
 ```
 
-**Coverage:** 100% line, 96% branch, 100% method across Core + Application + Helpers.
+`WindowsFileManager.Tests.csproj` sets `CollectCoverage=true`, `Threshold=100`, and `ThresholdType=line,branch,method`, so a bare `dotnet test` *does* collect coverage and *does* fail the build below 100%.
+
+**Coverage:** 100% line, 100% branch, 100% method — 217 tests, 0 failed, 0 skipped.
 
 | Module | Line | Branch | Method |
 |--------|------|--------|--------|
 | WindowsFileManager.Core | 100% | 100% | 100% |
-| WindowsFileManager.Application | 100% | 94% | 100% |
-| WindowsFileManager (Helpers) | 100% | 96% | 100% |
+| WindowsFileManager.Application | 100% | 100% | 100% |
+| WindowsFileManager (ViewModels + Helpers) | 100% | 100% | 100% |
+
+The coverage `Include` filter covers `WindowsFileManager.Core`, `WindowsFileManager.Application`, and the UI assembly's `Helpers` + `ViewModels` namespaces. Infrastructure is excluded, and the UI types that only touch WPF/COM surfaces (`MainViewModel`, `ExtensionFilter`, `ToggleItem`, `FileTypeIconConverter`, `FormattedTextBehavior`, `MiniPreviewConverter`, `ShortcutHelper`, `TextBoxEnterKeyBehavior`) carry `[ExcludeFromCodeCoverage]`.
 
 **Test stack:** xUnit + Moq + FluentAssertions
 
 ## CI/CD
 
-### CI Pipeline (`.github/workflows/ci.yml`)
+### Quality Gate Pipeline (`.github/workflows/ci.yml`)
 
-Runs on every push and PR to `main`:
+Runs on `windows-latest` for every push and PR to `main`, in this order:
 
-1. **Build** — `dotnet build -c Release`
-2. **Format Check** — `dotnet format --verify-no-changes`
-3. **Test + Coverage** — All tests with coverlet.collector, coverage report uploaded as artifact
+1. **Restore** — `dotnet restore`
+2. **Format check** — `dotnet format --verify-no-changes --no-restore`
+3. **Build** — `dotnet build -c Release --no-restore /p:TreatWarningsAsErrors=true`
+4. **Test with coverage** — `dotnet test -c Release --no-build --collect:"XPlat Code Coverage" --settings tests/WindowsFileManager.Tests/coverlet.runsettings`
+5. **Dependency audit** — `dotnet list package --vulnerable --include-transitive`, failing the job when any vulnerable package is reported
+6. **Upload coverage** — `coverage.cobertura.xml` published as the `coverage-report` artifact (runs even on failure)
 
 ### MSIX Store Pipeline (`.github/workflows/msix-pipeline.yml`)
 
