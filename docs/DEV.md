@@ -155,14 +155,17 @@ omission. The report lands at `tests/WindowsFileManager.Tests/coverage/coverage.
 
 Two things about coverage in this repo are easy to trip over:
 
-- `tests/WindowsFileManager.Tests/coverlet.runsettings` **enforces nothing.** It declares
-  `ThresholdType` and `ThresholdStat` but no `Threshold` value, and its `Include` omits
-  `ViewModels`. Both CI workflows pass `--collect:"XPlat Code Coverage" --settings …runsettings`,
-  but the gate that actually fails a build is the csproj block above.
+- `tests/WindowsFileManager.Tests/coverlet.runsettings` **enforces nothing, and nothing reads
+  it.** It declares `ThresholdType` and `ThresholdStat` but no `Threshold` value, and its
+  `Include` omits `ViewModels`. Both workflows used to pass
+  `--collect:"XPlat Code Coverage" --settings …runsettings`; that was removed on 2026-08-30
+  because the collector it asks for is not referenced. The file is now a deletion candidate, not
+  a control surface — the gate that fails a build is the csproj block above.
 - The test project references **`coverlet.msbuild` only — `coverlet.collector` is not
-  referenced**, even though CI uploads `tests/**/TestResults/**/coverage.cobertura.xml`, the path
-  the collector would produce. Do not "fix" a build by editing the runsettings file; edit the
-  csproj.
+  referenced.** Do not "fix" a build by editing the runsettings file; edit the csproj.
+  Migrating to the collector is an open decision — see
+  [ADR-005](adr/ADR-005-coverage-enforcement-coverlet-msbuild.md), which records the
+  instrumentation race that makes it worth considering.
 - `[WindowsFileManager]*Helpers.Win32Api*` in `Exclude` is stale — no `Win32Api` type exists in
   the tree.
 
@@ -200,8 +203,10 @@ Three layers enforce style, and all three are fatal:
 
 `Directory.Build.props` sits at the repo root and applies to all five projects, including the
 test project. It sets `TreatWarningsAsErrors=true` and `CodeAnalysisTreatWarningsAsErrors=true`:
-**any analyzer warning is a build error.** `ci.yml` re-asserts it with
-`/p:TreatWarningsAsErrors=true`.
+**any analyzer warning is a build error.** `ci.yml` used to re-assert it with
+`/p:TreatWarningsAsErrors=true`; that was removed on 2026-09-02 as redundant (passing it as a
+global property also made the build and test steps two different MSBuild builds). The props file
+is the single source.
 
 ### Conventions that are enforced
 
@@ -444,6 +449,28 @@ unsigned MSIX by design — do not remove that branch condition. `.gitignore` co
 
 The WACK job runs `if`-less after `build-and-package`, so a failed `appcert.exe` exit code fails
 the job; the report artifact is still uploaded (`if: always()`).
+
+---
+
+## Dependency updates
+
+Every GitHub Action is pinned to a full commit SHA, not a tag, because Semgrep's
+`github-actions-mutable-action-tag` rule is blocking (`security-scan` runs `semgrep --error`).
+See [SECURITY.md](SECURITY.md#action-pinning) for the pin table.
+
+Pinning freezes versions, so [`../.github/dependabot.yml`](../.github/dependabot.yml) owns keeping
+them fresh. What you will see as a contributor:
+
+- **One grouped PR per week**, not one per action. Its commit prefix is `chore(actions)`.
+- **No major bumps.** They are ignored deliberately: the first unconfigured run proposed
+  `upload-artifact 4.6.2 -> 7.0.1` and `checkout 4.4.0 -> 7.0.1`, both breaking, and every one of
+  those PRs failed CI. Adopt a major deliberately, reviewing the workflow alongside it.
+- **A 7-day cooldown** (30 for majors) before any release is proposed. A brand-new release is
+  exactly the window a compromised one ships in, and SHA-pinning buys nothing if the bump is
+  automatic and instant.
+
+When you take a bump, update the SHA **and** its trailing `# vX.Y.Z` comment together — they are
+the only thing making a 40-character hash readable.
 
 ---
 

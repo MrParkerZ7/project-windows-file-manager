@@ -235,7 +235,7 @@ Exactly two, both GitHub Actions repository secrets, both used only by
 
 | Secret | Purpose | Consumed at |
 |---|---|---|
-| `CERTIFICATE_PFX` | Base64-encoded code-signing PFX | `msix-pipeline.yml:139` (availability check), `:150` (decode to `${{ runner.temp }}\certificate.pfx`) |
+| `CERTIFICATE_PFX` | Base64-encoded code-signing PFX | `msix-pipeline.yml:137-147` (availability check), `:148-153` (decode to `${{ runner.temp }}\certificate.pfx`) |
 | `CERTIFICATE_PASSWORD` | PFX password | `msix-pipeline.yml:170` (`signtool /p`) |
 
 **The branch guard is the important part.** Both the decode step and the sign step carry the
@@ -260,10 +260,10 @@ them knows the full list:
 
 | Weakness | Location | Nature |
 |---|---|---|
-| Base64 PFX interpolated into the **body** of a PowerShell script | `msix-pipeline.yml:139, :150` | The entire blob becomes part of the executed script text |
+| Base64 PFX interpolated into the **body** of a PowerShell script | `msix-pipeline.yml:141`, `:152` | The entire blob becomes part of the executed script text |
 | Password interpolated into a **command line** | `msix-pipeline.yml:170` | Visible in the runner's process command line for the duration of `signtool` |
 | PFX written to disk, cleaned best-effort | written `:151`, removed `:176` with `-ErrorAction SilentlyContinue` under `if: always()` | A failed cleanup is not an error |
-| Availability check runs on **every** event | `msix-pipeline.yml:135-144` — the `Check signing certificate availability` step has **no** `if:` condition | It interpolates the secret into a string comparison on PR runs too |
+| Availability check runs on **every** event | `msix-pipeline.yml:137-147` — the `Check signing certificate availability` step has **no** `if:` condition | It interpolates the secret into a string comparison on PR runs too |
 | `ci.yml` declares **no `permissions:` block** | `.github/workflows/ci.yml` | Inherits the repository default token scope. `msix-pipeline.yml` correctly declares `contents: read` + `security-events: write` |
 
 ### The dev certificate script
@@ -420,7 +420,7 @@ direct-dependency-only.
 
 | Gate | Tool | Where | Failure behavior |
 |---|---|---|---|
-| Dependency vulnerabilities | `dotnet list package --vulnerable --include-transitive` | `.github/workflows/ci.yml:40-48` (pwsh; greps for `"has the following vulnerable packages"`) | `Write-Error` + `exit 1` — job fails |
+| Dependency vulnerabilities | `dotnet list package --vulnerable --include-transitive` | `.github/workflows/ci.yml:53-61` (pwsh; greps for `"has the following vulnerable packages"`) | `Write-Error` + `exit 1` — job fails |
 | SAST | Semgrep, rulesets **`p/default`** + **`p/csharp`** | `.github/workflows/msix-pipeline.yml:34-42`, in the `semgrep/semgrep` container on `ubuntu-latest` | `--error` ⇒ any finding fails the job |
 | SAST reporting | SARIF upload | `msix-pipeline.yml:44-48` — `github/codeql-action/upload-sarif`, SHA-pinned, `if: always()`, `sarif_file: semgrep-results.sarif` | Results land in the GitHub Security tab (requires the `security-events: write` permission declared at `msix-pipeline.yml:16-18`) |
 | Store certification | WACK `appcert.exe` | `msix-pipeline.yml:211-216` (job `wack-validation`) | Non-zero exit fails the job |
