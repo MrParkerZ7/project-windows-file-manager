@@ -1,0 +1,15 @@
+# Keeps the SHA-pinned GitHub Actions current.
+#
+# Every `uses:` in this repo is pinned to a commit SHA rather than a mutable
+# tag, because Semgrep's github-actions-mutable-action-tag rule is blocking
+# (the security-scan job runs `semgrep --error`). Pinning removes the supply
+# chain risk but freezes the versions, so Dependabot owns bumping them and
+# keeps the trailing `# vX.Y.Z` comment in sync.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: "chore(actions)"

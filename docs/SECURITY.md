@@ -422,7 +422,7 @@ direct-dependency-only.
 |---|---|---|---|
 | Dependency vulnerabilities | `dotnet list package --vulnerable --include-transitive` | `.github/workflows/ci.yml:40-48` (pwsh; greps for `"has the following vulnerable packages"`) | `Write-Error` + `exit 1` — job fails |
 | SAST | Semgrep, rulesets **`p/default`** + **`p/csharp`** | `.github/workflows/msix-pipeline.yml:34-42`, in the `semgrep/semgrep` container on `ubuntu-latest` | `--error` ⇒ any finding fails the job |
-| SAST reporting | SARIF upload | `msix-pipeline.yml:44-48` — `github/codeql-action/upload-sarif@v3`, `if: always()`, `sarif_file: semgrep-results.sarif` | Results land in the GitHub Security tab (requires the `security-events: write` permission declared at `msix-pipeline.yml:16-18`) |
+| SAST reporting | SARIF upload | `msix-pipeline.yml:44-48` — `github/codeql-action/upload-sarif`, SHA-pinned, `if: always()`, `sarif_file: semgrep-results.sarif` | Results land in the GitHub Security tab (requires the `security-events: write` permission declared at `msix-pipeline.yml:16-18`) |
 | Store certification | WACK `appcert.exe` | `msix-pipeline.yml:211-216` (job `wack-validation`) | Non-zero exit fails the job |
 
 **The `security-scan` job is a hard gate on packaging.** `build-and-package` declares
@@ -438,11 +438,31 @@ finding therefore blocks the MSIX build *and* certification.
 
 ### Action pinning
 
-All GitHub Actions are pinned by **major tag** (`actions/checkout@v4`, `actions/setup-dotnet@v4`,
-`actions/upload-artifact@v4`, `actions/download-artifact@v4`, `github/codeql-action/upload-sarif@v3`),
-not by commit SHA. That accepts upstream mutation within the major version. **ABSENT: SHA
-pinning.** If the threat model tightens (a signing certificate is already in scope on `main`),
-SHA-pin the actions in the workflow that touches the certificate first.
+**PRESENT: SHA pinning** (2026-09-02). All 10 `uses:` references across both workflows are pinned
+to a full 40-character commit SHA, with the human-readable version kept in a trailing comment:
+
+| Action | Pinned SHA | Version |
+|---|---|---|
+| `actions/checkout` | `11d5960a326750d5838078e36cf38b85af677262` | v4.4.0 |
+| `actions/setup-dotnet` | `67a3573c9a986a3f9c594539f4ab511d57bb3ce9` | v4.3.1 |
+| `actions/upload-artifact` | `ea165f8d65b6e75b540449e92b4886f43607fa02` | v4.6.2 |
+| `actions/download-artifact` | `d3f86a106a0bac45b974a628896c90dbdf5c8093` | v4.3.0 |
+| `github/codeql-action/upload-sarif` | `6f5948dfacef28e207b48d0905cf90c03365536d` | v3.37.9 |
+
+Previously every reference used a mutable major tag (`@v4`), which accepts upstream mutation
+within the major version. Semgrep's `github-actions-mutable-action-tag` rule flagged all 10, and
+because the `security-scan` job runs `--error`, those findings blocked the entire MSIX pipeline —
+every downstream job declares `needs: security-scan`. This matters more here than in most repos: a
+signing certificate is in scope on `main`, so a mutated action runs in the same job as the PFX.
+
+**The cost of pinning is staleness**, and that is owned by
+[`../.github/dependabot.yml`](../.github/dependabot.yml) — a weekly `github-actions` update that
+bumps the SHAs and their version comments together. Removing that file re-introduces the tail
+without re-introducing the finding, which is the silent-failure mode to watch for.
+
+> **Rule 23 — never replace a pinned SHA with a tag.** Re-introducing `@v4` restores the
+> supply-chain exposure *and* re-blocks the MSIX pipeline on the Semgrep gate. Bump the SHA and
+> its trailing version comment together; let Dependabot do it.
 
 ### Analyzer gates that also serve security
 
