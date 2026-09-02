@@ -53,7 +53,7 @@ one place, and every test constructs the services with a `Mock<IFileSystemServic
 - Application services are constructor-injected and fully mockable — the entire 217-test suite runs with no
   disk I/O, no fixtures, and no temp directories.
 - Core carries **zero package references**, so the dependency-vulnerability gate
-  ([`../../.github/workflows/ci.yml`](../../.github/workflows/ci.yml) lines 40–48) has nothing to flag in the
+  ([`../../.github/workflows/ci.yml`](../../.github/workflows/ci.yml) lines 61–69) has nothing to flag in the
   layer that holds the domain model.
 - Infrastructure can be excluded from the coverage denominator without hiding business logic, which is what
   makes the 100% gate achievable ([ADR-004](ADR-004-ifilesystemservice-io-abstraction.md),
@@ -68,7 +68,7 @@ one place, and every test constructs the services with a `Mock<IFileSystemServic
 - **There is no composition root.** There is no DI container and no service locator; wiring is two static
   factory methods plus a `new FileSystemService()` in a parameterless constructor that XAML invokes. The
   layering is real; the container is not. Anyone looking for a composition root will not find one.
-  ([`../../CLAUDE.md`](../../CLAUDE.md) line 104 states the same: "there is **no DI container**".)
+  ([`../../CLAUDE.md`](../../CLAUDE.md) line 107 states the same: "there is **no DI container**".)
 - **`WindowsFileManager.Application.csproj:14` declares `InternalsVisibleTo("WindowsFileManager.Application.Tests")`
   — an assembly that does not exist.** The real test project is `WindowsFileManager.Tests`, so Application
   internals are *not* visible to the tests that cover it. The line is dead configuration that reads as if it

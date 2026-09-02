@@ -56,12 +56,12 @@ All five enable `<Nullable>enable</Nullable>` and `<ImplicitUsings>enable</Impli
 
 Measured 2026-08-30: **217 tests, 0 failed, 0 skipped; 100% line / 100% branch / 100% method** on Core, Application, and the UI's ViewModels + Helpers namespaces. Infrastructure is excluded.
 
-The boundary is defined by MSBuild properties in `tests/WindowsFileManager.Tests/WindowsFileManager.Tests.csproj`:
+The boundary is defined in `tests/WindowsFileManager.Tests/coverlet.runsettings`, the single source of coverage scope, read by the `XPlat Code Coverage` data collector:
 
 ```xml
 <Include>[WindowsFileManager.Core]*,[WindowsFileManager.Application]*,[WindowsFileManager]WindowsFileManager.Helpers*,[WindowsFileManager]WindowsFileManager.ViewModels*</Include>
-<Threshold>100</Threshold>
-<ThresholdType>line,branch,method</ThresholdType>
 ```
 
-`WindowsFileManager.Infrastructure` is absent from `Include`, so it contributes nothing to the percentage. Types marked `[ExcludeFromCodeCoverage]` are dropped via `ExcludeByAttribute`. Each module doc's `## Testing` section states exactly what is covered and what is not.
+The collector measures but cannot enforce, so the 100% line/branch/method threshold is applied afterwards by `scripts/Check-Coverage.ps1`. The full local gate is two commands — `dotnet test -c Release --collect:"XPlat Code Coverage" --settings tests/WindowsFileManager.Tests/coverlet.runsettings`, then `./scripts/Check-Coverage.ps1`; see [`../adr/ADR-011-coverage-via-collector-and-script.md`](../adr/ADR-011-coverage-via-collector-and-script.md).
+
+`WindowsFileManager.Infrastructure` is absent from `Include`, so it contributes nothing to the percentage. Types marked `[ExcludeFromCodeCoverage]` are dropped via the same file's `ExcludeByAttribute`. Each module doc's `## Testing` section states exactly what is covered and what is not.

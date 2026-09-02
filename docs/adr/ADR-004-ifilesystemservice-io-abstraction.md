@@ -36,12 +36,18 @@ directly. It sets `IgnoreInaccessible = true` and `AttributesToSkip = FileAttrib
 
 **Infrastructure is excluded from coverage by two independent mechanisms**, both present today:
 
-1. The coverage `Include` list in `tests/WindowsFileManager.Tests/WindowsFileManager.Tests.csproj:26` names
-   only `[WindowsFileManager.Core]*`, `[WindowsFileManager.Application]*`,
+1. The coverage `Include` list in
+   [`../../tests/WindowsFileManager.Tests/coverlet.runsettings`](../../tests/WindowsFileManager.Tests/coverlet.runsettings)
+   (line 20) names only `[WindowsFileManager.Core]*`, `[WindowsFileManager.Application]*`,
    `[WindowsFileManager]WindowsFileManager.Helpers*`, and `[WindowsFileManager]WindowsFileManager.ViewModels*`.
    `WindowsFileManager.Infrastructure` is simply not in scope.
 2. `FileSystemService` additionally carries `[ExcludeFromCodeCoverage]` (line 10), and
-   `ExcludeFromCodeCoverageAttribute` is listed in `ExcludeByAttribute` (csproj line 24).
+   `ExcludeFromCodeCoverageAttribute` is listed in `ExcludeByAttribute` (runsettings line 23).
+
+Both filters lived in the test `.csproj` until 2026-09-02, when
+[ADR-011](ADR-011-coverage-via-collector-and-script.md) replaced `coverlet.msbuild` with the
+`coverlet.collector` data collector and moved them — unchanged — into `coverlet.runsettings`, now the single
+source of coverage scope. The exclusion itself is unaffected.
 
 Consumers take the interface by constructor: `DuplicateScannerService(IFileSystemService, FileHashService)`,
 `FileHashService(IFileSystemService)`, `SettingsService(IFileSystemService, string settingsPath)`.

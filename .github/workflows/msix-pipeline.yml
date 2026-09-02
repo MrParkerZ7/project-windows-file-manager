@@ -70,13 +70,19 @@ jobs:
       - name: Build (Release)
         run: dotnet build -c Release --no-restore
 
-      # Do NOT add --no-build: coverlet.msbuild instruments during the build,
-      # so --no-build makes Core/Application report 0% and trips the 100%
-      # threshold even when every test passes. --collect:"XPlat Code Coverage"
-      # is omitted deliberately — that collector ships in coverlet.collector,
-      # which this project does not reference. Same fix as ci.yml (2026-08-30).
+      # Coverage is measured by the XPlat Code Coverage collector and enforced by
+      # scripts/Check-Coverage.ps1. coverlet.msbuild was removed on 2026-09-02: its
+      # build-time instrumentation raced and dropped modules to 0% in ~20-40% of runs.
+      # See docs/adr/ADR-011-coverage-via-collector-and-script.md.
       - name: Run tests
-        run: dotnet test -c Release --no-restore
+        run: >
+          dotnet test -c Release --no-build
+          --collect:"XPlat Code Coverage"
+          --settings tests/WindowsFileManager.Tests/coverlet.runsettings
+
+      - name: Coverage threshold
+        run: ./scripts/Check-Coverage.ps1
+        shell: pwsh
 
       - name: Publish self-contained
         run: >

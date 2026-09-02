@@ -57,9 +57,13 @@ file_scoped:warning`, `csharp_prefer_braces = true:warning`, and **14 explicit S
 with a rationale comment (lines 78–91): `SA1101`, `SA1309`, `SA1633`, `SA1200`, `SA1202`, `SA1600`, `SA1601`,
 `SA1602`, `SA1000`, `SA1204`, `SA0001`, `SA1118`, `SA1008`, `SA1009`.
 
-CI re-asserts the flag explicitly (`dotnet build -c Release --no-restore /p:TreatWarningsAsErrors=true`,
-[`../../.github/workflows/ci.yml`](../../.github/workflows/ci.yml) line 30) and adds a separate formatting
-gate (`dotnet format --verify-no-changes --no-restore`, lines 25–26).
+CI relies on `Directory.Build.props` rather than re-asserting the flag — its build step is plain
+`dotnet build -c Release --no-restore` ([`../../.github/workflows/ci.yml`](../../.github/workflows/ci.yml)
+line 35). It did once pass `/p:TreatWarningsAsErrors=true` explicitly, but as a *global* property that made
+the build step a different MSBuild build than the test step; it was removed as redundant on 2026-09-02 while
+ruling out causes of the coverage flake ([ADR-011](ADR-011-coverage-via-collector-and-script.md) § Context),
+and the workflow carries a comment saying the removal was a cleanup, not a fix. CI does add a separate
+formatting gate (`dotnet format --verify-no-changes --no-restore`, lines 25–26).
 
 ## Consequences
 
@@ -105,9 +109,11 @@ These are what the gate costs a contributor:
   style; each carries a rationale comment in `.editorconfig`.
 - Naming rules sit at `warning` (interfaces, types) and `suggestion` (private fields) — so the `_camelCase`
   field convention is advisory, not enforced, while the `I` prefix is enforced.
-- The MSIX pipeline's build step does **not** pass `/p:TreatWarningsAsErrors=true`
-  ([`../../.github/workflows/msix-pipeline.yml`](../../.github/workflows/msix-pipeline.yml) line 71) — but
-  `Directory.Build.props` supplies it anyway, so both workflows enforce the same policy by different routes.
+- **Neither** workflow's build step passes `/p:TreatWarningsAsErrors=true` — both are plain
+  `dotnet build -c Release --no-restore`
+  ([`../../.github/workflows/ci.yml`](../../.github/workflows/ci.yml) line 35 ·
+  [`../../.github/workflows/msix-pipeline.yml`](../../.github/workflows/msix-pipeline.yml) line 71).
+  `Directory.Build.props` supplies the flag to both, so the policy now holds by a single route rather than two.
 - `StyleCop.Analyzers` is `PrivateAssets=all`, so it does not flow to consumers of any produced package.
 
 ## Links

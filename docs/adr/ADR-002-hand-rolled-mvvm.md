@@ -46,7 +46,7 @@ are covered by `tests/WindowsFileManager.Tests/Helpers/RelayCommandTests.cs` and
 ### Positive
 
 - No third-party MVVM dependency to version-track, audit, or migrate. The CI dependency-vulnerability gate
-  ([`../../.github/workflows/ci.yml`](../../.github/workflows/ci.yml) lines 40–48) has nothing to report from
+  ([`../../.github/workflows/ci.yml`](../../.github/workflows/ci.yml) lines 61–69) has nothing to report from
   the UI project.
 - No source generator in the build, so `TreatWarningsAsErrors`
   ([ADR-009](ADR-009-treat-warnings-as-errors.md)) needed no generated-code carve-outs beyond the standard

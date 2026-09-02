@@ -21,7 +21,7 @@ WindowsFileManager.Infrastructure/
 
 **The module must stay thin.** Every member is a one-line forward to `System.IO`, with the single exception of the two enumeration methods, which construct an `EnumerationOptions` value. There is no caching, no retry, no logging, no path normalization, no business rule. Anything with a decision in it belongs in Application, where it can be tested.
 
-**It is excluded from coverage on purpose.** The class carries `[ExcludeFromCodeCoverage]`, the assembly is absent from the test project's coverlet `Include` list, and the test project does not even reference this project. Two independent mechanisms therefore keep it out of the 100% threshold. That is the trade recorded in ADR-004: pure delegation is verified by integration use, not by unit tests that would assert the framework's behavior.
+**It is excluded from coverage on purpose.** The class carries `[ExcludeFromCodeCoverage]`, the assembly is absent from the coverlet `Include` list in `tests/WindowsFileManager.Tests/coverlet.runsettings`, and the test project does not even reference this project. Two independent mechanisms therefore keep it out of the 100% threshold. That is the trade recorded in ADR-004: pure delegation is verified by integration use, not by unit tests that would assert the framework's behavior.
 
 ## Key types
 
@@ -86,8 +86,8 @@ The class has no declared constructor (the implicit parameterless one), no field
 **There are no unit tests for this module, and that is the intended design.**
 
 - The test project (`tests/WindowsFileManager.Tests/WindowsFileManager.Tests.csproj`) references Core, Application, and the UI project — **not Infrastructure**. It cannot see this class.
-- The coverlet `Include` list is `[WindowsFileManager.Core]*,[WindowsFileManager.Application]*,[WindowsFileManager]WindowsFileManager.Helpers*,[WindowsFileManager]WindowsFileManager.ViewModels*`. `WindowsFileManager.Infrastructure` is absent, so it contributes nothing to the 100% line/branch/method threshold.
-- `FileSystemService` also carries `[ExcludeFromCodeCoverage]`, which the test project's `ExcludeByAttribute` list would honor even if the assembly were included.
+- The coverlet `Include` list, in `tests/WindowsFileManager.Tests/coverlet.runsettings`, is `[WindowsFileManager.Core]*,[WindowsFileManager.Application]*,[WindowsFileManager]WindowsFileManager.Helpers*,[WindowsFileManager]WindowsFileManager.ViewModels*`. `WindowsFileManager.Infrastructure` is absent, so it contributes nothing to the 100% line/branch/method threshold that `scripts/Check-Coverage.ps1` enforces.
+- `FileSystemService` also carries `[ExcludeFromCodeCoverage]`, which the same file's `ExcludeByAttribute` list would honor even if the assembly were included.
 
 **Why:** every member is a one-line delegation to a framework API. A unit test would either mock `System.IO` (impossible without a further abstraction, which is what this class already is) or hit the real disk, making the suite slow, machine-dependent, and non-deterministic — the exact properties the `IFileSystemService` seam was introduced to avoid. Correctness of the delegation is established by running the application; correctness of everything built on top is established by the 50 tests that put a `Mock<IFileSystemService>` in this class’s place — all 50 of them in Application (`DuplicateScannerServiceTests` 27, `SettingsServiceTests` 20, `FileHashServiceTests` 3). The suite’s other 167 tests use no mock at all: 122 over Core’s models, and 45 over the UI assembly’s `Helpers`/`ViewModels`, not Core or Application.
 
@@ -98,7 +98,7 @@ The class has no declared constructor (the implicit parameterless one), no field
 ## Links
 
 - [`../../ARCHITECTURE.md`](../../ARCHITECTURE.md) — system map and layer boundaries
-- [`../adr/`](../adr/) — ADR-001 (four-module Clean Architecture), ADR-004 (all I/O behind `IFileSystemService`, with Infrastructure excluded from coverage), ADR-005 (100% coverage enforced by coverlet.msbuild)
+- [`../adr/`](../adr/) — ADR-001 (four-module Clean Architecture), ADR-004 (all I/O behind `IFileSystemService`, with Infrastructure excluded from coverage), ADR-011 (100% coverage measured by coverlet.collector and enforced by `scripts/Check-Coverage.ps1`; supersedes ADR-005)
 - [core.md](core.md#ifilesystemservice) — the `IFileSystemService` port this implements
 - [application.md](application.md) — the consumers that run against this in production and against a mock in tests
 - [ui.md](ui.md) — the composition root that instantiates it

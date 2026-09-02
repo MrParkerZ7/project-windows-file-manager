@@ -31,23 +31,31 @@ jobs:
         # passing it here as a global property was redundant — and being a global
         # property it made this step a different MSBuild build than the test step.
         # Removing it is a cleanup, NOT a fix for the intermittent coverage failure:
-        # that reproduces locally with or without this flag (see ADR-005).
+        # that reproduces locally with or without this flag (see ADR-011).
         run: dotnet build -c Release --no-restore
 
       # Gate 3: Test with coverage enforcement (100% line, branch, method)
       #
-      # Do NOT add --no-build here. Coverage is enforced by coverlet.msbuild
-      # (see docs/adr/ADR-005-coverage-enforcement-coverlet-msbuild.md), which
-      # instruments the referenced assemblies during the build. With --no-build
-      # those targets never run, so Core/Application report 0% and the 100%
-      # threshold fails even though all 217 tests pass.
+      # Measurement is the XPlat Code Coverage data collector (coverlet.collector),
+      # which instruments at RUNTIME. coverlet.msbuild instrumented at BUILD time and
+      # raced: whole modules intermittently reported 0% while all 217 tests passed,
+      # failing this gate in ~20-40% of runs. Measured across 6.0.2, 6.0.4 and 10.0.1
+      # (20+ local trials) — no version fixed it.
       #
-      # --collect:"XPlat Code Coverage" is also absent deliberately: that data
-      # collector ships in coverlet.collector, which this project does not
-      # reference (only coverlet.msbuild). Asking for it logged
-      # "Could not find data collector 'XPlat Code Coverage'" on every run.
+      # --no-build is safe again now: with no build-time instrumentation there is
+      # nothing for a rebuild to overwrite.
+      #
+      # The collector cannot enforce a threshold, so Gate 3b does it.
       - name: Test with coverage
-        run: dotnet test -c Release --no-restore
+        run: >
+          dotnet test -c Release --no-build
+          --collect:"XPlat Code Coverage"
+          --settings tests/WindowsFileManager.Tests/coverlet.runsettings
+
+      # Gate 3b: the threshold the collector cannot enforce itself
+      - name: Coverage threshold
+        run: ./scripts/Check-Coverage.ps1
+        shell: pwsh
 
       # Gate 4: Dependency vulnerability audit
       - name: Dependency audit
@@ -66,4 +74,4 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: coverage-report
-          path: tests/**/coverage/coverage.cobertura.xml
+          path: tests/**/TestResults/**/coverage.cobertura.xml

@@ -9,9 +9,11 @@
 ```
 BUILD:    dotnet build -c Release
 FORMAT:   dotnet format
-TEST:     dotnet test -p:CollectCoverage=false              (skip coverage threshold)
-TEST+COV: dotnet test                                       (with 100% coverage enforcement)
-COVERAGE: 100% line, branch, method (enforced by coverlet.msbuild in test .csproj)
+TEST:     dotnet test                                       (fast local loop — no coverage)
+TEST+COV: the full gate is TWO commands — measure, then enforce:
+            1. dotnet test -c Release --collect:"XPlat Code Coverage" --settings tests/WindowsFileManager.Tests/coverlet.runsettings
+            2. ./scripts/Check-Coverage.ps1                 (this is what fails below 100%)
+COVERAGE: 100% line, branch, method — measured by coverlet.collector, enforced by scripts/Check-Coverage.ps1
 MSIX:     two steps — publish, then pack (see below; there is no one-line MSIX publish here)
 ```
 
@@ -42,9 +44,10 @@ project-windows-file-manager/
 ├── README.md
 ├── docs/                          # See § Documentation Map below
 ├── scripts/
+│   ├── Check-Coverage.ps1         # Coverage gate — reads the Cobertura report, fails below 100% line/branch/method
 │   └── New-DevCertificate.ps1     # Self-signed dev cert for MSIX signing
 ├── .github/workflows/
-│   ├── ci.yml                     # "Quality Gate" — restore → format → build → test → dep-audit → coverage artifact
+│   ├── ci.yml                     # "Quality Gate" — restore → format → build → test+collect → coverage threshold → dep-audit → coverage artifact
 │   └── msix-pipeline.yml          # Semgrep SAST → publish+MakeAppx+sign → WACK
 ├── src/
 │   ├── WindowsFileManager.Core/           # Models + Interfaces (zero dependencies)
@@ -82,8 +85,8 @@ project-windows-file-manager/
 │           └── ShortcutHelper.cs         # .lnk folder shortcuts via WScript.Shell COM
 └── tests/
     └── WindowsFileManager.Tests/
-        ├── WindowsFileManager.Tests.csproj  # Coverage Include/Exclude + Threshold=100
-        ├── coverlet.runsettings             # XPlat Code Coverage settings (used by CI)
+        ├── WindowsFileManager.Tests.csproj  # coverlet.collector only — no coverage properties live here
+        ├── coverlet.runsettings             # Single source of coverage scope (Include/Exclude), read by the collector
         ├── GlobalUsings.cs · xunit.runner.json
         ├── Models/                # Core model tests
         ├── Services/              # Application service tests with Moq
@@ -111,7 +114,7 @@ project-windows-file-manager/
 - **Nullable**: Enabled project-wide (`<Nullable>enable</Nullable>`)
 - **File-scoped namespaces**: Required (`namespace Foo;`)
 - **Testing**: xUnit + Moq + FluentAssertions, AAA pattern
-- **Coverage exclusions**: Views, Infrastructure, generated code (via coverlet.msbuild Include/Exclude in test .csproj). The `<Include>` filter *does* name `WindowsFileManager.ViewModels*` and `WindowsFileManager.Helpers*`, but the WPF/COM-bound types inside them carry `[ExcludeFromCodeCoverage]` (`ExcludeByAttribute` honours it): `MainViewModel`, `ExtensionFilter`, `ToggleItem`, `FileTypeIconConverter`, `FormattedTextBehavior`, `MiniPreviewConverter`, `ShortcutHelper`, `TextBoxEnterKeyBehavior`. **The measured UI types are `ViewModelBase`, `RelayCommand`, and `Converters.cs` only** — which is why 100% is attainable with no `tests/.../ViewModels/` folder. Adding a testable type to ViewModels/ or Helpers/ without that attribute puts it under the 100% gate.
+- **Coverage exclusions**: Views, Infrastructure, generated code (via the `<Include>`/`<Exclude>` filters in [`tests/WindowsFileManager.Tests/coverlet.runsettings`](tests/WindowsFileManager.Tests/coverlet.runsettings) — the single source of coverage scope; the test `.csproj` carries none). The `<Include>` filter *does* name `WindowsFileManager.ViewModels*` and `WindowsFileManager.Helpers*`, but the WPF/COM-bound types inside them carry `[ExcludeFromCodeCoverage]` (`ExcludeByAttribute` honours it): `MainViewModel`, `ExtensionFilter`, `ToggleItem`, `FileTypeIconConverter`, `FormattedTextBehavior`, `MiniPreviewConverter`, `ShortcutHelper`, `TextBoxEnterKeyBehavior`. **The measured UI types are `ViewModelBase`, `RelayCommand`, and `Converters.cs` only** — which is why 100% is attainable with no `tests/.../ViewModels/` folder. Adding a testable type to ViewModels/ or Helpers/ without that attribute puts it under the 100% gate.
 - **Interface abstraction**: All I/O through `IFileSystemService` for mock-friendly testing
 - **ToggleItem pattern**: Target paths and exclude folders use `ToggleItem` wrapper (string + IsEnabled) for temporary enable/disable
 - **FilterRule INotifyPropertyChanged**: `FilterRule.IsEnabled` notifies UI for bulk enable/disable operations
@@ -197,16 +200,19 @@ project-windows-file-manager/
 | Gate | Tool | Command |
 |------|------|---------|
 | Format | dotnet format | `dotnet format --verify-no-changes` |
-| Build | dotnet build + TreatWarningsAsErrors | `dotnet build -c Release /p:TreatWarningsAsErrors=true` |
+| Build | dotnet build + TreatWarningsAsErrors | `dotnet build -c Release` (the flag is redundant — `Directory.Build.props` already sets it) |
 | Lint | StyleCop 1.1.118 + Roslyn analyzers | Runs during build |
-| Test | xUnit + Moq + FluentAssertions | `dotnet test` |
-| Coverage | Coverlet 100% line/branch/method | Enforced in test .csproj via `coverlet.msbuild` |
+| Test | xUnit + Moq + FluentAssertions | `dotnet test` (no coverage — see the Coverage row for the gate) |
+| Coverage | coverlet.collector 6.0.2 measures, `scripts/Check-Coverage.ps1` enforces 100% line/branch/method | `dotnet test -c Release --collect:"XPlat Code Coverage" --settings tests/WindowsFileManager.Tests/coverlet.runsettings` **then** `./scripts/Check-Coverage.ps1` |
 | Security | Semgrep SAST (MSIX pipeline, `semgrep/semgrep` container on ubuntu-latest) | `semgrep scan --config p/default --config p/csharp --error --sarif --output semgrep-results.sarif .` (SARIF uploaded to GitHub Security) |
 | Dependency | NuGet vulnerability audit (ci.yml gate 4) | `dotnet list package --vulnerable --include-transitive` |
 
 - **TreatWarningsAsErrors**: `true` in `Directory.Build.props` — all warnings are build errors
-- **Coverage threshold**: `Threshold=100` in test `.csproj` — fails build if below 100% line, branch, or method
-- **Skip coverage locally**: `dotnet test -p:CollectCoverage=false` to run tests without threshold enforcement
+- **Coverage threshold**: enforced by [`scripts/Check-Coverage.ps1`](scripts/Check-Coverage.ps1) — reads the Cobertura report, prints a per-module table, exits 1 below 100% line, branch or method (`-Threshold` and `-ReportPath` override the defaults). `dotnet test` on its own no longer fails on low coverage
+- **Coverage scope**: [`tests/WindowsFileManager.Tests/coverlet.runsettings`](tests/WindowsFileManager.Tests/coverlet.runsettings) — the single source of Include/Exclude; must be passed via `--settings`
+- **Report location**: `tests/**/TestResults/<guid>/coverage.cobertura.xml` (the collector's own path; the CI artifact glob follows it)
+- **Fast local loop**: plain `dotnet test` with no `--collect`. `-p:CollectCoverage=false` is now meaningless — that property belonged to `coverlet.msbuild`, which is gone
+- **CI**: both `ci.yml` and `msix-pipeline.yml` run the pair — a "Test with coverage" / "Run tests" step, then a "Coverage threshold" step running the script under `shell: pwsh`. `--no-build` is safe again now that nothing instruments at build time
 
 ---
 
@@ -244,6 +250,7 @@ Where each kind of knowledge lives. Read the one that matches the question — d
 
 ## Project Notes
 
+- **[2026-09-02]** Coverage **measurement** moved from `coverlet.msbuild` to the `coverlet.collector` data collector, and **enforcement** moved out of the build into [`scripts/Check-Coverage.ps1`](scripts/Check-Coverage.ps1) — see [ADR-011](docs/adr/ADR-011-coverage-via-collector-and-script.md), which supersedes [ADR-005](docs/adr/ADR-005-coverage-enforcement-coverlet-msbuild.md). **Why:** `coverlet.msbuild` instruments during the build and raced — whole modules intermittently came out uninstrumented and reported **0%** while all 217 tests passed, failing the gate in **~20% of runs from a clean tree** (~40% under load). Reproduced across 6.0.2, 6.0.4 and 10.0.1 — **no version fixed it**; the collector, which instruments at runtime, passed **20/20**. **Consequences for this file:** the enforcement statement in the 2026-08-30 note below is superseded (the mechanism changed, not the bar); the test `.csproj` no longer carries any coverage properties; `coverlet.runsettings` is now actually read and is the single source of scope (its `Include` gained `ViewModels`, matching what was really enforced); the Cobertura report moved to `tests/**/TestResults/<guid>/`; and the full local gate is now **two** commands — `dotnet test … --collect:"XPlat Code Coverage" --settings …` then `./scripts/Check-Coverage.ps1`. `-p:CollectCoverage=false` is meaningless from here on. **Unchanged:** the 100% bar, the `Include`/`Exclude` filters, `[ExcludeFromCodeCoverage]`, 217 tests, and 100% actual line/branch/method coverage.
 - **[2026-08-30]** Coverage is now **100% line / 100% branch / 100% method across Core, Application, and the UI assembly's ViewModels + Helpers** (217 tests, 0 failed, 0 skipped) — the `~44%` figure in the 2026-04-16 note below is superseded. Attainable because the WPF/COM-bound UI types carry `[ExcludeFromCodeCoverage]` (see § Key Conventions → Coverage exclusions); the threshold is enforced by `coverlet.msbuild` in the test `.csproj`.
 - **[2026-08-30]** Documentation restructured to the AI-native 3-layer standard: `ARCHITECTURE.md` at root plus `docs/{README,CONTEXT,SECURITY,DEV,GLOSSARY}.md`, `docs/adr/`, `docs/specs/`, `docs/modules/` — see § Documentation Map. The three `D:\Programing\claude-prompt-solution-architect\...` spec pointers were dead (that repo is a frozen legacy predecessor and is not on disk) and now point at in-repo specs.
 - **[2026-04-16]** Folder Control moved to first tab. Action section moved from inline to right sidebar panel (same position as Analytics). Tab switching saves/restores panel states.

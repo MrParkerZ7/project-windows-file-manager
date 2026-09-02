@@ -202,12 +202,12 @@ Three test classes under `tests/WindowsFileManager.Tests/Services/`, all built o
 
 **What is mocked:** `IFileSystemService`, always. **What is not mocked:** nothing else — the services have no other dependency, and `FileHashService` is passed to `DuplicateScannerService` as a real instance wrapping the same mock.
 
-**Coverage:** `[WindowsFileManager.Application]*` is in the test project's `Include` list, so the 100% line/branch/method threshold applies to every method here. No type in Application is marked `[ExcludeFromCodeCoverage]`. A new `if`, `??`, or `catch` needs its test in the same commit or `dotnet test` fails.
+**Coverage:** `[WindowsFileManager.Application]*` is in the `Include` list in `tests/WindowsFileManager.Tests/coverlet.runsettings`, so the 100% line/branch/method threshold applies to every method here. No type in Application is marked `[ExcludeFromCodeCoverage]`. A new `if`, `??`, or `catch` needs its test in the same commit or `./scripts/Check-Coverage.ps1` fails — `dotnet test` on its own no longer reports a coverage shortfall (see [ADR-011](../adr/ADR-011-coverage-via-collector-and-script.md)).
 
 ## Links
 
 - [`../../ARCHITECTURE.md`](../../ARCHITECTURE.md) — system map and layer boundaries
-- [`../adr/`](../adr/) — ADR-003 (three-stage duplicate detection: size grouping, then SHA256, then confirmation), ADR-004 (all I/O behind `IFileSystemService`), ADR-005 (100% coverage enforced by coverlet.msbuild), ADR-007 (System.Text.Json settings, enum-ordinal stability)
+- [`../adr/`](../adr/) — ADR-003 (three-stage duplicate detection: size grouping, then SHA256, then confirmation), ADR-004 (all I/O behind `IFileSystemService`), ADR-011 (100% coverage measured by coverlet.collector and enforced by `scripts/Check-Coverage.ps1`; supersedes ADR-005), ADR-007 (System.Text.Json settings, enum-ordinal stability)
 - [core.md](core.md) — the models these services consume and produce
 - [infrastructure.md](infrastructure.md) — the real `IFileSystemService` these services run against in production
 - [ui.md](ui.md) — the composition root and how `Scan` is called

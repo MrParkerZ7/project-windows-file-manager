@@ -1,15 +1,29 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!--
+  Coverage scope for the XPlat Code Coverage data collector (coverlet.collector).
+
+  This file is the SINGLE SOURCE of coverage scope. It previously described a
+  narrower scope than the csproj actually enforced (its Include omitted
+  ViewModels) while nothing read it at all. Both filters below are now identical
+  to the ones the csproj used to carry.
+
+  The collector does NOT enforce thresholds. Enforcement lives in
+  scripts/Check-Coverage.ps1, which both CI and a local run call. See
+  docs/adr/ADR-011-coverage-via-collector-and-script.md.
+-->
 <RunSettings>
   <DataCollectionRunSettings>
     <DataCollectors>
       <DataCollector friendlyName="XPlat Code Coverage">
         <Configuration>
           <Format>cobertura</Format>
-          <Include>[WindowsFileManager.Core]*,[WindowsFileManager.Application]*,[WindowsFileManager]WindowsFileManager.Helpers*</Include>
+          <Include>[WindowsFileManager.Core]*,[WindowsFileManager.Application]*,[WindowsFileManager]WindowsFileManager.Helpers*,[WindowsFileManager]WindowsFileManager.ViewModels*</Include>
+          <Exclude>[WindowsFileManager]*Views*,[WindowsFileManager]*Helpers.Win32Api*,[WindowsFileManager]XamlGeneratedNamespace*</Exclude>
           <ExcludeByFile>**/AssemblyInfo.cs,**/App.xaml.cs,**/*.g.cs,**/*.g.i.cs</ExcludeByFile>
           <ExcludeByAttribute>GeneratedCodeAttribute,CompilerGeneratedAttribute,ExcludeFromCodeCoverageAttribute</ExcludeByAttribute>
-          <ThresholdType>line</ThresholdType>
-          <ThresholdStat>total</ThresholdStat>
+          <SkipAutoProps>true</SkipAutoProps>
+          <UseSourceLink>true</UseSourceLink>
+          <IncludeTestAssembly>false</IncludeTestAssembly>
         </Configuration>
       </DataCollector>
     </DataCollectors>

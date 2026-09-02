@@ -46,7 +46,7 @@ UI -> Application -> Core <- Infrastructure
 
 Core sits at the centre and depends on nothing. Application and Infrastructure both point
 inward at Core. UI is the only project that references all three, because UI is also the
-composition root (see [§4](#4-request-flow-a-duplicate-scan-from-click-to-result)).
+composition root (see [§4](#4-request-flow--a-duplicate-scan-from-click-to-result)).
 
 ### 1.1 What each module is, and what it may depend on
 
@@ -100,7 +100,7 @@ concrete facts in the source tree:
 | The `ProjectReference` graph itself | Hard — a Core file that used an Application type fails to compile | the five `.csproj` files |
 | Core declares no runtime `PackageReference` of its own | Hard — Core cannot pick up a transitive framework dependency without an explicit, reviewable edit. Its one package is the build-time `StyleCop.Analyzers` analyzer that `Directory.Build.props` injects into every project | `src/WindowsFileManager.Core/WindowsFileManager.Core.csproj` (analyzer from `Directory.Build.props:10-13`) |
 | `TreatWarningsAsErrors` + `CodeAnalysisTreatWarningsAsErrors` + StyleCop, applied to every project | Hard for style/analyzer violations; says nothing about layering | `Directory.Build.props` |
-| Coverage `Include` list naming only Core, Application, and the UI's `Helpers`/`ViewModels` | Soft — pressures logic toward the covered modules, since anything landing there must be fully tested | `tests/WindowsFileManager.Tests/WindowsFileManager.Tests.csproj` |
+| Coverage `Include` list naming only Core, Application, and the UI's `Helpers`/`ViewModels` | Soft — pressures logic toward the covered modules, since anything landing there must be fully tested | `tests/WindowsFileManager.Tests/coverlet.runsettings` |
 
 **Honest gap:** there is no architecture-fitness test, no `NetArchTest`/`ArchUnitNET` suite, and no
 dependency-direction lint. Nothing would stop a contributor from adding
@@ -399,14 +399,15 @@ Index: [docs/adr/](docs/adr/).
 |---|---|---|
 | [ADR-001](docs/adr/ADR-001-clean-architecture-four-modules.md) | Clean Architecture with four modules (Core / Application / Infrastructure / UI) | The module split and the inward dependency rule of [§1](#1-module-map) |
 | [ADR-002](docs/adr/ADR-002-hand-rolled-mvvm.md) | Hand-rolled MVVM (`ViewModelBase` + `RelayCommand`) instead of an MVVM framework | Why there is no CommunityToolkit.Mvvm / Prism / Caliburn dependency |
-| [ADR-003](docs/adr/ADR-003-three-stage-duplicate-detection.md) | Three-stage duplicate detection (size grouping, then SHA256, then confirmation) | The scan algorithm in [§4](#4-request-flow-a-duplicate-scan-from-click-to-result) |
+| [ADR-003](docs/adr/ADR-003-three-stage-duplicate-detection.md) | Three-stage duplicate detection (size grouping, then SHA256, then confirmation) | The scan algorithm in [§4](#4-request-flow--a-duplicate-scan-from-click-to-result) |
 | [ADR-004](docs/adr/ADR-004-ifilesystemservice-io-abstraction.md) | All I/O behind `IFileSystemService`, with Infrastructure excluded from coverage | Why one port carries every disk call and why the adapter is untested |
-| [ADR-005](docs/adr/ADR-005-coverage-enforcement-coverlet-msbuild.md) | 100% coverage enforced by `coverlet.msbuild` in the test csproj (moved off `coverlet.runsettings`) | Where the threshold actually lives — see [§9](#9-known-deviations-and-doc-drift) |
+| [ADR-005](docs/adr/ADR-005-coverage-enforcement-coverlet-msbuild.md) | 100% coverage enforced by `coverlet.msbuild` in the test csproj (moved off `coverlet.runsettings`) | **Superseded by ADR-011** — kept for the history of how the 100% bar was established |
 | [ADR-006](docs/adr/ADR-006-persist-settings-on-every-mutation.md) | Persist settings on every mutation rather than on window close | The save cadence of [§7.4](#74-settings-persistence) |
 | [ADR-007](docs/adr/ADR-007-system-text-json-settings-compatibility.md) | `System.Text.Json` settings with enum-ordinal stability and `[JsonIgnore]` on computed properties | The back-compat contract for `settings.json` |
 | [ADR-008](docs/adr/ADR-008-msix-packaging-anycpu-store.md) | MSIX packaging on AnyCPU targeting the Microsoft Store | The packaging pipeline of [§6.2](#62-publish-and-msix) |
 | [ADR-009](docs/adr/ADR-009-treat-warnings-as-errors.md) | `TreatWarningsAsErrors` with StyleCop and .NET analyzers as build gates | Why a warning breaks the build — see `Directory.Build.props` |
 | [ADR-010](docs/adr/ADR-010-wpf-net8-desktop-shell.md) | WPF on .NET 8 for the desktop shell (and why `dotnet watch` is not usable) | The UI framework choice and its dev-loop consequence |
+| [ADR-011](docs/adr/ADR-011-coverage-via-collector-and-script.md) | Measure coverage with `coverlet.collector`, enforce the 100% threshold with `scripts/Check-Coverage.ps1` (supersedes ADR-005) | Where the threshold actually lives, and why `dotnet test` alone no longer enforces it |
 
 ---
 
@@ -416,9 +417,7 @@ Recorded so a future reader does not have to rediscover them.
 
 | Item | Reality |
 |---|---|
-| `tests/WindowsFileManager.Tests/coverlet.runsettings` | Declares `ThresholdType`/`ThresholdStat` but **no `Threshold` value**, and its `Include` omits `ViewModels`. It enforces nothing. The real gate is the MSBuild property block in `WindowsFileManager.Tests.csproj`. |
-| `coverlet.collector` | Both workflows pass `--collect:"XPlat Code Coverage" --settings …/coverlet.runsettings`, but the test project references **`coverlet.msbuild` only**. The artifact path depends on a collector that is not referenced; the enforcement comes from the csproj. |
-| Coverage `Exclude` entry `[WindowsFileManager]*Helpers.Win32Api*` | No `Win32Api` type exists in the tree. Dead exclusion. |
+| Coverage `Exclude` entry `[WindowsFileManager]*Helpers.Win32Api*` | No `Win32Api` type exists in the tree. Dead exclusion, in `tests/WindowsFileManager.Tests/coverlet.runsettings`. |
 | `ScanOptions.MinimumFileSize` and `ScanOptions.FileExtensions` | Fully implemented and fully tested in `DuplicateScannerService`, but `MainViewModel.ScanAsync` never sets either. `MinimumFileSize` is persisted per profile yet never fed into a scan; `FileExtensions` is never set from the UI at all. Both filters are unreachable from the running app. Post-scan filtering by size and extension does exist, in `MainViewModel.ApplyFilters`/`FilterDuplicateGroup` — a different mechanism. |
 | `BuildRegexKey` comment in `DuplicateScannerService` | The comment says capture groups are joined with SOH (0x01) so `("ab","c")` and `("a","bc")` stay distinct; the code is `string.Join("", parts)`, an empty separator, so those tuples collide. No test covers it. |
 | Delete help popup in `Views/MainWindow.xaml` | Says Delete is permanent with "No Recycle Bin — cannot be undone." The code recycles via `Microsoft.VisualBasic.FileIO.FileSystem.DeleteFile(..., SendToRecycleBin)` and pushes an undo entry. |
@@ -449,7 +448,8 @@ Recorded so a future reader does not have to rediscover them.
 | Add a new file-system operation | Add the member to `src/WindowsFileManager.Core/Services/IFileSystemService.cs`, implement it in `src/WindowsFileManager.Infrastructure/Services/FileSystemService.cs`, then mock it in the affected tests |
 | Add a value converter or attached behavior | `src/WindowsFileManager/Helpers/` — and remember `Helpers` is inside the coverage `Include` list, so it needs full test coverage |
 | Change build gates, analyzers, or style rules | `Directory.Build.props`, `.editorconfig`, `stylecop.json`; decision [ADR-009](docs/adr/ADR-009-treat-warnings-as-errors.md) |
-| Change the coverage threshold or its scope | `tests/WindowsFileManager.Tests/WindowsFileManager.Tests.csproj` — the MSBuild property block, **not** `coverlet.runsettings`; decision [ADR-005](docs/adr/ADR-005-coverage-enforcement-coverlet-msbuild.md) |
+| Change the coverage scope | `tests/WindowsFileManager.Tests/coverlet.runsettings` — the single source of `Include`/`Exclude`, read by the `XPlat Code Coverage` collector; decision [ADR-011](docs/adr/ADR-011-coverage-via-collector-and-script.md) |
+| Change the coverage threshold | `scripts/Check-Coverage.ps1` — it reads the Cobertura report and fails below 100% line/branch/method (`-Threshold` overrides, `-ReportPath` picks a specific report); decision [ADR-011](docs/adr/ADR-011-coverage-via-collector-and-script.md) |
 | Change CI or the MSIX pipeline | `.github/workflows/ci.yml`, `.github/workflows/msix-pipeline.yml`, `src/WindowsFileManager/Package.appxmanifest`, `scripts/New-DevCertificate.ps1`; decision [ADR-008](docs/adr/ADR-008-msix-packaging-anycpu-store.md); guardrails [docs/SECURITY.md](docs/SECURITY.md) |
 | Set up, build, or run locally | [docs/DEV.md](docs/DEV.md) — the SDK is .NET 8.0.422 at `D:\_env_storeage\dotnet` on this machine and is **not** on `PATH` |
 | Look up a term used above | [docs/GLOSSARY.md](docs/GLOSSARY.md) |

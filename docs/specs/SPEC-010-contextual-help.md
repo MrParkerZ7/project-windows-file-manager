@@ -91,7 +91,7 @@ Putting the explanation one click from the control keeps it where the question i
 - Every popup is independent — each `?` owns its own `Popup` instance through the template, and opening one does not close another; `StaysOpen = False` closes on an outside click.
 - Because `Popup.IsOpen` is bound to `IsChecked`, the button's visual state and the popup's visibility can never disagree.
 - The four styling colors are fixed in code (`#0D47A1` highlight, `#C62828` on `#FFEBEE` warning, `#1565C0` link) and are not themeable.
-- `FormattedTextBehavior` is `[ExcludeFromCodeCoverage]`, so none of the grammar is exercised by the 100 % coverage gate ([ADR-005](../adr/ADR-005-coverage-enforcement-coverlet-msbuild.md)).
+- `FormattedTextBehavior` is `[ExcludeFromCodeCoverage]`, so none of the grammar is exercised by the 100 % coverage gate ([ADR-011](../adr/ADR-011-coverage-via-collector-and-script.md)).
 
 **Edge cases**
 
@@ -121,7 +121,7 @@ Putting the explanation one click from the control keeps it where the question i
 
 ## Links
 
-- Decisions: [ADR-002 — Hand-rolled MVVM](../adr/ADR-002-hand-rolled-mvvm.md) · [ADR-010 — WPF on .NET 8 for the desktop shell](../adr/ADR-010-wpf-net8-desktop-shell.md) · [ADR-005 — 100 % coverage enforced by coverlet.msbuild](../adr/ADR-005-coverage-enforcement-coverlet-msbuild.md)
+- Decisions: [ADR-002 — Hand-rolled MVVM](../adr/ADR-002-hand-rolled-mvvm.md) · [ADR-010 — WPF on .NET 8 for the desktop shell](../adr/ADR-010-wpf-net8-desktop-shell.md) · [ADR-011 — coverage measured by coverlet.collector, enforced by script](../adr/ADR-011-coverage-via-collector-and-script.md)
 - Module docs: [WindowsFileManager (WPF UI)](../modules/ui.md)
 - Related specs: [SPEC-007 — Folder search](SPEC-007-folder-search.md) · [SPEC-008 — Clear subfolders](SPEC-008-clear-subfolders.md) · [SPEC-003 — Custom filter rules](SPEC-003-custom-filter-rules.md) · [SPEC-004 — Selection and file actions](SPEC-004-selection-and-file-actions.md)
 - Background: [`../CONTEXT.md`](../CONTEXT.md) · [`../SECURITY.md`](../SECURITY.md)

@@ -43,14 +43,31 @@ version has been tagged yet (`git tag` is empty and no GitHub release exists).
 - Renamed the duplicates tab to "Duplicates Control"
 - Moved "Include Subdirectories" into the header row; replaced `GroupBox` with `Border`
 - Profile switching no longer blocks the UI thread
+- **Running the tests locally is now two commands** if you want the coverage gate:
+  `dotnet test -c Release --collect:"XPlat Code Coverage" --settings tests/WindowsFileManager.Tests/coverlet.runsettings`
+  followed by `pwsh ./scripts/Check-Coverage.ps1`. A bare `dotnet test` still runs all
+  217 tests but no longer fails on low coverage, and `-p:CollectCoverage=false` — which
+  belonged to the removed package — now skips nothing.
 
 ### Fixed
 
 - Bulk-select lag when toggling many rows at once
-- **CI coverage gate** — `dotnet test --no-build` skipped coverlet.msbuild
-  instrumentation, so Core and Application reported 0% and the 100% threshold failed
-  even with every test passing. Both workflows also requested the
-  `XPlat Code Coverage` collector, which this project does not reference.
+- **CI coverage gate rebuilt.** The 100% line/branch/method bar is unchanged, but the
+  mechanism behind it is new. `coverlet.msbuild` instrumented assemblies during the
+  build and raced: whole modules intermittently reported 0% while all 217 tests passed,
+  failing the gate in roughly 1 run in 5. Reproduced across coverlet 6.0.2, 6.0.4 and
+  10.0.1 — no version fixed it. Coverage is now measured by the `coverlet.collector`
+  data collector, which instruments at runtime, and the threshold is enforced by
+  `scripts/Check-Coverage.ps1`. See ADR-011.
+- Removed a redundant `/p:TreatWarningsAsErrors=true` from the CI build step; the
+  property is already set in `Directory.Build.props`.
+
+### Security
+
+- **Every GitHub Action is pinned to a commit SHA** rather than a mutable major tag,
+  closing 10 blocking Semgrep `github-actions-mutable-action-tag` findings that had kept
+  the MSIX pipeline red. `.github/dependabot.yml` keeps the pins current with a weekly
+  grouped PR, a release cooldown, and major bumps ignored.
 
 ### Internal
 

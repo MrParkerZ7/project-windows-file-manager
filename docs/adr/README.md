@@ -49,12 +49,13 @@ line states it and cites the commit. Where it is not, the line reads `Accepted (
 | [ADR-002](ADR-002-hand-rolled-mvvm.md) | Hand-rolled MVVM (`ViewModelBase` + `RelayCommand`) instead of an MVVM framework | Accepted | 2026-04-04 | commit `57de160` |
 | [ADR-003](ADR-003-three-stage-duplicate-detection.md) | Three-stage duplicate detection — size grouping, then SHA-256, then hash-equality confirmation | Accepted | 2026-04-04 | commit `7b59636` |
 | [ADR-004](ADR-004-ifilesystemservice-io-abstraction.md) | All I/O behind `IFileSystemService`, with Infrastructure excluded from coverage | Accepted | 2026-04-04 | commit `7b59636` |
-| [ADR-005](ADR-005-coverage-enforcement-coverlet-msbuild.md) | 100% coverage enforced by `coverlet.msbuild` in the test csproj (moved off `coverlet.runsettings`) | Accepted | 2026-04-16 | commit `125a7b1`; CLAUDE.md `[2026-04-16]` |
+| [ADR-005](ADR-005-coverage-enforcement-coverlet-msbuild.md) | 100% coverage enforced by `coverlet.msbuild` in the test csproj (moved off `coverlet.runsettings`) | Superseded by [ADR-011](ADR-011-coverage-via-collector-and-script.md) | 2026-04-16 | commit `125a7b1`; CLAUDE.md `[2026-04-16]` |
 | [ADR-006](ADR-006-persist-settings-on-every-mutation.md) | Persist settings on every mutation rather than on window close | Accepted | 2026-04-15 | commit `fab9c91`; CLAUDE.md `[2026-04-15]` |
 | [ADR-007](ADR-007-system-text-json-settings-compatibility.md) | `System.Text.Json` settings with enum-ordinal stability and `[JsonIgnore]` on computed properties | Accepted | 2026-04-15 | commits `2a9177c` · `cc02c3b` · `fab9c91`; CLAUDE.md `[2026-04-15]` |
 | [ADR-008](ADR-008-msix-packaging-anycpu-store.md) | MSIX packaging on AnyCPU targeting the Microsoft Store | Accepted | 2026-04-04 | commit `9d82e5a` |
 | [ADR-009](ADR-009-treat-warnings-as-errors.md) | `TreatWarningsAsErrors` with StyleCop and .NET analyzers as build gates | Accepted | 2026-04-16 | commit `125a7b1`; CLAUDE.md `[2026-04-16]` |
 | [ADR-010](ADR-010-wpf-net8-desktop-shell.md) | WPF on .NET 8 for the desktop shell (and why `dotnet watch` is not usable) | Accepted | 2026-04-04 | commit `57de160`; CLAUDE.md `[2026-04-14]` |
+| [ADR-011](ADR-011-coverage-via-collector-and-script.md) | Measure coverage with `coverlet.collector`, enforce the threshold with a script | Accepted | 2026-09-02 | CLAUDE.md `[2026-09-02]`; [`../../scripts/Check-Coverage.ps1`](../../scripts/Check-Coverage.ps1) |
 
 ## Template
 

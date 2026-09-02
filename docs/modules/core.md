@@ -347,14 +347,14 @@ Ten test classes under `tests/WindowsFileManager.Tests/Models/` cover this modul
 | `SubfolderItemTests` | Filter/paging: filter resets the page, `TotalPages == 1` when empty, `PageStatus` singular/plural, `NextPage`/`PrevPage` bounds, the seven paging events |
 | `SubfolderLocationTests`, `AppSettingsTests`, `ProfileSettingsTests`, `ActionHistoryEntryTests` | Defaults, `ItemCount`'s switch (including that it ignores the non-matching collections), enum ordinals |
 
-**Coverage:** Core is fully inside the boundary — `[WindowsFileManager.Core]*` is in the test project's `Include` list and the 100% line/branch/method threshold applies to it. No type in Core is marked `[ExcludeFromCodeCoverage]`.
+**Coverage:** Core is fully inside the boundary — `[WindowsFileManager.Core]*` is in the `Include` list in `tests/WindowsFileManager.Tests/coverlet.runsettings` and the 100% line/branch/method threshold applies to it. No type in Core is marked `[ExcludeFromCodeCoverage]`.
 
-**Consequence for new code:** every branch you add here needs a test in the same change or `dotnet test` fails the build with a coverlet threshold error. That includes the `else` arm of a ternary and the fallback arm of a `switch` expression.
+**Consequence for new code:** every branch you add here needs a test in the same change or `./scripts/Check-Coverage.ps1` fails the gate with a threshold error. (`dotnet test` alone reports a green suite — the threshold is enforced by that script, run after the collector-based test command; see [ADR-011](../adr/ADR-011-coverage-via-collector-and-script.md).) That includes the `else` arm of a ternary and the fallback arm of a `switch` expression.
 
 ## Links
 
 - [`../../ARCHITECTURE.md`](../../ARCHITECTURE.md) — system map and layer boundaries
-- [`../adr/`](../adr/) — ADR-001 (four-module Clean Architecture), ADR-004 (all I/O behind `IFileSystemService`), ADR-005 (100% coverage enforced by coverlet.msbuild), ADR-007 (System.Text.Json settings, enum-ordinal stability, `[JsonIgnore]` on computed properties)
+- [`../adr/`](../adr/) — ADR-001 (four-module Clean Architecture), ADR-004 (all I/O behind `IFileSystemService`), ADR-011 (100% coverage measured by coverlet.collector and enforced by `scripts/Check-Coverage.ps1`; supersedes ADR-005), ADR-007 (System.Text.Json settings, enum-ordinal stability, `[JsonIgnore]` on computed properties)
 - [application.md](application.md) — the services that consume these models
 - [infrastructure.md](infrastructure.md) — the real `IFileSystemService` implementation
 - [ui.md](ui.md) — how the models are bound and mutated

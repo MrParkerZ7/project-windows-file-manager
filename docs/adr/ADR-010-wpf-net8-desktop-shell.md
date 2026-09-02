@@ -75,7 +75,7 @@ So there is **no file-watch or hot-reload dev mode for this project**. The inner
 edit → stop the app → `dotnet run --project src/WindowsFileManager` → wait for the build → re-navigate to the
 state under test (re-select folders, re-run a scan, re-open the preview). For a UI-heavy application whose
 interesting states require a completed scan, that is the dominant cost of iterating on the UI. The repository's
-documented workflow is `dotnet run` in both [`../../CLAUDE.md`](../../CLAUDE.md) (line 256) and
+documented workflow is `dotnet run` in both [`../../CLAUDE.md`](../../CLAUDE.md) (line 263) and
 [`../../README.md`](../../README.md) Quick Start; nothing in the repo provides a watch alternative. (Visual
 Studio's XAML Hot Reload exists under the debugger, but it is not part of this repo's `dotnet`-CLI workflow
 and is not documented anywhere in the tree.)

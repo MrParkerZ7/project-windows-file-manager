@@ -119,11 +119,11 @@ The inventory step exists so the user chooses from **what is actually there**, r
 - **Undo is best-effort and locale-fragile.** `RestoreFromRecycleBin` assumes Recycle-Bin detail column 1 is "Original Location", which is locale- and OS-dependent; when the assumption fails it silently restores nothing and reports every item as not found.
 - **`FolderSearchIncludeSubdirectories` is not persisted.** It resets to `true` on every launch, so a scan configuration is not fully reproducible from a saved profile ([SPEC-009](SPEC-009-settings-and-window-state-persistence.md)).
 - **Neither inventory is persisted.** `DiscoveredSubfolders` / `DiscoveredFileTypes` are rebuilt from scratch each time, and are cleared by `ClearFolderSearch` and by any profile switch.
-- **No unit tests cover the scan or the clear actions.** `MainViewModel` is `[ExcludeFromCodeCoverage]` ([ADR-005](../adr/ADR-005-coverage-enforcement-coverlet-msbuild.md)); only the `SubfolderItem` / `SubfolderLocation` models are tested.
+- **No unit tests cover the scan or the clear actions.** `MainViewModel` is `[ExcludeFromCodeCoverage]` ([ADR-011](../adr/ADR-011-coverage-via-collector-and-script.md)); only the `SubfolderItem` / `SubfolderLocation` models are tested.
 
 ## Links
 
-- Decisions: [ADR-002 — Hand-rolled MVVM](../adr/ADR-002-hand-rolled-mvvm.md) · [ADR-004 — All I/O behind `IFileSystemService`](../adr/ADR-004-ifilesystemservice-io-abstraction.md) · [ADR-005 — 100 % coverage enforced by coverlet.msbuild](../adr/ADR-005-coverage-enforcement-coverlet-msbuild.md) · [ADR-006 — Persist settings on every mutation](../adr/ADR-006-persist-settings-on-every-mutation.md)
+- Decisions: [ADR-002 — Hand-rolled MVVM](../adr/ADR-002-hand-rolled-mvvm.md) · [ADR-004 — All I/O behind `IFileSystemService`](../adr/ADR-004-ifilesystemservice-io-abstraction.md) · [ADR-011 — coverage measured by coverlet.collector, enforced by script](../adr/ADR-011-coverage-via-collector-and-script.md) · [ADR-006 — Persist settings on every mutation](../adr/ADR-006-persist-settings-on-every-mutation.md)
 - Module docs: [WindowsFileManager (WPF UI)](../modules/ui.md) · [WindowsFileManager.Core](../modules/core.md) · [WindowsFileManager.Infrastructure](../modules/infrastructure.md)
 - Related specs: [SPEC-007 — Folder search](SPEC-007-folder-search.md) · [SPEC-004 — Selection and file actions](SPEC-004-selection-and-file-actions.md) · [SPEC-009 — Settings and window-state persistence](SPEC-009-settings-and-window-state-persistence.md) · [SPEC-010 — Contextual help](SPEC-010-contextual-help.md)
 - Background: [`../CONTEXT.md`](../CONTEXT.md) · [`../SECURITY.md`](../SECURITY.md)

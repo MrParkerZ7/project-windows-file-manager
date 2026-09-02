@@ -324,8 +324,8 @@ Modal, `Owner` set by the caller, validates against `reservedNames` live, disabl
 
 **Coverage**
 
-4. **Anything you add to `Helpers/` or `ViewModels/` is inside the coverage boundary unless you mark it.** The coverlet `Include` list covers both namespaces. A new converter or VM primitive needs tests to reach 100% line/branch/method, or the build fails.
-5. **`[ExcludeFromCodeCoverage]` is a real escape hatch and must not be used to dodge the gate.** It is in the test project's `ExcludeByAttribute` list, so applying it to genuine logic would let untested code ship green. Reserve it for what it already marks: WPF-hosted types, COM/shell interop, and the `MainViewModel` god-object.
+4. **Anything you add to `Helpers/` or `ViewModels/` is inside the coverage boundary unless you mark it.** The coverlet `Include` list in `tests/WindowsFileManager.Tests/coverlet.runsettings` covers both namespaces. A new converter or VM primitive needs tests to reach 100% line/branch/method, or `./scripts/Check-Coverage.ps1` fails the gate — `dotnet test` on its own will not (see [ADR-011](../adr/ADR-011-coverage-via-collector-and-script.md)).
+5. **`[ExcludeFromCodeCoverage]` is a real escape hatch and must not be used to dodge the gate.** It is in that file's `ExcludeByAttribute` list, so applying it to genuine logic would let untested code ship green. Reserve it for what it already marks: WPF-hosted types, COM/shell interop, and the `MainViewModel` god-object.
 
 **Threading and dispatcher**
 
@@ -377,14 +377,14 @@ Four test classes under `tests/WindowsFileManager.Tests/Helpers/` cover this mod
 | `MainWindow`, `ProfileNameDialog` | `[ExcludeFromCodeCoverage]` **and** the `[WindowsFileManager]*Views*` pattern | Window code-behind |
 | `App.xaml.cs`, `AssemblyInfo.cs`, `*.g.cs`, `*.g.i.cs` | `ExcludeByFile` | Entry point and XAML-generated code |
 
-One stale entry: the exclude pattern `[WindowsFileManager]*Helpers.Win32Api*` refers to a type that does not exist anywhere in the tree.
+One stale entry: the exclude pattern `[WindowsFileManager]*Helpers.Win32Api*`, in `tests/WindowsFileManager.Tests/coverlet.runsettings`, refers to a type that does not exist anywhere in the tree.
 
 **Consequence:** the measured 100% for this module is 100% of `Converters.cs` + `RelayCommand` + `ViewModelBase`. Every feature behavior in `MainViewModel` is verified by running the application, not by the suite. Behavior changes there must be validated manually and reflected in the relevant spec in the same commit.
 
 ## Links
 
 - [`../../ARCHITECTURE.md`](../../ARCHITECTURE.md) — system map and layer boundaries
-- [`../adr/`](../adr/) — ADR-001 (four-module Clean Architecture), ADR-002 (hand-rolled MVVM instead of a framework), ADR-005 (100% coverage enforced by coverlet.msbuild), ADR-006 (persist settings on every mutation), ADR-008 (MSIX packaging on AnyCPU), ADR-009 (TreatWarningsAsErrors with StyleCop), ADR-010 (WPF on .NET 8, and why `dotnet watch` is unusable here)
+- [`../adr/`](../adr/) — ADR-001 (four-module Clean Architecture), ADR-002 (hand-rolled MVVM instead of a framework), ADR-011 (100% coverage measured by coverlet.collector and enforced by `scripts/Check-Coverage.ps1`; supersedes ADR-005), ADR-006 (persist settings on every mutation), ADR-008 (MSIX packaging on AnyCPU), ADR-009 (TreatWarningsAsErrors with StyleCop), ADR-010 (WPF on .NET 8, and why `dotnet watch` is unusable here)
 - [core.md](core.md) — the models bound to the views
 - [application.md](application.md) — the services this module composes and calls
 - [infrastructure.md](infrastructure.md) — the `IFileSystemService` implementation wired in here

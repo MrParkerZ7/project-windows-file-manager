@@ -24,8 +24,9 @@ next to it is stated. Treat "the code does not stop me" as *"I am the only thing
 Build/test/quality-gate commands: [`DEV.md`](DEV.md). Per-decision rationale: [`adr/README.md`](adr/README.md).
 Feature behavior contracts: [`specs/_index.md`](specs/_index.md). Agent build conventions: [`../CLAUDE.md`](../CLAUDE.md).
 There is **no `QUALITY.md`** in this repo; gate enforcement is documented in [`DEV.md`](DEV.md)
-and defined in `Directory.Build.props`, `tests/WindowsFileManager.Tests/WindowsFileManager.Tests.csproj`,
-and the two workflows under `.github/workflows/`.
+and defined in `Directory.Build.props`, `scripts/Check-Coverage.ps1` (with its scope in
+`tests/WindowsFileManager.Tests/coverlet.runsettings`), and the two workflows under
+`.github/workflows/`.
 
 ---
 
@@ -235,11 +236,11 @@ Exactly two, both GitHub Actions repository secrets, both used only by
 
 | Secret | Purpose | Consumed at |
 |---|---|---|
-| `CERTIFICATE_PFX` | Base64-encoded code-signing PFX | `msix-pipeline.yml:137-147` (availability check), `:148-153` (decode to `${{ runner.temp }}\certificate.pfx`) |
-| `CERTIFICATE_PASSWORD` | PFX password | `msix-pipeline.yml:170` (`signtool /p`) |
+| `CERTIFICATE_PFX` | Base64-encoded code-signing PFX | `msix-pipeline.yml:143-152` (availability check), `:154-159` (decode to `${{ runner.temp }}\certificate.pfx`) |
+| `CERTIFICATE_PASSWORD` | PFX password | `msix-pipeline.yml:178` (`signtool /p`) |
 
 **The branch guard is the important part.** Both the decode step and the sign step carry the
-identical condition (lines 147 and 154):
+identical condition (lines 155 and 162):
 
 ```yaml
 if: steps.check-cert.outputs.HAS_CERT == 'true' && github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -260,10 +261,10 @@ them knows the full list:
 
 | Weakness | Location | Nature |
 |---|---|---|
-| Base64 PFX interpolated into the **body** of a PowerShell script | `msix-pipeline.yml:141`, `:152` | The entire blob becomes part of the executed script text |
+| Base64 PFX interpolated into the **body** of a PowerShell script | `msix-pipeline.yml:147`, `:157` | The entire blob becomes part of the executed script text |
 | Password interpolated into a **command line** | `msix-pipeline.yml:170` | Visible in the runner's process command line for the duration of `signtool` |
 | PFX written to disk, cleaned best-effort | written `:151`, removed `:176` with `-ErrorAction SilentlyContinue` under `if: always()` | A failed cleanup is not an error |
-| Availability check runs on **every** event | `msix-pipeline.yml:137-147` — the `Check signing certificate availability` step has **no** `if:` condition | It interpolates the secret into a string comparison on PR runs too |
+| Availability check runs on **every** event | `msix-pipeline.yml:143-152` — the `Check signing certificate availability` step has **no** `if:` condition | It interpolates the secret into a string comparison on PR runs too |
 | `ci.yml` declares **no `permissions:` block** | `.github/workflows/ci.yml` | Inherits the repository default token scope. `msix-pipeline.yml` correctly declares `contents: read` + `security-events: write` |
 
 ### The dev certificate script
@@ -405,7 +406,7 @@ This is the strongest supply-chain property this repository has.
 |---|---|---|
 | Runtime (`src/`) | **none** | — |
 | Build-time analyzer (all projects, via `Directory.Build.props`) | `StyleCop.Analyzers` **1.1.118** (`PrivateAssets=all`) | Exact version |
-| Test-only (`tests/`, `IsPackable=false`) | `xunit` 2.8.1 · `xunit.runner.visualstudio` 2.8.1 · `Microsoft.NET.Test.Sdk` 17.10.0 · `Moq` 4.20.70 · `FluentAssertions` 6.12.0 · `coverlet.msbuild` 6.0.2 | Exact versions |
+| Test-only (`tests/`, `IsPackable=false`) | `xunit` 2.8.1 · `xunit.runner.visualstudio` 2.8.1 · `Microsoft.NET.Test.Sdk` 17.10.0 · `Moq` 4.20.70 · `FluentAssertions` 6.12.0 · `coverlet.collector` 6.0.2 | Exact versions |
 
 **No lockfile.** There is no `packages.lock.json` and `RestorePackagesWithLockFile` is not set,
 so the exact-version pins bind the *direct* set only; transitive versions are resolved at restore
@@ -420,10 +421,11 @@ direct-dependency-only.
 
 | Gate | Tool | Where | Failure behavior |
 |---|---|---|---|
-| Dependency vulnerabilities | `dotnet list package --vulnerable --include-transitive` | `.github/workflows/ci.yml:53-61` (pwsh; greps for `"has the following vulnerable packages"`) | `Write-Error` + `exit 1` — job fails |
+| Coverage threshold | `scripts/Check-Coverage.ps1` (100% line, branch, method) over the collector's Cobertura report | `.github/workflows/ci.yml:56-58` and `.github/workflows/msix-pipeline.yml:83-85`, each a `Coverage threshold` step under `shell: pwsh` | `exit 1` — job fails |
+| Dependency vulnerabilities | `dotnet list package --vulnerable --include-transitive` | `.github/workflows/ci.yml:61-69` (pwsh; greps for `"has the following vulnerable packages"`) | `Write-Error` + `exit 1` — job fails |
 | SAST | Semgrep, rulesets **`p/default`** + **`p/csharp`** | `.github/workflows/msix-pipeline.yml:34-42`, in the `semgrep/semgrep` container on `ubuntu-latest` | `--error` ⇒ any finding fails the job |
 | SAST reporting | SARIF upload | `msix-pipeline.yml:44-48` — `github/codeql-action/upload-sarif`, SHA-pinned, `if: always()`, `sarif_file: semgrep-results.sarif` | Results land in the GitHub Security tab (requires the `security-events: write` permission declared at `msix-pipeline.yml:16-18`) |
-| Store certification | WACK `appcert.exe` | `msix-pipeline.yml:211-216` (job `wack-validation`) | Non-zero exit fails the job |
+| Store certification | WACK `appcert.exe` | `msix-pipeline.yml:219-224` (job `wack-validation`) | Non-zero exit fails the job |
 
 **The `security-scan` job is a hard gate on packaging.** `build-and-package` declares
 `needs: security-scan`, and `wack-validation` declares `needs: build-and-package`. A Semgrep
@@ -552,14 +554,18 @@ change that must not merge.
     every URL is currently authored in this repository's own XAML.
 
 16. **Never add `[ExcludeFromCodeCoverage]` to real logic to get past the 100% coverage
-    threshold.** The attribute is in the `ExcludeByAttribute` list
-    (`WindowsFileManager.Tests.csproj:24`), so the gate would still pass — silently. That makes
-    the gate a lie.
+    threshold.** The attribute is in the `ExcludeByAttribute` list in
+    `tests/WindowsFileManager.Tests/coverlet.runsettings`, so the gate would still pass —
+    silently. That makes the gate a lie.
 
-17. **Never weaken the coverage threshold** in `tests/WindowsFileManager.Tests/WindowsFileManager.Tests.csproj:20-22`,
-    and never wire `-p:CollectCoverage=false` into a CI step. The sibling
-    `coverlet.runsettings` file declares `ThresholdType` but **no `Threshold` value** — it would
-    not compensate. The csproj MSBuild properties are the only real enforcement.
+17. **Never weaken the coverage threshold**, which since ADR-011 lives in
+    `scripts/Check-Coverage.ps1` — its `-Threshold` default of `100` and the line/branch/method
+    totals it checks — and **never remove the `Coverage threshold` step** that runs it in
+    `ci.yml` and `msix-pipeline.yml`. Measurement and enforcement are now separate: the
+    `XPlat Code Coverage` collector only produces the Cobertura report, so a `dotnet test` with
+    no following script run reports a green suite at any coverage level. Deleting the step
+    deletes the gate. (`-p:CollectCoverage=false` belonged to the removed `coverlet.msbuild`
+    package and is now inert — it skips nothing.)
 
 18. **Never suppress a `CA`-prefixed security analyzer in `.editorconfig`.** Fix it, or suppress
     it at the single call site with a written justification.

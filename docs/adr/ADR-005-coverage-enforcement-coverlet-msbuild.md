@@ -2,7 +2,14 @@
 
 ## Status
 
-Accepted — 2026-04-16 (commit `125a7b1` "feat: add quality gates, Exclude/Mismatch/Contains match types,
+**Superseded by [ADR-011](ADR-011-coverage-via-collector-and-script.md) — 2026-09-02.** The
+`coverlet.msbuild` instrumentation this ADR depended on ran *during the build* and raced — whole modules
+intermittently reported 0% while all 217 tests passed — so measurement moved to the `coverlet.collector`
+data collector and threshold enforcement moved to
+[`../../scripts/Check-Coverage.ps1`](../../scripts/Check-Coverage.ps1); the 100% line/branch/method bar
+this ADR established carried over unchanged.
+
+Originally accepted — 2026-04-16 (commit `125a7b1` "feat: add quality gates, Exclude/Mismatch/Contains match types,
 column sorting, and tab panel switching")
 
 ## Context
@@ -12,7 +19,7 @@ From the Clean Architecture restructure (`7b59636`, 2026-04-04) the test project
 `dotnet test --collect:"XPlat Code Coverage" --settings …`. That file declares `<ThresholdType>line</ThresholdType>`
 and `<ThresholdStat>total</ThresholdStat>` but **no `<Threshold>` value at all**
 ([`../../tests/WindowsFileManager.Tests/coverlet.runsettings`](../../tests/WindowsFileManager.Tests/coverlet.runsettings)
-lines 11–12). It therefore enforced nothing: coverage was collected and uploaded as an artifact, and a
+lines 11–12 **as of this decision**; the file was rewritten for the collector under ADR-011). It therefore enforced nothing: coverage was collected and uploaded as an artifact, and a
 regression could not fail the build.
 
 The dated Project Note records the decision and the starting point honestly
@@ -29,7 +36,7 @@ threshold enforcement."*
 
 Move enforcement into MSBuild properties on the test project itself, so **any** `dotnet test` enforces it
 without a flag ([`../../tests/WindowsFileManager.Tests/WindowsFileManager.Tests.csproj`](../../tests/WindowsFileManager.Tests/WindowsFileManager.Tests.csproj)
-lines 11–27):
+lines 11–27 **as of this decision** — the block was removed under ADR-011):
 
 ```xml
 <CollectCoverage>true</CollectCoverage>
@@ -58,6 +65,14 @@ Infrastructure is out of scope by design ([ADR-004](ADR-004-ifilesystemservice-i
 dated 2026-08-30 note recording it as superseded.
 
 ## Consequences
+
+> **Read the rest of this section as of 2026-09-02, before
+> [ADR-011](ADR-011-coverage-via-collector-and-script.md).** Where a bullet below is written in the present
+> tense it describes the `coverlet.msbuild` gate while it was live. That package, its
+> `CollectCoverage` / `Threshold` / `ThresholdType` property block, the `CoverletOutput` path, and the
+> `-p:CollectCoverage=false` opt-out are all gone from the test project; the Cobertura report now lands under
+> `tests/**/TestResults/`. What carried over unchanged: the 100% bar, the `Include` / `Exclude` filters, and
+> the `[ExcludeFromCodeCoverage]` escape hatch.
 
 ### Positive
 
@@ -88,12 +103,18 @@ These are what the gate costs a contributor:
   threshold and turning `main` red on a docs-only commit. Reproduced locally with the identical command.
   Fixed the same day by dropping `--no-build` from both workflows; the flag must not be reintroduced, and both
   files now carry a comment saying so.
+  **[ADR-011](ADR-011-coverage-via-collector-and-script.md) reversed this on 2026-09-02:** with the collector
+  instrumenting at runtime there is no build-time step left for a rebuild to overwrite, so `--no-build` is safe
+  again and both workflows pass it.
 - **A data collector was requested that this project does not ship.** Both workflows also passed
   `--collect:"XPlat Code Coverage" --settings tests/WindowsFileManager.Tests/coverlet.runsettings`, but
   `coverlet.collector` — the package that provides that collector and consumes runsettings — is not
   referenced, so every run logged *"Could not find data collector 'XPlat Code Coverage'"*. Removed 2026-08-30.
   The CI artifact path was `tests/**/TestResults/**/coverage.cobertura.xml`, the collector's output location;
-  it is now `tests/**/coverage/coverage.cobertura.xml`, where coverlet.msbuild actually writes.
+  it became `tests/**/coverage/coverage.cobertura.xml`, where coverlet.msbuild actually writes.
+  **[ADR-011](ADR-011-coverage-via-collector-and-script.md) reversed both on 2026-09-02:** `coverlet.collector`
+  is referenced again and both workflows pass `--collect` deliberately, so the artifact path returned to
+  `tests/**/TestResults/**/coverage.cobertura.xml`.
 - **The gate is non-deterministic, and the rate is high.** One or more modules intermittently report
   0% while all 217 tests pass, failing the 100% threshold. Characterised 2026-09-02:
   - **Reproducible locally**, roughly 4 failures in 10 clean-tree runs. Signatures seen: 55.72% total
@@ -114,9 +135,19 @@ These are what the gate costs a contributor:
     `branch-rate`. That is a deliberate design change, not a config tweak — it is the open decision
     this ADR now carries.
   - Until then a red run is **not** evidence of a coverage regression. Re-run before investigating.
+  - **Resolved by [ADR-011](ADR-011-coverage-via-collector-and-script.md), 2026-09-02.** The open decision
+    above was taken: `coverlet.msbuild` was removed, `coverlet.collector` became the measurement path, and
+    the 100% gate was re-implemented as
+    [`../../scripts/Check-Coverage.ps1`](../../scripts/Check-Coverage.ps1) — a separate step reading the
+    Cobertura report's `line-rate` / `branch-rate`, with a method rate derived from per-method line data.
+    Further trials pinned the clean-tree failure rate at ~20% (~40% under load) and reproduced the race on
+    6.0.4 and 10.0.1 too, so it is not specific to 6.0.2; the collector passed 20 consecutive runs. A red
+    coverage run means something again — the re-run-first advice above no longer applies.
 - **`coverlet.runsettings` remains on disk and is still inert.** Nothing consumes it, and its `Include` list
   omits `ViewModels`, so it describes a narrower scope than the one actually enforced. Anyone editing it to
   change the gate will change nothing. It is a deletion candidate, not a control surface.
+  **[ADR-011](ADR-011-coverage-via-collector-and-script.md) made it the control surface instead:** the
+  collector reads it, its `Include` gained `ViewModels`, and it is now the single source of coverage scope.
 - **Weakening the gate is a one-line csproj edit** — lowering `Threshold`, dropping `branch` from
   `ThresholdType`, or wiring `-p:CollectCoverage=false` into CI. Nothing structural raises an alarm; the
   runsettings file would silently *not* compensate.
@@ -128,7 +159,7 @@ These are what the gate costs a contributor:
 - `[WindowsFileManager]*Helpers.Win32Api*` in the `Exclude` list is **stale** — no `Win32Api` type exists in
   the tree. Harmless, but it misdescribes the exclusion set.
 - Coverage output is written to `./coverage/coverage.cobertura.xml` relative to the test project by
-  `CoverletOutput` (csproj line 14).
+  `CoverletOutput` (csproj line 14 **at the time**; removed under ADR-011).
 - The threshold statistic is `total`, not `minimum` — an individual file may sit below 100% only if another
   compensates, which at a 100% target is a distinction without a difference.
 - The [`../../CHANGELOG.md`](../../CHANGELOG.md) v1.0.0 entry claims "100% test coverage on Core and
@@ -136,6 +167,8 @@ These are what the gate costs a contributor:
 
 ## Links
 
+- **Superseded by [ADR-011](ADR-011-coverage-via-collector-and-script.md)** — the `coverlet.collector` +
+  [`../../scripts/Check-Coverage.ps1`](../../scripts/Check-Coverage.ps1) mechanism that replaced this gate
 - [ADR-004](ADR-004-ifilesystemservice-io-abstraction.md) — why Infrastructure is out of scope
 - [ADR-009](ADR-009-treat-warnings-as-errors.md) — the sibling build gate added in the same commit
 - [ADR-002](ADR-002-hand-rolled-mvvm.md) — why `MainViewModel` is large enough to be excluded

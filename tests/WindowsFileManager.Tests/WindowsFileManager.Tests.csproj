@@ -8,22 +8,12 @@
     <IsTestProject>true</IsTestProject>
     <UseWPF>true</UseWPF>
 
-    <!-- Coverage enforcement — 100% line, branch, method -->
-    <CollectCoverage>true</CollectCoverage>
-    <CoverletOutputFormat>cobertura</CoverletOutputFormat>
-    <CoverletOutput>./coverage/coverage.cobertura.xml</CoverletOutput>
-    <UseSourceLink>true</UseSourceLink>
-    <SingleHit>false</SingleHit>
-    <SkipAutoProps>true</SkipAutoProps>
-    <DeterministicReport>true</DeterministicReport>
-    <IncludeTestAssembly>false</IncludeTestAssembly>
-    <Threshold>100</Threshold>
-    <ThresholdType>line,branch,method</ThresholdType>
-    <ThresholdStat>total</ThresholdStat>
-    <ExcludeByFile>**/AssemblyInfo.cs,**/App.xaml.cs,**/*.g.cs,**/*.g.i.cs</ExcludeByFile>
-    <ExcludeByAttribute>GeneratedCodeAttribute,CompilerGeneratedAttribute,ExcludeFromCodeCoverageAttribute</ExcludeByAttribute>
-    <Exclude>[WindowsFileManager]*Views*,[WindowsFileManager]*Helpers.Win32Api*,[WindowsFileManager]XamlGeneratedNamespace*</Exclude>
-    <Include>[WindowsFileManager.Core]*,[WindowsFileManager.Application]*,[WindowsFileManager]WindowsFileManager.Helpers*,[WindowsFileManager]WindowsFileManager.ViewModels*</Include>
+    <!-- Coverage scope + enforcement do NOT live here.
+         Scope: coverlet.runsettings (read by the XPlat Code Coverage collector).
+         Enforcement: scripts/Check-Coverage.ps1 (100% line, branch, method).
+         coverlet.msbuild was removed on 2026-09-02 — its build-time instrumentation
+         raced and dropped whole modules to 0% in ~20-40% of runs across 6.0.2,
+         6.0.4 and 10.0.1. See docs/adr/ADR-011-coverage-via-collector-and-script.md. -->
   </PropertyGroup>
 
   <ItemGroup>
@@ -36,7 +26,7 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
     <PackageReference Include="Moq" Version="4.20.70" />
     <PackageReference Include="FluentAssertions" Version="6.12.0" />
-    <PackageReference Include="coverlet.msbuild" Version="6.0.2" />
+    <PackageReference Include="coverlet.collector" Version="6.0.2" />
   </ItemGroup>
 
   <ItemGroup>

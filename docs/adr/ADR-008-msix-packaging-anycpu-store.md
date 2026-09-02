@@ -39,15 +39,15 @@ appears in exactly three places, all at publish/packaging time:
 **The package is assembled by hand in the workflow, not by an MSBuild packaging project.**
 [`../../.github/workflows/msix-pipeline.yml`](../../.github/workflows/msix-pipeline.yml):
 
-1. `dotnet publish … -r win-x64 --self-contained true -o publish-output` (lines 79–85)
-2. "Prepare MSIX layout" (lines 87–105): copy `publish-output\*` into `msix-layout`, copy
+1. `dotnet publish … -r win-x64 --self-contained true -o publish-output` (lines 87–93)
+2. "Prepare MSIX layout" (lines 95–113): copy `publish-output\*` into `msix-layout`, copy
    `Package.appxmanifest` → `msix-layout\AppxManifest.xml`, copy `Assets\*.png`
-3. "Create MSIX with MakeAppx" (lines 107–133): locate the newest x64 `makeappx.exe` under
+3. "Create MSIX with MakeAppx" (lines 115–141): locate the newest x64 `makeappx.exe` under
    `C:\Program Files (x86)\Windows Kits\10\bin`, then `pack /d msix-layout /p output\WindowsFileManager.msix /o`
 4. Conditional `signtool` signing — only when `secrets.CERTIFICATE_PFX` is present **and** the event is a
-   push to `refs/heads/main` (identical `if:` on lines 147 and 154)
+   push to `refs/heads/main` (identical `if:` on lines 155 and 162)
 5. Upload artifact `msix-package`; job `wack-validation` then runs the Windows App Certification Kit
-   (`appcert.exe test -appxpackagepath …`, lines 211–216)
+   (`appcert.exe test -appxpackagepath …`, lines 219–224)
 
 **Signing subject must equal the manifest publisher.** `scripts/New-DevCertificate.ps1` lines 5–6 state the
 rule: *"The `-Subject` value MUST match the Publisher in `Package.appxmanifest`. Currently:
@@ -76,8 +76,8 @@ rule: *"The `-Subject` value MUST match the Publisher in `Package.appxmanifest`.
   of its "Next steps" — the only occurrence of that command in the tree — but **that is not the CI path**.
   There is no Windows Application Packaging project; the layout is hand-assembled in PowerShell. A
   contributor following that printed command is not reproducing what CI does.
-  [`../../CLAUDE.md`](../../CLAUDE.md) contradicts it in two places: line 15 ("MSIX: two steps — publish,
-  then pack … there is no one-line MSIX publish here") and line 21, which records that the project declares
+  [`../../CLAUDE.md`](../../CLAUDE.md) contradicts it in two places: line 17 ("MSIX: two steps — publish,
+  then pack … there is no one-line MSIX publish here") and line 23, which records that the project declares
   no `WindowsPackageType` property, no Windows App SDK reference, and no `.wapproj`, so the flag is **inert**
   here.
 - **The hand-assembled layout must be maintained by hand.** Any new content file that must ship in the package

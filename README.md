@@ -124,8 +124,13 @@ dotnet build
 # Run the application
 dotnet run --project src/WindowsFileManager
 
-# Run tests — coverage collection and the 100% threshold are always on
+# Run tests (fast loop — no coverage)
 dotnet test
+
+# The full gate: measure with the collector, then enforce 100%
+dotnet test -c Release --collect:"XPlat Code Coverage" \
+  --settings tests/WindowsFileManager.Tests/coverlet.runsettings
+pwsh ./scripts/Check-Coverage.ps1   # or: powershell -File scripts/Check-Coverage.ps1
 ```
 
 ## Project Structure
@@ -186,8 +191,8 @@ project-windows-file-manager/
 │
 ├── tests/
 │   └── WindowsFileManager.Tests/          # Unit tests (217 tests, 100% line/branch/method)
-│       ├── WindowsFileManager.Tests.csproj  # Coverage Include/Exclude + Threshold=100
-│       ├── coverlet.runsettings           # XPlat Code Coverage settings (used by CI)
+│       ├── WindowsFileManager.Tests.csproj  # Test packages (xUnit, Moq, coverlet.collector)
+│       ├── coverlet.runsettings           # Coverage scope — Include/Exclude, read every run
 │       ├── GlobalUsings.cs                # Shared usings (xUnit, FluentAssertions, Moq)
 │       ├── xunit.runner.json              # xUnit runner configuration
 │       ├── Models/                        # Core model tests (AppSettings, FilterRule, SubfolderItem, …)
@@ -196,9 +201,10 @@ project-windows-file-manager/
 │
 ├── docs/                                  # Project documentation — see the Documentation section above
 ├── scripts/
+│   ├── Check-Coverage.ps1                 # 100% line/branch/method gate over the Cobertura report
 │   └── New-DevCertificate.ps1             # Self-signed dev certificate for MSIX signing
 ├── .github/workflows/
-│   ├── ci.yml                             # Quality Gate pipeline (format → build → test → audit)
+│   ├── ci.yml                             # Quality Gate pipeline (format → build → test → coverage → audit)
 │   └── msix-pipeline.yml                  # MSIX Store pipeline (Semgrep → package/sign → WACK)
 ├── WindowsFileManager.sln                 # Solution — 5 projects in src/ + tests/ solution folders
 ├── Directory.Build.props                  # Shared analyzers (StyleCop, .NET Analyzers)
@@ -246,18 +252,19 @@ All file system operations go through `IFileSystemService`, allowing complete mo
 ## Testing
 
 ```bash
-# Run all 217 tests — coverage and the 100% threshold are enforced by the test .csproj
+# Fast local loop — all 217 tests, no coverage instrumentation
 dotnet test
 
-# Same run, plus the XPlat cobertura report CI uploads as an artifact
-dotnet test --collect:"XPlat Code Coverage" \
+# Full gate, step 1 of 2 — measure with the XPlat Code Coverage collector
+dotnet test -c Release --collect:"XPlat Code Coverage" \
   --settings tests/WindowsFileManager.Tests/coverlet.runsettings
 
-# Quick run without the coverage threshold (the only way to skip it)
-dotnet test -p:CollectCoverage=false
+# Full gate, step 2 of 2 — enforce 100% line/branch/method
+# (a PowerShell script: from Git Bash invoke it through pwsh, not directly)
+pwsh ./scripts/Check-Coverage.ps1
 ```
 
-`WindowsFileManager.Tests.csproj` sets `CollectCoverage=true`, `Threshold=100`, and `ThresholdType=line,branch,method`, so a bare `dotnet test` *does* collect coverage and *does* fail the build below 100%.
+**The gate is two commands.** A bare `dotnet test` no longer fails on low coverage: `coverlet.msbuild` and its `CollectCoverage` / `Threshold` / `ThresholdType` property block were removed on 2026-09-02 because build-time instrumentation raced — whole modules intermittently reported 0% while every test passed (see [ADR-011](docs/adr/ADR-011-coverage-via-collector-and-script.md)). Measurement now comes from the `coverlet.collector` data collector, which instruments at runtime; it cannot enforce a threshold, so `scripts/Check-Coverage.ps1` reads the report it writes to `tests/**/TestResults/<guid>/coverage.cobertura.xml`, prints a per-module table, and exits non-zero below 100%. `-p:CollectCoverage=false` belonged to the removed package and now skips nothing.
 
 **Coverage:** 100% line, 100% branch, 100% method — 217 tests, 0 failed, 0 skipped.
 
@@ -267,7 +274,7 @@ dotnet test -p:CollectCoverage=false
 | WindowsFileManager.Application | 100% | 100% | 100% |
 | WindowsFileManager (ViewModels + Helpers) | 100% | 100% | 100% |
 
-The coverage `Include` filter covers `WindowsFileManager.Core`, `WindowsFileManager.Application`, and the UI assembly's `Helpers` + `ViewModels` namespaces. Infrastructure is excluded, and the UI types that only touch WPF/COM surfaces (`MainViewModel`, `ExtensionFilter`, `ToggleItem`, `FileTypeIconConverter`, `FormattedTextBehavior`, `MiniPreviewConverter`, `ShortcutHelper`, `TextBoxEnterKeyBehavior`) carry `[ExcludeFromCodeCoverage]`.
+The coverage `Include` filter — declared in `tests/WindowsFileManager.Tests/coverlet.runsettings`, the single source of coverage scope — covers `WindowsFileManager.Core`, `WindowsFileManager.Application`, and the UI assembly's `Helpers` + `ViewModels` namespaces. Infrastructure is excluded, and the UI types that only touch WPF/COM surfaces (`MainViewModel`, `ExtensionFilter`, `ToggleItem`, `FileTypeIconConverter`, `FormattedTextBehavior`, `MiniPreviewConverter`, `ShortcutHelper`, `TextBoxEnterKeyBehavior`) carry `[ExcludeFromCodeCoverage]`.
 
 **Test stack:** xUnit + Moq + FluentAssertions
 
@@ -279,10 +286,11 @@ Runs on `windows-latest` for every push and PR to `main`, in this order:
 
 1. **Restore** — `dotnet restore`
 2. **Format check** — `dotnet format --verify-no-changes --no-restore`
-3. **Build** — `dotnet build -c Release --no-restore /p:TreatWarningsAsErrors=true`
+3. **Build** — `dotnet build -c Release --no-restore` (`TreatWarningsAsErrors` is already set in `Directory.Build.props`)
 4. **Test with coverage** — `dotnet test -c Release --no-build --collect:"XPlat Code Coverage" --settings tests/WindowsFileManager.Tests/coverlet.runsettings`
-5. **Dependency audit** — `dotnet list package --vulnerable --include-transitive`, failing the job when any vulnerable package is reported
-6. **Upload coverage** — `coverage.cobertura.xml` published as the `coverage-report` artifact (runs even on failure)
+5. **Coverage threshold** — `./scripts/Check-Coverage.ps1` under `shell: pwsh`, failing the job below 100% line/branch/method
+6. **Dependency audit** — `dotnet list package --vulnerable --include-transitive`, failing the job when any vulnerable package is reported
+7. **Upload coverage** — `tests/**/TestResults/**/coverage.cobertura.xml` published as the `coverage-report` artifact (runs even on failure)
 
 ### MSIX Store Pipeline (`.github/workflows/msix-pipeline.yml`)
 

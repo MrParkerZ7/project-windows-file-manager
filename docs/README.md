@@ -75,12 +75,13 @@ Frozen at acceptance. IDs are global, assigned in acceptance order, and **never 
 | [`adr/ADR-002-hand-rolled-mvvm.md`](adr/ADR-002-hand-rolled-mvvm.md) | Hand-rolled MVVM (`ViewModelBase` + `RelayCommand`) instead of an MVVM framework. | 2026-04-04 |
 | [`adr/ADR-003-three-stage-duplicate-detection.md`](adr/ADR-003-three-stage-duplicate-detection.md) | Three-stage duplicate detection — size grouping, then SHA-256, then hash-equality confirmation. | 2026-04-04 |
 | [`adr/ADR-004-ifilesystemservice-io-abstraction.md`](adr/ADR-004-ifilesystemservice-io-abstraction.md) | All I/O behind `IFileSystemService`, with Infrastructure excluded from coverage. | 2026-04-04 |
-| [`adr/ADR-005-coverage-enforcement-coverlet-msbuild.md`](adr/ADR-005-coverage-enforcement-coverlet-msbuild.md) | 100% coverage enforced by `coverlet.msbuild` in the test csproj (moved off `coverlet.runsettings`). | 2026-04-16 |
+| [`adr/ADR-005-coverage-enforcement-coverlet-msbuild.md`](adr/ADR-005-coverage-enforcement-coverlet-msbuild.md) | 100% coverage enforced by `coverlet.msbuild` in the test csproj (moved off `coverlet.runsettings`). **Superseded by ADR-011.** | 2026-04-16 |
 | [`adr/ADR-006-persist-settings-on-every-mutation.md`](adr/ADR-006-persist-settings-on-every-mutation.md) | Persist settings on every mutation rather than on window close. | 2026-04-15 |
 | [`adr/ADR-007-system-text-json-settings-compatibility.md`](adr/ADR-007-system-text-json-settings-compatibility.md) | `System.Text.Json` settings with enum-ordinal stability and `[JsonIgnore]` on computed properties. | 2026-04-15 |
 | [`adr/ADR-008-msix-packaging-anycpu-store.md`](adr/ADR-008-msix-packaging-anycpu-store.md) | MSIX packaging on AnyCPU targeting the Microsoft Store. | 2026-04-04 |
 | [`adr/ADR-009-treat-warnings-as-errors.md`](adr/ADR-009-treat-warnings-as-errors.md) | `TreatWarningsAsErrors` with StyleCop and .NET analyzers as build gates. | 2026-04-16 |
 | [`adr/ADR-010-wpf-net8-desktop-shell.md`](adr/ADR-010-wpf-net8-desktop-shell.md) | WPF on .NET 8 for the desktop shell (and why `dotnet watch` is not usable). | 2026-04-04 |
+| [`adr/ADR-011-coverage-via-collector-and-script.md`](adr/ADR-011-coverage-via-collector-and-script.md) | Measure coverage with `coverlet.collector`, enforce the 100% threshold with `scripts/Check-Coverage.ps1`. Supersedes ADR-005. | 2026-09-02 |
 
 ---
 

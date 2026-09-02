@@ -16,6 +16,7 @@ This guide covers only the build / test / release loop. It does not repeat the f
 | Windows | 10 or 11 | everything | WPF is Windows-only. All projects target `net8.0-windows*`; the UI, Application, and Tests projects target `net8.0-windows10.0.22621.0`. |
 | .NET SDK | 8.0 (verified **8.0.422** on the reference machine) | build, test, run, publish | `dotnet format` and `dotnet test` ship in-box with the SDK — nothing extra to install. |
 | Git | any recent | clone | — |
+| PowerShell | Windows PowerShell 5.1 (in-box) or PowerShell 7 (`pwsh`) | **the coverage gate** — `scripts/Check-Coverage.ps1` | Enforcement moved out of the build into a script on 2026-09-02 ([ADR-011](adr/ADR-011-coverage-via-collector-and-script.md)). Both workflows run it with `shell: pwsh`. See [Test loop](#test-loop). |
 | Windows 10 SDK | any version providing `makeappx.exe` + `signtool.exe` (x64) | **MSIX packaging only** | Not needed to build, test, or run the app. Not installed on the reference machine — see [Troubleshooting](#troubleshooting). |
 | Windows App Certification Kit | ships with the Windows SDK (`appcert.exe`) | **Store certification checks only** | CI runs this; local runs are optional. |
 | Elevated PowerShell | — | `scripts/New-DevCertificate.ps1` only | The script imports into `Cert:\LocalMachine\TrustedPeople`, which requires admin. |
@@ -104,16 +105,34 @@ fast) and using the app only to confirm the UI wiring.
 
 ## Test loop
 
-```bash
-# Full gate — runs the suite AND enforces 100% coverage. Fails the build below threshold.
+```powershell
+# Fast loop — runs the suite only. No coverage instrumentation, no threshold.
 dotnet test
 
-# Fast loop — runs the suite only, no coverage instrumentation, no threshold.
-dotnet test -p:CollectCoverage=false
-
 # One class / one test while iterating
-dotnet test -p:CollectCoverage=false --filter FullyQualifiedName~DuplicateScannerServiceTests
+dotnet test --filter FullyQualifiedName~DuplicateScannerServiceTests
+
+# Full gate — TWO commands. The first measures, the second enforces.
+dotnet test -c Release --collect:"XPlat Code Coverage" --settings tests/WindowsFileManager.Tests/coverlet.runsettings
+./scripts/Check-Coverage.ps1
 ```
+
+**`dotnet test` on its own no longer fails on low coverage.** Measurement and enforcement were
+split on 2026-09-02 ([ADR-011](adr/ADR-011-coverage-via-collector-and-script.md)): the `--collect`
+run writes a Cobertura report through the `coverlet.collector` data collector, and
+[`scripts/Check-Coverage.ps1`](../scripts/Check-Coverage.ps1) reads that report and exits non-zero
+below 100% line, branch, or method. **Run both** — running only the first is exactly what a green
+suite at 90% coverage looks like. It is the same pair CI runs (`ci.yml` → "Test with coverage",
+then "Coverage threshold").
+
+`-p:CollectCoverage=false` is **meaningless now.** It was a `coverlet.msbuild` property and that
+package is gone; the property is silently ignored. The fast loop is bare `dotnet test`.
+
+The report lands at `tests/WindowsFileManager.Tests/TestResults/<guid>/coverage.cobertura.xml` —
+a new guid folder per run, gitignored via the `*.cobertura.xml` rule. `Check-Coverage.ps1` uses the
+most recently written report under `tests/` by default; `-ReportPath <file>` pins a specific one and
+`-Threshold <n>` checks against a different bar (CI passes neither). From Git Bash, invoke it as
+`pwsh ./scripts/Check-Coverage.ps1`.
 
 Current state (measured 2026-08-30):
 
@@ -133,16 +152,17 @@ hide behind parallelism.
 
 ### Where the threshold is configured
 
-The **authoritative** coverage gate is an MSBuild property block in
-`tests/WindowsFileManager.Tests/WindowsFileManager.Tests.csproj`, applied by `coverlet.msbuild`
-6.0.2 on every `dotnet test`:
+Two files, one job each. The test `.csproj` configures **neither** — it carries a
+`coverlet.collector` package reference and a comment pointing here.
+
+| File | Owns |
+|---|---|
+| [`scripts/Check-Coverage.ps1`](../scripts/Check-Coverage.ps1) | **Enforcement.** Reads the Cobertura report, fails below **100% line, branch and method**, prints a per-module table. `-Threshold` overrides the bar (don't), `-ReportPath` picks a specific report. |
+| `tests/WindowsFileManager.Tests/coverlet.runsettings` | **Scope.** The `Include` / `Exclude` / `ExcludeByFile` / `ExcludeByAttribute` filters the collector applies, passed to `dotnet test` via `--settings`. |
+
+The scope filters, verbatim from the runsettings `<Configuration>`:
 
 ```xml
-<CollectCoverage>true</CollectCoverage>
-<CoverletOutput>./coverage/coverage.cobertura.xml</CoverletOutput>
-<Threshold>100</Threshold>
-<ThresholdType>line,branch,method</ThresholdType>
-<ThresholdStat>total</ThresholdStat>
 <Include>[WindowsFileManager.Core]*,[WindowsFileManager.Application]*,[WindowsFileManager]WindowsFileManager.Helpers*,[WindowsFileManager]WindowsFileManager.ViewModels*</Include>
 <Exclude>[WindowsFileManager]*Views*,[WindowsFileManager]*Helpers.Win32Api*,[WindowsFileManager]XamlGeneratedNamespace*</Exclude>
 <ExcludeByFile>**/AssemblyInfo.cs,**/App.xaml.cs,**/*.g.cs,**/*.g.i.cs</ExcludeByFile>
@@ -150,29 +170,29 @@ The **authoritative** coverage gate is an MSBuild property block in
 ```
 
 Because `Include` never names `WindowsFileManager.Infrastructure`, that module is excluded by
-omission. The report lands at `tests/WindowsFileManager.Tests/coverage/coverage.cobertura.xml`
-(gitignored via the `coverage/` rule).
+omission.
 
-Two things about coverage in this repo are easy to trip over:
+Three things about coverage in this repo are easy to trip over:
 
-- `tests/WindowsFileManager.Tests/coverlet.runsettings` **enforces nothing, and nothing reads
-  it.** It declares `ThresholdType` and `ThresholdStat` but no `Threshold` value, and its
-  `Include` omits `ViewModels`. Both workflows used to pass
-  `--collect:"XPlat Code Coverage" --settings …runsettings`; that was removed on 2026-08-30
-  because the collector it asks for is not referenced. The file is now a deletion candidate, not
-  a control surface — the gate that fails a build is the csproj block above.
-- The test project references **`coverlet.msbuild` only — `coverlet.collector` is not
-  referenced.** Do not "fix" a build by editing the runsettings file; edit the csproj.
-  Migrating to the collector is an open decision — see
-  [ADR-005](adr/ADR-005-coverage-enforcement-coverlet-msbuild.md), which records the
-  instrumentation race that makes it worth considering.
+- `coverlet.runsettings` is the **single source of coverage scope, and it is read** — both
+  workflows and the local full-gate command pass it with `--settings`. Until 2026-09-02 it was
+  inert *and* wrong (its `Include` omitted `ViewModels`, describing a narrower scope than the
+  csproj enforced); both were fixed together. **Change the scope here, not in the csproj.**
+- The test project references **`coverlet.collector` only — `coverlet.msbuild` is gone**, along
+  with the `<CollectCoverage>` / `<Threshold>` / `<ThresholdType>` block that used to enforce the
+  gate in-build. Editing the csproj no longer changes anything about coverage. Why it moved:
+  [ADR-011](adr/ADR-011-coverage-via-collector-and-script.md), which supersedes
+  [ADR-005](adr/ADR-005-coverage-enforcement-coverlet-msbuild.md). A stale branch may still carry
+  those properties; they are silently ignored now.
 - `[WindowsFileManager]*Helpers.Win32Api*` in `Exclude` is stale — no `Win32Api` type exists in
   the tree.
 
 ### When a new file drops coverage
 
-`dotnet test` fails with a coverlet threshold error naming the metric and the assembly. Pick one
-of these, in order of preference:
+The suite stays green — `./scripts/Check-Coverage.ps1` is what fails, with
+`FAIL: total <metric> coverage is N%, below the required 100%` above a per-module table showing
+which module dropped. (A module at exactly **0%** means instrumentation was lost, not that tests
+went missing — the script says so on failure.) Pick one of these, in order of preference:
 
 | Option | When it is right | How |
 |---|---|---|
@@ -181,8 +201,11 @@ of these, in order of preference:
 | Move it to Infrastructure | The type is a thin, untestable wrapper over `System.IO` / COM / P-Invoke with no logic. | `src/WindowsFileManager.Infrastructure/Services/` — outside `Include`, so not gated. Keep it genuinely thin; logic that moves here escapes all testing. |
 | `[ExcludeFromCodeCoverage]` | Last resort: WPF code-behind, interop shims, a class the runtime constructs (e.g. `MainViewModel`, which already carries the attribute). | Attribute the type. **This is a gate bypass** — it makes the build pass without adding a single test. Use it for plumbing, never for business logic; a reviewer should question every new one. |
 
-Do not lower `<Threshold>`, and do not weaken an existing test to make a change fit. The 100%
-bar is the project's contract — see [ADR-005 in the decision index](adr/README.md).
+Do not lower the bar — neither the script's `-Threshold` parameter nor its default — and do not
+weaken an existing test to make a change fit. The 100% bar is the project's contract, unchanged by
+the 2026-09-02 mechanism change; see
+[ADR-011](adr/ADR-011-coverage-via-collector-and-script.md) and the
+[decision index](adr/README.md).
 
 ---
 
@@ -259,7 +282,7 @@ up. Place new code accordingly:
 | A ViewModel | `src/WindowsFileManager/ViewModels/` | `WindowsFileManager.ViewModels` | expose it from `MainViewModel` or bind it in XAML | **Yes** — `Include` covers `WindowsFileManager.ViewModels*`. Note `MainViewModel` itself is `[ExcludeFromCodeCoverage]`; a new ViewModel without that attribute is fully gated. |
 | A converter / attached behavior / helper | `src/WindowsFileManager/Helpers/` | `WindowsFileManager.Helpers` | reference it from XAML | **Yes** — `Include` covers `WindowsFileManager.Helpers*`. Existing examples: `tests/.../Helpers/ConverterTests.cs`, `PercentToWidthConverterTests.cs`, `RelayCommandTests.cs`, `ViewModelBaseTests.cs`. |
 | A View / window / code-behind | `src/WindowsFileManager/Views/` | `WindowsFileManager.Views` | `App.xaml` `StartupUri` for a startup window; otherwise construct it from code-behind | **No** — excluded by `[WindowsFileManager]*Views*`. Keep code-behind to what bindings genuinely cannot do. |
-| A whole new project | `src/` or `tests/` | — | add it to `WindowsFileManager.sln`; it inherits `Directory.Build.props` automatically | Decide explicitly whether to add it to the coverage `Include` in the test csproj. |
+| A whole new project | `src/` or `tests/` | — | add it to `WindowsFileManager.sln`; it inherits `Directory.Build.props` automatically | Decide explicitly whether to add it to the coverage `Include` in `coverlet.runsettings`. |
 
 ### How wiring works (there is no DI container)
 
@@ -285,8 +308,8 @@ MVVM framework is used.
 - Mirror the source folder: `Models/` → `Models/`, `Services/` → `Services/`, `Helpers/` →
   `Helpers/`. One test class per production type, named `<Type>Tests`.
 - AAA (Arrange / Act / Assert), FluentAssertions for assertions, Moq for `IFileSystemService`.
-- Cover branches, not just lines. `ThresholdType` includes `branch`, so an unexercised `else`,
-  an unhit `catch`, or an untaken ternary arm fails the build.
+- Cover branches, not just lines. The gate is line **and** branch **and** method, so an
+  unexercised `else`, an unhit `catch`, or an untaken ternary arm fails `Check-Coverage.ps1`.
 - Behavior-pinning tests are load-bearing here — e.g. the enum-ordinal tests described in the
   next section. Do not delete or weaken one to make a change fit.
 
@@ -363,6 +386,7 @@ build-and-package (windows)
     dotnet restore
     dotnet build -c Release --no-restore
     dotnet test  -c Release --no-build --collect:"XPlat Code Coverage" --settings …/coverlet.runsettings
+    ./scripts/Check-Coverage.ps1                     ← the 100% gate (pwsh)
     dotnet publish src/WindowsFileManager -c Release -r win-x64 --self-contained true -o publish-output
     msix-layout\  ← publish-output\*  +  Package.appxmanifest → AppxManifest.xml  +  Assets\*.png
     makeappx.exe pack /d msix-layout /p output\WindowsFileManager.msix /o
@@ -493,7 +517,7 @@ Bump the manifest and the changelog together in the release commit.
 | Symptom | Cause | Fix |
 |---|---|---|
 | `No .NET SDKs were found` / `dotnet build` unrecognized | The `dotnet` on `PATH` is a runtime-only host. | Prepend `D:\_env_storeage\dotnet` to `PATH`, or call `D:\_env_storeage\dotnet\dotnet.exe` directly. See [Prerequisites](#the-sdk-is-not-on-path-on-this-machine). |
-| `dotnet test` fails with a coverlet threshold error | New or changed code is not fully covered — the gate is `line,branch,method` at 100%. | Add tests, or apply one of the options in [When a new file drops coverage](#when-a-new-file-drops-coverage). Never lower `<Threshold>`. |
+| `Check-Coverage.ps1` exits 1 with `FAIL: total <metric> coverage is N%, below the required 100%` | New or changed code is not fully covered — the gate is 100% line, **branch**, and method. Note `dotnet test` stays green here: since 2026-09-02 it does not enforce coverage at all, so only the second command catches this. | Add tests, or apply one of the options in [When a new file drops coverage](#when-a-new-file-drops-coverage). Never lower the script's `-Threshold`. |
 | Build fails on a warning such as `SA1503` | `TreatWarningsAsErrors=true` in `Directory.Build.props`. | Fix the code (add braces, rename, resolve nullability). Suppressions belong in `.editorconfig` only with a documented rationale. |
 | `dotnet format --verify-no-changes` fails in CI, passes locally | Line endings or an unformatted file. `.editorconfig` pins CRLF. | Run `dotnet format` locally and commit the diff. |
 | Editing code changes nothing in the running app | There is no hot reload; `dotnet watch` does not work for this WPF app. | Stop the app, `dotnet build`, `dotnet run --project src/WindowsFileManager`. |
@@ -502,9 +526,9 @@ Bump the manifest and the changelog together in the release commit.
 | CI is green but the MSIX is unsigned | `CERTIFICATE_PFX` is unset, or the run is not a push to `main` — the signing steps are conditioned on both. | Expected on PRs. Add the secret and push to `main` for a signed package. |
 | `msix-pipeline` fails before building | The `security-scan` job runs Semgrep with `--error`; every downstream job has `needs: security-scan`. | Read the SARIF in the Security tab, fix the finding. |
 | CI dependency-audit step fails | `dotnet list package --vulnerable --include-transitive` reported a vulnerable package. | Upgrade the offending package. Reproduce locally with the same command. |
-| The `coverage-report` CI artifact is empty | Fixed 2026-08-30. CI used to upload `tests/**/TestResults/**/coverage.cobertura.xml`, the path the **collector** writes, while the project references `coverlet.msbuild` only. | Nothing to do; the glob is now `tests/**/coverage/coverage.cobertura.xml`. Locally the report is at `tests/WindowsFileManager.Tests/coverage/coverage.cobertura.xml`. |
-| CI fails the coverage threshold but every test passes, and Core/Application show **0%** | `dotnet test` was invoked with `--no-build`. coverlet.msbuild instruments during the build, so `--no-build` skips instrumentation entirely and the modules report zero. This turned `main` red on 2026-08-30. | Never pass `--no-build` to `dotnet test` in this repo — both workflows carry a comment saying so. Run `dotnet test -c Release` and it reports 100%. |
-| CI coverage gate fails intermittently on an unchanged commit, one module at **0%** | Instrumentation race inside coverlet.msbuild 6.0.2. **Reproducible locally** — about 4 failures in 10 clean-tree runs. Ruled out: `--no-build`, the redundant global property, MSBuild parallelism, build sequencing, TFM mismatch (see ADR-005). | Re-run the job (`gh run rerun <id> --failed`). If it becomes frequent, move the gate to `coverlet.collector` + a `--collect` run, which does not depend on msbuild instrumentation ordering. Do not lower `<Threshold>`. |
+| The `coverage-report` CI artifact is empty | The upload glob and the path the report is actually written to have drifted apart. Both moved when the mechanism changed on 2026-09-02: `coverlet.msbuild` wrote under `tests/**/coverage/`, the collector writes under `tests/**/TestResults/<guid>/`. An empty artifact also results when the "Test with coverage" step produced no report at all. | `ci.yml` uploads `tests/**/TestResults/**/coverage.cobertura.xml` — the collector's location. Check the test step still passes **both** `--collect:"XPlat Code Coverage"` and `--settings tests/WindowsFileManager.Tests/coverlet.runsettings`; without both, nothing is written to upload. |
+| `Check-Coverage.ps1` reports a module at **0%**, or errors with `Report contains no packages` | That module was never instrumented. Usual causes: the run omitted `--collect:"XPlat Code Coverage"` or `--settings …/coverlet.runsettings` (a bare `dotnet test` writes no report, so the script silently grades a stale one from an earlier run), or the module is not matched by `Include` in `coverlet.runsettings`. | Re-run the full two-command gate from [Test loop](#test-loop). For a new module, add it to `Include`. `--no-build` is **not** a cause: it defeated the old build-time gate until 2026-09-02, but the collector instruments at runtime and both workflows now pass `--no-build` deliberately. |
+| CI coverage gate failed intermittently on an unchanged commit, one module at **0%** (before 2026-09-02) | The build-time instrumentation race in `coverlet.msbuild` — ~20% of runs from a clean tree, ~40% under load, reproduced across 6.0.2, 6.0.4 and 10.0.1 with the suite green every time. This flake is why the mechanism changed. | Fixed by [ADR-011](adr/ADR-011-coverage-via-collector-and-script.md): measurement moved to the runtime `coverlet.collector`, enforcement to `scripts/Check-Coverage.ps1`. Nothing to do on a current checkout — a 0% module now means the row above, not a race. |
 | An `internal` type in `WindowsFileManager.Application` is not visible from a test | The Application csproj declares `InternalsVisibleTo("WindowsFileManager.Application.Tests")` — an assembly that does not exist. The real test project is `WindowsFileManager.Tests`. | Make the type `public`, or add the correct `InternalsVisibleTo`. (Core already grants access to `WindowsFileManager.Tests`.) |
 | The app "forgets" settings after being killed | Settings are written on every mutation, so this should not happen — but a hard kill during a write can truncate `settings.json`. | Delete `%APPDATA%\WindowsFileManager\settings.json`; `Load()` falls back to defaults. |
 

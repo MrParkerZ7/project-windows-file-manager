@@ -309,6 +309,7 @@ in [../CLAUDE.md](../CLAUDE.md). Decision records are indexed in [adr/README.md]
 | 2026-04-28 | **Per-file size column, a per-file preview button, and mutually exclusive filter modes** — the base-filter toolbar and the regex-match toolbar became alternatives rather than co-existing controls. | — |
 | 2026-07-12 | **Application icon** added for taskbar, title bar, and the executable. | — |
 | 2026-08-30 | **Documentation set reverse-engineered from the code** (this file, ADRs, feature specs, module docs). Measured on the same day: 217 tests passing, 100% line/branch/method coverage on Core + Application + UI ViewModels/Helpers. Prior claims of "105 tests", "96% branch", and "~44% coverage" in `README.md` / `CLAUDE.md` were stale. | — |
+| 2026-09-02 | **Coverage measurement split from coverage enforcement** — `coverlet.msbuild` and its `CollectCoverage` / `Threshold` / `ThresholdType` block removed from the test project, replaced by the `coverlet.collector` data collector plus `scripts/Check-Coverage.ps1`. Build-time instrumentation raced: whole modules intermittently reported 0% while all 217 tests passed, failing the gate in ~20-40% of runs, reproduced across 6.0.2, 6.0.4 and 10.0.1. Runtime instrumentation has no build to race. `coverlet.runsettings` becomes the single source of coverage scope (and gains the `ViewModels` its `Include` had been missing); the 100% bar, the filters, and `[ExcludeFromCodeCoverage]` are unchanged. | ADR-011 |
 
 ---
 
@@ -345,10 +346,13 @@ in [../CLAUDE.md](../CLAUDE.md). Decision records are indexed in [adr/README.md]
   user, are persisted to `settings.json`, and are reloaded on the next launch. Both regex evaluation
   sites carry a 1-second match timeout; removing one reintroduces a ReDoS stall that survives
   restarts. See [SECURITY.md](SECURITY.md).
-- **Constraint: 100% line/branch/method coverage is a build gate**, enforced by `coverlet.msbuild`
-  in the test project on Core, Application, and the UI's ViewModels + Helpers. Infrastructure is
-  excluded because it *is* the real I/O. New logic without tests fails the build, not just the
-  review.
+- **Constraint: 100% line/branch/method coverage is a gate** on Core, Application, and the UI's
+  ViewModels + Helpers. Infrastructure is excluded because it *is* the real I/O. Since ADR-011
+  (2026-09-02) measurement and enforcement are separate steps: the `coverlet.collector` data
+  collector produces the report (`dotnet test --collect:"XPlat Code Coverage" --settings
+  tests/WindowsFileManager.Tests/coverlet.runsettings`) and `scripts/Check-Coverage.ps1` fails
+  below 100%. Both CI workflows run the pair, so new logic without tests still fails the pipeline
+  — but a bare local `dotnet test` no longer catches it, and never says so.
 
 ### Non-Goals
 
@@ -406,9 +410,9 @@ in [../CLAUDE.md](../CLAUDE.md). Decision records are indexed in [adr/README.md]
 
 | Dependency | Role here | Reference |
 |---|---|---|
-| **GitHub Actions** | Two workflows: `ci.yml` (format → build → test+coverage → dependency vulnerability audit) and `msix-pipeline.yml` (Semgrep → build/package → WACK). | <https://docs.github.com/actions> |
+| **GitHub Actions** | Two workflows: `ci.yml` (format → build → test+coverage → coverage threshold → dependency vulnerability audit) and `msix-pipeline.yml` (Semgrep → build/package → WACK). | <https://docs.github.com/actions> |
 | **StyleCop.Analyzers 1.1.118 + .NET analyzers** | Style and correctness rules, made fatal by `TreatWarningsAsErrors` in `Directory.Build.props`. Fourteen StyleCop rules are explicitly suppressed in `.editorconfig`, each with a rationale comment. | <https://github.com/DotNetAnalyzers/StyleCopAnalyzers> |
-| **coverlet.msbuild 6.0.2** | Enforces the 100% line/branch/method threshold during `dotnet test`. | <https://github.com/coverlet-coverage/coverlet> |
+| **coverlet.collector 6.0.2** | Measures coverage at runtime as the `XPlat Code Coverage` data collector, writing Cobertura to `tests/**/TestResults/<guid>/`. It cannot enforce a threshold — `scripts/Check-Coverage.ps1` does that, failing below 100% line/branch/method. Split apart in ADR-011; `coverlet.msbuild`'s build-time instrumentation raced. | <https://github.com/coverlet-coverage/coverlet> |
 | **xUnit + Moq + FluentAssertions** | The test stack: 217 tests, run fully serially (`xunit.runner.json` disables assembly and collection parallelism). | <https://xunit.net> |
 | **Semgrep (`p/default` + `p/csharp`)** | SAST in the MSIX pipeline; `--error` makes any finding block packaging. Results upload as **SARIF** to the GitHub Security tab. | <https://semgrep.dev> |
 
