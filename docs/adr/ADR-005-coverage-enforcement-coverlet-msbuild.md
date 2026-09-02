@@ -94,14 +94,26 @@ These are what the gate costs a contributor:
   referenced, so every run logged *"Could not find data collector 'XPlat Code Coverage'"*. Removed 2026-08-30.
   The CI artifact path was `tests/**/TestResults/**/coverage.cobertura.xml`, the collector's output location;
   it is now `tests/**/coverage/coverage.cobertura.xml`, where coverlet.msbuild actually writes.
-- **The gate is intermittently non-deterministic on CI.** Even with `--no-build` removed, one module
-  occasionally reports 0% on the runner while every test passes. Proven a flake on 2026-09-02: commit
-  `da50cf6` failed and then passed on a bare re-run with no changes (green ×2, red ×1 across three
-  docs-only commits). Not reproducible locally — a clean tree reports 100% every time, with or without
-  the redundant `/p:TreatWarningsAsErrors=true` the Build step passes. A blanket 100% threshold turns
-  any instrumentation hiccup into a red `main`, so the gate's own reliability is now part of its cost.
-  If it recurs, `coverlet.collector` is the escape: the collector path does not depend on msbuild
-  instrumentation ordering.
+- **The gate is non-deterministic, and the rate is high.** One or more modules intermittently report
+  0% while all 217 tests pass, failing the 100% threshold. Characterised 2026-09-02:
+  - **Reproducible locally**, roughly 4 failures in 10 clean-tree runs. Signatures seen: 55.72% total
+    (`Application` at 0%) and 9.5% total (`Application` **and** `Core` at 0%).
+  - **Proven a flake, not a commit defect** — commit `da50cf6` failed and then passed on a bare re-run
+    with zero changes.
+  - **Ruled out by experiment:** `--no-build` (fixed separately, and the flake outlives it); the
+    redundant `/p:TreatWarningsAsErrors=true` global property on the Build step (removed; flake
+    persists); MSBuild parallelism (`-m:1`; flake persists); build-then-test sequencing (`dotnet test`
+    alone with no prior build is flakier still); a TFM or double-build mismatch (all projects resolve
+    to a single output path, one `Application.dll` in the test output).
+  - **Conclusion: an instrumentation race inside `coverlet.msbuild` 6.0.2 itself**, not in how this
+    repo invokes it. Nothing in the workflow files can reliably fix it.
+  - **The escape is `coverlet.collector`** — the `--collect:"XPlat Code Coverage"` path instruments at
+    runtime through the data collector instead of rewriting assemblies at build time, so there is no
+    build race. The cost is that the collector does **not** enforce thresholds, so the 100% gate would
+    have to be re-implemented as a separate step reading `coverage.cobertura.xml`'s `line-rate` /
+    `branch-rate`. That is a deliberate design change, not a config tweak — it is the open decision
+    this ADR now carries.
+  - Until then a red run is **not** evidence of a coverage regression. Re-run before investigating.
 - **`coverlet.runsettings` remains on disk and is still inert.** Nothing consumes it, and its `Include` list
   omits `ViewModels`, so it describes a narrower scope than the one actually enforced. Anyone editing it to
   change the gate will change nothing. It is a deletion candidate, not a control surface.

@@ -11,5 +11,29 @@ updates:
     directory: /
     schedule:
       interval: weekly
+
+    # Do not adopt a release the moment it appears. A freshly published
+    # version is exactly the window a compromised release ships in, and
+    # pinning by SHA buys nothing if the bump is automatic and instant.
+    # Required by Semgrep's dependabot-missing-cooldown rule.
+    cooldown:
+      default-days: 7
+      semver-major-days: 30
+
+    # One PR for all actions, not one per action. Without this the first run
+    # opened five separate PRs.
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+
+    # Major bumps of these actions carry breaking changes (upload-artifact v4
+    # -> v7 changes artifact semantics) and must be adopted deliberately, with
+    # the workflow reviewed. Minor and patch bumps keep the pins fresh.
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - version-update:semver-major
+
     commit-message:
       prefix: "chore(actions)"

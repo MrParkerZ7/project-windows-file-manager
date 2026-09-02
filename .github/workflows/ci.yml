@@ -27,7 +27,12 @@ jobs:
 
       # Gate 2: Build with warnings as errors
       - name: Build
-        run: dotnet build -c Release --no-restore /p:TreatWarningsAsErrors=true
+        # TreatWarningsAsErrors is already true in Directory.Build.props:6, so
+        # passing it here as a global property was redundant — and being a global
+        # property it made this step a different MSBuild build than the test step.
+        # Removing it is a cleanup, NOT a fix for the intermittent coverage failure:
+        # that reproduces locally with or without this flag (see ADR-005).
+        run: dotnet build -c Release --no-restore
 
       # Gate 3: Test with coverage enforcement (100% line, branch, method)
       #
