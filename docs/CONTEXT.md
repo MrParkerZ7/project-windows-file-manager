@@ -1,4 +1,4 @@
-# Project Context — Windows File Manager ("Folder File Control")
+# Project Context — Folder File Control (code identity: `WindowsFileManager`)
 
 > Deep background for humans and AI agents. Read at session start when the task touches
 > domain or business logic. For *how it's built* see [../ARCHITECTURE.md](../ARCHITECTURE.md);

@@ -1,4 +1,4 @@
-# Glossary — Windows File Manager ("Folder File Control")
+# Glossary — Folder File Control (code identity: `WindowsFileManager`)
 
 > Domain terms, abbreviations, and coined names used across the codebase, kept alphabetical.
 > Terms marked **(coined)** are this product's own vocabulary and will not be found in external

@@ -1,4 +1,8 @@
-# Windows File Manager
+# Folder File Control
+
+> Ships as **Folder File Control** — the `Package.appxmanifest` `DisplayName` and the main
+> window title. The repository, solution, assemblies and namespaces remain
+> `WindowsFileManager`; that is the code identity, not the product name.
 
 A .NET 8 WPF desktop application for managing folders and files on Windows. It ships three tabs: **Folder** (search folders, clear repeated subfolders, flatten, link siblings), **Duplication** (find identical files by content hash and reclaim wasted disk space), and **History** (undo any destructive action it performed).
 
