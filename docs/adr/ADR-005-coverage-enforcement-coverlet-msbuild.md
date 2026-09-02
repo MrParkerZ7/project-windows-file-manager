@@ -94,6 +94,14 @@ These are what the gate costs a contributor:
   referenced, so every run logged *"Could not find data collector 'XPlat Code Coverage'"*. Removed 2026-08-30.
   The CI artifact path was `tests/**/TestResults/**/coverage.cobertura.xml`, the collector's output location;
   it is now `tests/**/coverage/coverage.cobertura.xml`, where coverlet.msbuild actually writes.
+- **The gate is intermittently non-deterministic on CI.** Even with `--no-build` removed, one module
+  occasionally reports 0% on the runner while every test passes. Proven a flake on 2026-09-02: commit
+  `da50cf6` failed and then passed on a bare re-run with no changes (green ×2, red ×1 across three
+  docs-only commits). Not reproducible locally — a clean tree reports 100% every time, with or without
+  the redundant `/p:TreatWarningsAsErrors=true` the Build step passes. A blanket 100% threshold turns
+  any instrumentation hiccup into a red `main`, so the gate's own reliability is now part of its cost.
+  If it recurs, `coverlet.collector` is the escape: the collector path does not depend on msbuild
+  instrumentation ordering.
 - **`coverlet.runsettings` remains on disk and is still inert.** Nothing consumes it, and its `Include` list
   omits `ViewModels`, so it describes a narrower scope than the one actually enforced. Anyone editing it to
   change the gate will change nothing. It is a deletion candidate, not a control surface.
