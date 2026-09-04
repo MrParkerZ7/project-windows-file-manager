@@ -36,3 +36,6 @@ AppPackages/
 Thumbs.db
 desktop.ini
 .DS_Store
+
+# Task board (generated view - regenerate on read, never committed)
+docs/todo/_board.md
