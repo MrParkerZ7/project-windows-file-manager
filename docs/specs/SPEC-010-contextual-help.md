@@ -83,6 +83,7 @@ Putting the explanation one click from the control keeps it where the question i
 
     The **History** tab has no popups. Every popup's text opens with an `<h>…</h>` title line by convention; the longest is `MATCH TYPES` at 903 characters.
 16. **Exactly one link exists.** The `REGEX (Regular Expression)` popup ends with `<link=https://regex101.com>regex101.com — test & learn regex interactively</link>`.
+17. **The tag set is closed, and nothing enforces it.** Only the four tags in rule 4 are legal. An unsupported tag is not an error — `FormattedTextBehavior`'s scan falls to `AddPlainText(text[tagStart..(tagEnd + 1)])`, so the raw tag characters are rendered to the user (the same degradation rule 4's `<i>text</i>` row describes). This was live: the `MATCH BY NAME REGEX` popup used `<code>` **8 times** and showed literal `<code>` / `</code>` in the UI until 2026-09-04, when they were replaced with `<b>` (`T-015`). All **21** help payloads were swept for unknown and unbalanced tags at that time and are clean. The sweep is a one-off check, **not a gate** — nothing prevents the next unsupported tag.
 
 **Invariants**
 
@@ -115,6 +116,7 @@ Putting the explanation one click from the control keeps it where the question i
   - `MATCH TYPES` documented five of the six — `NotContain` was implemented and selectable but undocumented. Now documents all six.
   - `CUSTOM FILTER RULES` used the retired `Contains`/`Ignore` vocabulary for what the code calls `FilterAction.Include`/`Exclude` (`FilterRule.cs:9,12`), named a button *"Apply Rules"* whose label is `▶ Apply` (`MainWindow.xaml:1242`), and asserted *"Ignore ALWAYS overrides Contains"* — a precedence model the code does not implement. `ApplyFilterRules` breaks on the first enabled matching rule in list order (`MainViewModel.cs:3018-3031`, `break; // highest priority match wins`), so precedence is positional, not action-based. Now states first-match-wins and that reordering changes precedence ([SPEC-003](SPEC-003-custom-filter-rules.md)).
 - **No tests.** The grammar's behavior — including the degradation rules above — is pinned by nothing.
+- **No tag-set validation.** Invariant 17's closed tag set is enforced by nobody: not the XAML parser (an unknown tag is well-formed text), not the build, not CI. The 2026-09-04 sweep found one violation across 21 payloads; a future one would ship silently and render as visible markup to the user.
 - **No nesting, and no way to escape a literal `<` inside help text at runtime.** A `<` that is not a recognized tag is emitted verbatim, which happens to work, but there is no escape syntax.
 - **No URL allow-list.** `AddHyperlink` shell-executes whatever string the `Tag` supplies; the parser does not require `http`/`https`. Only app-authored text reaches it today, but nothing enforces that — see [`../SECURITY.md`](../SECURITY.md).
 - **Not localizable.** Every string is hard-coded English inside a XAML attribute; there is no resource file and no `x:Uid` usage.
