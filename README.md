@@ -21,7 +21,7 @@ A .NET 8 WPF desktop application for managing folders and files on Windows. It s
 - **Sort Options** — Sort by size, file count, wasted space, type, or name (ascending/descending)
 
 ### Custom Rules
-- **Pattern-based rules** — Create rules with Contains (select) or Ignore (deselect) actions on filename or filepath
+- **Pattern-based rules** — Create rules with Include (select) or Exclude (deselect) actions on filename or filepath. Rules are tried top-down and the first enabled match decides the file
 - **Regex support** — Toggle regex mode per rule with `.*` indicator and contextual help link to regex101.com
 - **Case sensitivity** — Toggle ignore-case per rule with `Aa` indicator
 - **Enable/Disable toggle** — Checkbox on each rule for quick temporary on/off without deleting
