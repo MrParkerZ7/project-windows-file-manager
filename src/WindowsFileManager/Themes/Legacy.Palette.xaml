@@ -1,0 +1,277 @@
+<!--
+    Legacy palette - the application's CURRENT colours, lifted verbatim.
+
+    TRANSITIONAL, WITH A WRITTEN EXPIRY AND A NAMED OWNER FOR IT.
+    Keys are named for the role each colour OBSERVABLY plays today - read off the
+    attribute it appears in and the surfaces it is drawn on - never for the role it will
+    play in 3a. Naming these for their final 3a role and flipping only the values later
+    was considered and rejected: seven of these colours (the greens, the violet, the warm
+    orange, the History-tab gold trio) have NO Broadsheet counterpart, and collapsing them
+    now would change pixels. T-001's acceptance bar is pixel-equivalence.
+
+    The `broadsheet:` note on each entry is the map forward. T-003 through T-009 rebind
+    their surfaces to the Broadsheet key as they rebuild them; T-009 - the last task in
+    the epic to touch a rendered surface - DELETES this file and Legacy.Metrics.xaml.
+    (T-001's spec body says T-011; the coherence pass reassigned it to T-009 and that
+    amendment governs. See docs/todo/T-001.md "Coherence amendments".)
+
+    Every value here is the value that shipped. If one differs from git HEAD before
+    T-001, this file is wrong.
+-->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                    xmlns:po="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
+                    mc:Ignorable="po">
+
+    <!-- Accent -->
+    <!-- #7986CB - 3 uses - BorderBrush x1, Background x1, BorderBrush(setter) x1
+         broadsheet: Broadsheet.Brush.Accent500 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Accent.Mid" Color="#FF7986CB" po:Freeze="True" />
+    <!-- #1A237E - 2 uses - Foreground x2
+         broadsheet: Broadsheet.Brush.Accent900 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Accent.Deepest" Color="#FF1A237E" po:Freeze="True" />
+    <!-- #283593 - 1 use - Foreground x1
+         broadsheet: Broadsheet.Brush.Accent800 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Accent.Deep" Color="#FF283593" po:Freeze="True" />
+    <!-- #6A1B9A - 1 use - Foreground x1
+         broadsheet: Broadsheet.Brush.Accent800 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Accent.Violet" Color="#FF6A1B9A" po:Freeze="True" />
+
+    <!-- Action -->
+    <!-- #1565C0 - 46 uses - Foreground x31, Foreground(setter) x5, Background(setter) x3, Background x1
+         broadsheet: Broadsheet.Brush.Accent700 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Action.Primary" Color="#FF1565C0" po:Freeze="True" />
+    <!-- #0D47A1 - 6 uses - BorderBrush(setter) x2, BorderBrush x1
+         broadsheet: Broadsheet.Brush.Accent800 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Action.PrimaryDark" Color="#FF0D47A1" po:Freeze="True" />
+    <!-- #0277BD - 4 uses - Background(setter) x4
+         broadsheet: Broadsheet.Brush.Accent600 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Action.Info" Color="#FF0277BD" po:Freeze="True" />
+    <!-- #0288D1 - 4 uses - Background(setter) x4
+         broadsheet: Broadsheet.Brush.Accent500 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Action.InfoMid" Color="#FF0288D1" po:Freeze="True" />
+    <!-- #01579B - 4 uses - BorderBrush(setter) x4
+         broadsheet: Broadsheet.Brush.Accent800 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Action.InfoDark" Color="#FF01579B" po:Freeze="True" />
+    <!-- #42A5F5 - 3 uses - BorderBrush(setter) x2, BorderBrush x1
+         broadsheet: Broadsheet.Brush.Accent400 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Action.Focus" Color="#FF42A5F5" po:Freeze="True" />
+    <!-- #1976D2 - 2 uses - Background(setter) x2
+         broadsheet: Broadsheet.Brush.Accent600 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Action.PrimaryMid" Color="#FF1976D2" po:Freeze="True" />
+    <!-- #29B6F6 - 1 use - BorderBrush(setter) x1
+         broadsheet: Broadsheet.Brush.Accent400 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Action.InfoLight" Color="#FF29B6F6" po:Freeze="True" />
+    <!-- #90CAF9 - 1 use - BorderBrush x1
+         broadsheet: Broadsheet.Brush.Accent300 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Action.FocusLight" Color="#FF90CAF9" po:Freeze="True" />
+    <!-- #BBDEFB - 1 use - keyword/code-behind
+         broadsheet: Broadsheet.Brush.Accent200 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Action.HoverTint" Color="#FFBBDEFB" po:Freeze="True" />
+
+    <!-- Border -->
+    <!-- #E0E0E0 - 23 uses - BorderBrush x18, Background x5
+         broadsheet: Broadsheet.Brush.Divider -->
+    <SolidColorBrush x:Key="Legacy.Brush.Border.Default" Color="#FFE0E0E0" po:Freeze="True" />
+    <!-- #CCCCCC - 10 uses - BorderBrush(setter) x6, Foreground x4
+         broadsheet: Broadsheet.Brush.Neutral300 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Border.Light" Color="#FFCCCCCC" po:Freeze="True" />
+    <!-- #D0D0D0 - 8 uses - Background x4, BorderBrush(setter) x4
+         broadsheet: Broadsheet.Brush.Neutral300 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Border.Panel" Color="#FFD0D0D0" po:Freeze="True" />
+    <!-- #C5CAE9 - 8 uses - BorderBrush x4, Background x3, Background(setter) x1
+         broadsheet: Broadsheet.Brush.Accent200 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Border.Accent" Color="#FFC5CAE9" po:Freeze="True" />
+    <!-- #F0F0F0 - 5 uses - BorderBrush x3, Background(setter) x2
+         broadsheet: Broadsheet.Brush.Divider -->
+    <SolidColorBrush x:Key="Legacy.Brush.Border.Hairline" Color="#FFF0F0F0" po:Freeze="True" />
+    <!-- #CFD8DC - 4 uses - BorderBrush x3, Background x1
+         broadsheet: Broadsheet.Brush.Neutral300 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Border.Chrome" Color="#FFCFD8DC" po:Freeze="True" />
+    <!-- #C0C0C0 - 2 uses - BorderBrush x2
+         broadsheet: Broadsheet.Brush.Neutral400 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Border.Mid" Color="#FFC0C0C0" po:Freeze="True" />
+    <!-- #BDBDBD - 2 uses - Background(setter) x2
+         broadsheet: Broadsheet.Brush.Neutral400 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Border.MidAlt" Color="#FFBDBDBD" po:Freeze="True" />
+    <!-- #E8E8E8 - 2 uses - BorderBrush x2
+         broadsheet: Broadsheet.Brush.Divider -->
+    <SolidColorBrush x:Key="Legacy.Brush.Border.Faint" Color="#FFE8E8E8" po:Freeze="True" />
+    <!-- #B0BEC5 - 2 uses - BorderBrush x1
+         broadsheet: Broadsheet.Brush.Neutral400 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Border.Slate" Color="#FFB0BEC5" po:Freeze="True" />
+    <!-- #DDDDDD - 1 use - BorderBrush x1
+         broadsheet: Broadsheet.Brush.Neutral300 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Border.Subtle" Color="#FFDDDDDD" po:Freeze="True" />
+
+    <!-- Danger -->
+    <!-- #C62828 - 22 uses - Foreground x21
+         broadsheet: Broadsheet.Brush.Accent2700 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Danger.Fg" Color="#FFC62828" po:Freeze="True" />
+    <!-- #BF360C - 3 uses - BorderBrush(setter) x2, Foreground x1
+         broadsheet: Broadsheet.Brush.Accent2800 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Danger.Dark" Color="#FFBF360C" po:Freeze="True" />
+    <!-- #EF9A9A - 2 uses - Background x2
+         broadsheet: Broadsheet.Brush.Accent2300 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Danger.Tint" Color="#FFEF9A9A" po:Freeze="True" />
+    <!-- #F4511E - 2 uses - Background(setter) x2
+         broadsheet: Broadsheet.Brush.Accent2600 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Danger.Strong" Color="#FFF4511E" po:Freeze="True" />
+    <!-- #EF5350 - 1 use - keyword/code-behind
+         broadsheet: Broadsheet.Brush.Accent2500 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Danger.Mid" Color="#FFEF5350" po:Freeze="True" />
+    <!-- #CD5C5C - 1 use - keyword/code-behind
+         broadsheet: Broadsheet.Brush.Accent2600 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Danger.IndianRed" Color="#FFCD5C5C" po:Freeze="True" />
+
+    <!-- Fg -->
+    <!-- #888888 - 25 uses - Foreground x25
+         broadsheet: Broadsheet.Brush.Neutral700 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Fg.Muted" Color="#FF888888" po:Freeze="True" />
+    <!-- #666666 - 21 uses - Foreground x18, Foreground(setter) x3
+         broadsheet: Broadsheet.Brush.Neutral700 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Fg.Secondary" Color="#FF666666" po:Freeze="True" />
+    <!-- #333333 - 17 uses - Foreground x17
+         broadsheet: Broadsheet.Brush.Text -->
+    <SolidColorBrush x:Key="Legacy.Brush.Fg.Strong" Color="#FF333333" po:Freeze="True" />
+    <!-- #555555 - 15 uses - Foreground x9, Foreground(setter) x6
+         broadsheet: Broadsheet.Brush.Neutral800 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Fg.Body" Color="#FF555555" po:Freeze="True" />
+    <!-- #999999 - 14 uses - Foreground x10, Foreground(setter) x4
+         broadsheet: Broadsheet.Brush.Neutral700 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Fg.MutedLight" Color="#FF999999" po:Freeze="True" />
+    <!-- #AAAAAA - 7 uses - Foreground x6, BorderBrush(setter) x1
+         broadsheet: Broadsheet.Brush.Neutral500 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Fg.Disabled" Color="#FFAAAAAA" po:Freeze="True" />
+    <!-- #424242 - 2 uses - Background(setter) x2
+         broadsheet: Broadsheet.Brush.Neutral800 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Fg.StrongAlt" Color="#FF424242" po:Freeze="True" />
+    <!-- #808080 - 2 uses - keyword/code-behind
+         broadsheet: Broadsheet.Brush.Neutral600 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Fg.Gray" Color="#FF808080" po:Freeze="True" />
+    <!-- #757575 - 1 use - Foreground x1
+         broadsheet: Broadsheet.Brush.Neutral700 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Fg.SecondaryAlt" Color="#FF757575" po:Freeze="True" />
+    <!-- #37474F - 1 use - Foreground x1
+         broadsheet: Broadsheet.Brush.Neutral800 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Fg.Slate" Color="#FF37474F" po:Freeze="True" />
+    <!-- #455A64 - 1 use - Foreground x1
+         broadsheet: Broadsheet.Brush.Neutral700 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Fg.SlateMid" Color="#FF455A64" po:Freeze="True" />
+    <!-- #546E7A - 1 use - Foreground x1
+         broadsheet: Broadsheet.Brush.Neutral700 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Fg.SlateLight" Color="#FF546E7A" po:Freeze="True" />
+    <!-- #263238 - 1 use - Foreground x1
+         broadsheet: Broadsheet.Brush.Neutral900 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Fg.SlateDark" Color="#FF263238" po:Freeze="True" />
+    <!-- #90A4AE - 1 use - Background(setter) x1
+         broadsheet: Broadsheet.Brush.Neutral500 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Fg.SlateMuted" Color="#FF90A4AE" po:Freeze="True" />
+
+    <!-- Help -->
+    <!-- #E0D0A0 - 6 uses - Background x6
+         broadsheet: Broadsheet.Brush.Divider -->
+    <SolidColorBrush x:Key="Legacy.Brush.Help.Divider" Color="#FFE0D0A0" po:Freeze="True" />
+    <!-- #FFFDE7 - 1 use - Background x1
+         broadsheet: Broadsheet.Brush.Neutral100 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Help.Bg" Color="#FFFFFDE7" po:Freeze="True" />
+    <!-- #FFD54F - 1 use - BorderBrush x1
+         broadsheet: Broadsheet.Brush.ProcessYellow -->
+    <SolidColorBrush x:Key="Legacy.Brush.Help.Border" Color="#FFFFD54F" po:Freeze="True" />
+    <!-- #FFEBEE - 1 use - keyword/code-behind
+         broadsheet: Broadsheet.Brush.Accent2100 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Help.WarnBg" Color="#FFFFEBEE" po:Freeze="True" />
+    <!-- #FFFBF0 - 1 use - Background x1
+         broadsheet: Broadsheet.Brush.Neutral100 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Help.RuleBg" Color="#FFFFFBF0" po:Freeze="True" />
+    <!-- #FFE082 - 1 use - BorderBrush x1
+         broadsheet: Broadsheet.Brush.ProcessYellow -->
+    <SolidColorBrush x:Key="Legacy.Brush.Help.RuleBorder" Color="#FFFFE082" po:Freeze="True" />
+
+    <!-- History -->
+    <!-- #FFF8DC - 1 use - Background x1
+         broadsheet: Broadsheet.Brush.Neutral100 -->
+    <SolidColorBrush x:Key="Legacy.Brush.History.Bg" Color="#FFFFF8DC" po:Freeze="True" />
+    <!-- #DAA520 - 1 use - BorderBrush x1
+         broadsheet: Broadsheet.Brush.ProcessYellow -->
+    <SolidColorBrush x:Key="Legacy.Brush.History.Border" Color="#FFDAA520" po:Freeze="True" />
+    <!-- #B8860B - 1 use - Foreground x1
+         broadsheet: Broadsheet.Brush.Neutral700 -->
+    <SolidColorBrush x:Key="Legacy.Brush.History.Fg" Color="#FFB8860B" po:Freeze="True" />
+
+    <!-- Ink -->
+    <!-- #000000 - 1 use - Color x1
+         broadsheet: Broadsheet.Brush.Text -->
+    <SolidColorBrush x:Key="Legacy.Brush.Ink.Black" Color="#FF000000" po:Freeze="True" />
+
+    <!-- Success -->
+    <!-- #388E3C - 9 uses - Foreground x9
+         broadsheet: Broadsheet.Brush.Neutral700 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Success.Fg" Color="#FF388E3C" po:Freeze="True" />
+    <!-- #2E7D32 - 4 uses - Foreground x4
+         broadsheet: Broadsheet.Brush.Neutral800 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Success.FgDark" Color="#FF2E7D32" po:Freeze="True" />
+    <!-- #E8F5E9 - 2 uses - Background x2
+         broadsheet: Broadsheet.Brush.Neutral100 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Success.Tint" Color="#FFE8F5E9" po:Freeze="True" />
+    <!-- #66BB6A - 1 use - Foreground(setter) x1
+         broadsheet: Broadsheet.Brush.Neutral500 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Success.Light" Color="#FF66BB6A" po:Freeze="True" />
+    <!-- #558B2F - 1 use - Foreground x1
+         broadsheet: Broadsheet.Brush.Neutral700 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Success.Olive" Color="#FF558B2F" po:Freeze="True" />
+
+    <!-- Surface -->
+    <!-- #FFFFFF - 14 uses - keyword/code-behind
+         broadsheet: Broadsheet.Brush.Neutral100 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Surface.White" Color="#FFFFFFFF" po:Freeze="True" />
+    <!-- #F5F5F5 - 7 uses - Background(setter) x6, Background x1
+         broadsheet: Broadsheet.Brush.Neutral100 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Surface.Raised" Color="#FFF5F5F5" po:Freeze="True" />
+    <!-- #E1F5FE - 6 uses - Background(setter) x6
+         broadsheet: Broadsheet.Brush.Accent100 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Surface.InfoTintAlt" Color="#FFE1F5FE" po:Freeze="True" />
+    <!-- #E3F2FD - 5 uses - Background(setter) x3, Background x2
+         broadsheet: Broadsheet.Brush.Accent100 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Surface.InfoTint" Color="#FFE3F2FD" po:Freeze="True" />
+    <!-- #EEEEEE - 5 uses - Background(setter) x4, Background x1
+         broadsheet: Broadsheet.Brush.Neutral200 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Surface.Sunken" Color="#FFEEEEEE" po:Freeze="True" />
+    <!-- #FAFAFA - 4 uses - Background x4
+         broadsheet: Broadsheet.Brush.Neutral100 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Surface.Card" Color="#FFFAFAFA" po:Freeze="True" />
+    <!-- #E8EAF6 - 3 uses - Background x2, Background(setter) x1
+         broadsheet: Broadsheet.Brush.Accent100 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Surface.Accent" Color="#FFE8EAF6" po:Freeze="True" />
+    <!-- #F0F4FF - 2 uses - Background x2
+         broadsheet: Broadsheet.Brush.Accent100 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Surface.InfoWash" Color="#FFF0F4FF" po:Freeze="True" />
+    <!-- #ECEFF1 - 2 uses - Background x2
+         broadsheet: Broadsheet.Brush.Surface -->
+    <SolidColorBrush x:Key="Legacy.Brush.Surface.Chrome" Color="#FFECEFF1" po:Freeze="True" />
+    <!-- #F8F9FC - 1 use - Background x1
+         broadsheet: Broadsheet.Brush.Accent100 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Surface.InfoWashAlt" Color="#FFF8F9FC" po:Freeze="True" />
+    <!-- #F5F7FA - 1 use - Background x1
+         broadsheet: Broadsheet.Brush.Neutral100 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Surface.Cool" Color="#FFF5F7FA" po:Freeze="True" />
+
+    <!-- Warn -->
+    <!-- #E65100 - 16 uses - Foreground x14, Background(setter) x2
+         broadsheet: Broadsheet.Brush.ProcessYellow -->
+    <SolidColorBrush x:Key="Legacy.Brush.Warn.Fg" Color="#FFE65100" po:Freeze="True" />
+    <!-- #FFF3E0 - 4 uses - Background x2, Background(setter) x2
+         broadsheet: Broadsheet.Brush.Neutral100 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Warn.Tint" Color="#FFFFF3E0" po:Freeze="True" />
+    <!-- #FFB74D - 3 uses - BorderBrush x2, Background x1
+         broadsheet: Broadsheet.Brush.Neutral300 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Warn.Border" Color="#FFFFB74D" po:Freeze="True" />
+    <!-- #FFE0B2 - 1 use - Background(setter) x1
+         broadsheet: Broadsheet.Brush.Neutral200 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Warn.TintStrong" Color="#FFFFE0B2" po:Freeze="True" />
+    <!-- #FFF8E1 - 1 use - Background x1
+         broadsheet: Broadsheet.Brush.Neutral100 -->
+    <SolidColorBrush x:Key="Legacy.Brush.Warn.Wash" Color="#FFFFF8E1" po:Freeze="True" />
+
+</ResourceDictionary>

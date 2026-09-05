@@ -1,0 +1,31 @@
+<!--
+    Legacy metrics - the corner radii, hairline thicknesses and font families in use
+    today. Same contract as Legacy.Palette.xaml: verbatim current values, named for
+    observed role, deleted by T-009 once no surface binds them.
+
+    NOT SUBSTITUTED BY T-001: the ~231 FontSize literals and the several hundred Margin
+    and Padding literals. Unlike colour - one value, used one way, swappable in isolation
+    - per-control sizing and spacing are replaced wholesale by keyed Styles in T-003 and
+    by new layouts in T-004 through T-008. Tokenising them now is churn the next task
+    discards, on a file T-002 is about to decompose.
+-->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=System.Runtime">
+
+    <!-- Corner radii in use -->
+    <CornerRadius x:Key="Legacy.Radius.Sm">2</CornerRadius>
+    <CornerRadius x:Key="Legacy.Radius.Md">3</CornerRadius>
+    <CornerRadius x:Key="Legacy.Radius.Lg">4</CornerRadius>
+
+    <!-- Hairline / border thicknesses in use -->
+    <Thickness x:Key="Legacy.Thickness.Hairline">1</Thickness>
+    <Thickness x:Key="Legacy.Thickness.Border">1,1,1,1</Thickness>
+
+    <!-- Font families in use. The shell declares no FontFamily except these, so the
+         effective UI face is the WPF default (Segoe UI on Windows). Recorded so the
+         substitution has somewhere to point and so T-003 can see what it is replacing. -->
+    <FontFamily x:Key="Legacy.FontFamily.Ui">Segoe UI</FontFamily>
+    <FontFamily x:Key="Legacy.FontFamily.Mono">Consolas</FontFamily>
+
+</ResourceDictionary>

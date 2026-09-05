@@ -3,5 +3,35 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              StartupUri="Views/MainWindow.xaml">
     <Application.Resources>
+        <ResourceDictionary>
+            <!--
+                Anchored at Application scope, not Window scope, for three reasons verified
+                against this codebase:
+
+                1. HelpButtonStyle's ControlTemplate contains a <Popup>. A Popup hosts its
+                   child in a SEPARATE visual tree on its own HwndSource; DynamicResource
+                   lookup walks the LOGICAL tree and terminates at Application.Resources.
+                   Anchoring here makes all 21 help popups resolve unconditionally, with no
+                   reasoning about tree position.
+                2. ProfileNameDialog is a second Window with its own colour sites. Window-
+                   scoped resources would have to be duplicated into it.
+                3. FormattedTextBehavior resolves its brushes via TryFindResource on a
+                   TextBlock that lives inside that Popup - same argument as (1).
+
+                MERGE ORDER IS LOAD-BEARING. StaticResource resolves only BACKWARDS through
+                merged-dictionary parse order, so Broadsheet.Tokens must be merged before
+                anything that will forward-reference it. No such reference exists in T-001 -
+                the legacy layer is deliberately self-contained - but T-003 adds them.
+
+                Each task appends EXACTLY ONE entry here. Legacy.Palette and Legacy.Metrics
+                are transitional and are deleted by T-009, the last task in the epic to touch
+                a rendered surface.
+            -->
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Themes/Broadsheet.Tokens.xaml" />
+                <ResourceDictionary Source="Themes/Legacy.Palette.xaml" />
+                <ResourceDictionary Source="Themes/Legacy.Metrics.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>
