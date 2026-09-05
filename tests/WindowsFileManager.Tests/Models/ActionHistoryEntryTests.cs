@@ -133,4 +133,28 @@ public class ActionHistoryEntryTests
         entry.Summary.Should().Be("Recycled 1 file");
         entry.Timestamp.Should().Be(ts);
     }
+
+    /// <summary>serves-spec: SPEC-004 rule 25 (history pushed by SPEC-008 rule 11) — both recycle kinds fall through to RecycledPaths.Count, so RecycleDirectories ignores a populated Moves list.</summary>
+    [Fact]
+    public void ItemCount_RecycleDirectories_WithPopulatedMoves_StillReturnsRecycledPathsCount()
+    {
+        var entry = new ActionHistoryEntry
+        {
+            Kind = ActionHistoryKind.RecycleDirectories,
+            Moves = new List<ActionHistoryMove>
+            {
+                new() { Source = @"D:\Media\Raw\clip-01.mov", Destination = @"D:\Media\Archive\clip-01.mov" },
+                new() { Source = @"D:\Media\Raw\clip-02.mov", Destination = @"D:\Media\Archive\clip-02.mov" },
+            },
+            RecycledPaths = new List<string>
+            {
+                @"D:\Projects\web-shop\node_modules",
+                @"D:\Projects\web-shop\.next",
+                @"D:\Projects\api\bin",
+            },
+            Summary = "Recycled 3 folders",
+        };
+
+        entry.ItemCount.Should().Be(3);
+    }
 }

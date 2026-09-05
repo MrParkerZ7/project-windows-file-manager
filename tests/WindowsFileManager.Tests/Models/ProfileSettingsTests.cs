@@ -89,4 +89,29 @@ public class ProfileSettingsTests
         profile.DuplicateMatchByRegex.Should().BeTrue();
         profile.DuplicateMatchRegex.Should().Be("(?i)(abc).*?(\\d{8})");
     }
+
+    /// <summary>serves-spec: SPEC-002 invariant 5 — of the five post-scan display controls only the sort option is persisted; the min-size text, its unit, the min-duplicate count and the per-extension check states are session-only and have no ProfileSettings member.</summary>
+    [Fact]
+    public void SessionOnlyDisplayFilters_ShouldNotBeProfileProperties()
+    {
+        var type = typeof(ProfileSettings);
+
+        type.GetProperty("MinFileSizeText").Should().BeNull();
+        type.GetProperty("SelectedSizeUnit").Should().BeNull();
+        type.GetProperty("MinDuplicateCount").Should().BeNull();
+        type.GetProperty("ExtensionFilters").Should().BeNull();
+        type.GetProperty("DisabledExtensions").Should().BeNull();
+        type.GetProperty(nameof(ProfileSettings.SelectedSortOption)).Should().NotBeNull();
+    }
+
+    /// <summary>serves-spec: SPEC-006 rule 17 — IsAnalyticsVisible is deliberately not persisted: it is absent from ProfileSettings, unlike the preview flags that sit beside it in the UI.</summary>
+    [Fact]
+    public void IsAnalyticsVisible_ShouldNotBeAProfileProperty()
+    {
+        var type = typeof(ProfileSettings);
+
+        type.GetProperty("IsAnalyticsVisible").Should().BeNull();
+        type.GetProperty(nameof(ProfileSettings.IsMiniPreview)).Should().NotBeNull();
+        type.GetProperty(nameof(ProfileSettings.IsAutoPreview)).Should().NotBeNull();
+    }
 }

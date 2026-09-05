@@ -61,4 +61,21 @@ public class FileHashServiceTests
 
         hash.Should().NotBeEmpty();
     }
+
+    /// <summary>serves-spec: SPEC-001 invariant "the hash is SHA-256 over the entire stream, uppercase hex; never truncated, never sampled" — pinned against a literal digest.</summary>
+    [Fact]
+    public void ComputeHash_KnownContent_ReturnsUppercase64CharSha256Hex()
+    {
+        const string Content = "invoice,2026-01-14,4820.50,THB";
+        const string ExpectedSha256 = "B1951448CDC3ADA42400359D9EC2659CD887FC347EB3F4A429395BBCDC602DA7";
+
+        _mockFileSystem.Setup(fs => fs.OpenRead(@"D:\Finance\Invoices\acme-INV-2026-0042.csv"))
+            .Returns(new MemoryStream(Encoding.UTF8.GetBytes(Content)));
+
+        var hash = _service.ComputeHash(@"D:\Finance\Invoices\acme-INV-2026-0042.csv");
+
+        hash.Should().Be(ExpectedSha256);
+        hash.Should().HaveLength(64);
+        hash.Should().MatchRegex("^[0-9A-F]{64}$");
+    }
 }

@@ -252,6 +252,124 @@ public class SubfolderItemTests
         firstPage.Should().HaveCount(50);
     }
 
+    /// <summary>serves-spec: SPEC-008 rule 7 — the location filter compares OrdinalIgnoreCase, in both FilteredCount and the PagedLocations slice.</summary>
+    [Fact]
+    public void LocationFilter_IsOrdinalIgnoreCase()
+    {
+        var item = new SubfolderItem
+        {
+            Name = "bin",
+            Count = 2,
+            Locations = new List<SubfolderLocation>
+            {
+                new() { ParentPath = @"C:\Projects\ProjectA", FullPath = @"C:\Projects\ProjectA\bin" },
+                new() { ParentPath = @"C:\Projects\Ledger", FullPath = @"C:\Projects\Ledger\bin" },
+            },
+        };
+
+        item.LocationFilter = "projecta";
+
+        item.FilteredCount.Should().Be(1);
+        item.PagedLocations.Single().FullPath.Should().Be(@"C:\Projects\ProjectA\bin");
+    }
+
+    /// <summary>serves-spec: SPEC-008 rule 7 — a changed LocationFilter raises exactly the seven paging notifications, in the documented order.</summary>
+    [Fact]
+    public void LocationFilter_WhenChanged_RaisesTheSevenPagingNotifications()
+    {
+        var item = MakeItemWith(120);
+        var changes = new List<string>();
+        item.PropertyChanged += (_, e) => changes.Add(e.PropertyName!);
+
+        item.LocationFilter = "7";
+
+        changes.Should().Equal(new[]
+        {
+            nameof(SubfolderItem.CurrentPage),
+            nameof(SubfolderItem.TotalPages),
+            nameof(SubfolderItem.FilteredCount),
+            nameof(SubfolderItem.PagedLocations),
+            nameof(SubfolderItem.PageStatus),
+            nameof(SubfolderItem.CanGoNextPage),
+            nameof(SubfolderItem.CanGoPrevPage),
+        });
+    }
+
+    /// <summary>serves-spec: SPEC-008 invariant 11 — assigning the same LocationFilter value does nothing, which includes raising no PropertyChanged traffic at all.</summary>
+    [Fact]
+    public void LocationFilter_SameValue_RaisesNoNotifications()
+    {
+        var item = MakeItemWith(120);
+        item.LocationFilter = "7";
+        var changes = new List<string>();
+        item.PropertyChanged += (_, e) => changes.Add(e.PropertyName!);
+
+        item.LocationFilter = "7";
+
+        changes.Should().BeEmpty();
+    }
+
+    /// <summary>serves-spec: SPEC-008 rule 7 — NextPage reaches the same seven paging notifications as the filter setter.</summary>
+    [Fact]
+    public void NextPage_RaisesTheSevenPagingNotifications()
+    {
+        var item = MakeItemWith(120);
+        var changes = new List<string>();
+        item.PropertyChanged += (_, e) => changes.Add(e.PropertyName!);
+
+        item.NextPage();
+
+        changes.Should().Equal(new[]
+        {
+            nameof(SubfolderItem.CurrentPage),
+            nameof(SubfolderItem.TotalPages),
+            nameof(SubfolderItem.FilteredCount),
+            nameof(SubfolderItem.PagedLocations),
+            nameof(SubfolderItem.PageStatus),
+            nameof(SubfolderItem.CanGoNextPage),
+            nameof(SubfolderItem.CanGoPrevPage),
+        });
+    }
+
+    /// <summary>serves-spec: SPEC-008 rule 7 — TotalPages is a true ceiling: a location count that is an exact multiple of the 50-item page size gains no empty trailing page.</summary>
+    [Fact]
+    public void TotalPages_AtExactPageSizeMultiple_DoesNotAddAnEmptyPage()
+    {
+        MakeItemWith(SubfolderItem.PageSize).TotalPages.Should().Be(1);
+        MakeItemWith(SubfolderItem.PageSize).CanGoNextPage.Should().BeFalse();
+        MakeItemWith(SubfolderItem.PageSize * 2).TotalPages.Should().Be(2);
+        MakeItemWith((SubfolderItem.PageSize * 2) + 1).TotalPages.Should().Be(3);
+    }
+
+    /// <summary>serves-spec: SPEC-008 rule 7 (edge-case row "Filter matches nothing inside an expanded item") — a populated Locations list filtered down to zero matches reports "No matches", TotalPages 1 and an empty page.</summary>
+    [Fact]
+    public void LocationFilter_MatchingNothing_ShowsNoMatchesAndEmptyPagedLocations()
+    {
+        var item = MakeItemWith(120);
+
+        item.LocationFilter = "node_modules";
+
+        item.FilteredCount.Should().Be(0);
+        item.PagedLocations.Should().BeEmpty();
+        item.PageStatus.Should().Be("No matches");
+        item.TotalPages.Should().Be(1);
+        item.CanGoNextPage.Should().BeFalse();
+    }
+
+    /// <summary>serves-spec: SPEC-008 invariant 9 — 1023 bytes is the last value under the 1024 byte threshold and stays in bytes.</summary>
+    [Fact]
+    public void TotalSizeDisplay_At1023Bytes_ShouldStayInBytes()
+    {
+        new SubfolderItem { TotalSize = 1023 }.TotalSizeDisplay.Should().Be("1023 B");
+    }
+
+    /// <summary>serves-spec: SPEC-008 invariant 9 (rule 6 renders scan-status sizes through this formatter) — an empty inventory renders as "0 B".</summary>
+    [Fact]
+    public void TotalSizeDisplay_AtZero_ShouldShowZeroBytes()
+    {
+        new SubfolderItem { Name = "obj", Count = 0 }.TotalSizeDisplay.Should().Be("0 B");
+    }
+
     private static SubfolderItem MakeItemWith(int n)
     {
         var locs = new List<SubfolderLocation>();

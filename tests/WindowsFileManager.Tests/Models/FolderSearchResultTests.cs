@@ -88,4 +88,34 @@ public class FolderSearchResultTests
         var act = () => r.TotalSize = 100;
         act.Should().NotThrow();
     }
+
+    /// <summary>serves-spec: SPEC-007 invariant 9 — the TB rung of the KB/MB/GB/TB/PB ladder, which this type's ladder skips between GB and PB.</summary>
+    [Fact]
+    public void TotalSizeDisplay_AtOneTerabyte_ShouldShowTB()
+    {
+        new FolderSearchResult { TotalSize = 1_099_511_627_776L }.TotalSizeDisplay.Should().Be("1 TB");
+    }
+
+    /// <summary>serves-spec: SPEC-007 invariant 9 — 1023 bytes is the last value under the 1024 byte threshold and must still render in bytes.</summary>
+    [Fact]
+    public void TotalSizeDisplay_At1023Bytes_ShouldStayInBytes()
+    {
+        new FolderSearchResult { TotalSize = 1023 }.TotalSizeDisplay.Should().Be("1023 B");
+    }
+
+    /// <summary>serves-spec: SPEC-007 invariant 9 — the two size formatters deliberately disagree at 1024 bytes ("1 KB" here, "1.0 KB" in ScannedFile); unifying them would break this spec.</summary>
+    [Fact]
+    public void TotalSizeDisplay_And_ScannedFileFormatFileSize_DisagreeAt1024()
+    {
+        var result = new FolderSearchResult
+        {
+            FullPath = @"D:\Media\Renders\2026-04",
+            FolderName = "2026-04",
+            TotalSize = 1024,
+        };
+
+        result.TotalSizeDisplay.Should().Be("1 KB");
+        ScannedFile.FormatFileSize(1024).Should().Be("1.0 KB");
+        result.TotalSizeDisplay.Should().NotBe(ScannedFile.FormatFileSize(result.TotalSize));
+    }
 }

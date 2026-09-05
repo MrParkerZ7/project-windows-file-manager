@@ -1,3 +1,4 @@
+using System.Text.Json;
 using FluentAssertions;
 using WindowsFileManager.Core.Models;
 
@@ -49,5 +50,51 @@ public class AppSettingsTests
         settings.WindowWidth.Should().Be(1200);
         settings.WindowHeight.Should().Be(800);
         settings.IsMaximized.Should().BeTrue();
+    }
+
+    /// <summary>serves-spec: SPEC-004 rule 26 — ActionHistoryKind ordinals are frozen because System.Text.Json writes them into settings.json as plain numbers; the entry survives the round trip with its kind and paths intact.</summary>
+    [Fact]
+    public void ActionHistory_JsonRoundTrip_ShouldWriteKindAsOrdinalNumber()
+    {
+        var settings = new AppSettings
+        {
+            Profiles = new List<ProfileSettings> { new() { Name = "Photos" } },
+            ActiveProfileName = "Photos",
+            ActionHistory = new List<ActionHistoryEntry>
+            {
+                new()
+                {
+                    Kind = ActionHistoryKind.RecycleDirectories,
+                    RecycledPaths = new List<string> { @"D:\Media\Photos\2019\.thumbnails" },
+                    Summary = "Recycled 1 folder",
+                    Timestamp = new DateTime(2026, 3, 14, 9, 30, 0),
+                },
+                new()
+                {
+                    Kind = ActionHistoryKind.MoveFiles,
+                    Moves = new List<ActionHistoryMove>
+                    {
+                        new() { Source = @"D:\Media\Photos\IMG_4821.jpg", Destination = @"E:\Quarantine\IMG_4821.jpg" },
+                    },
+                    Summary = "Moved 1 file",
+                    Timestamp = new DateTime(2026, 3, 14, 9, 28, 0),
+                },
+            },
+        };
+
+        var json = JsonSerializer.Serialize(settings);
+        var restored = JsonSerializer.Deserialize<AppSettings>(json);
+
+        json.Should().Contain("\"Kind\":2").And.Contain("\"Kind\":0");
+        json.Should().NotContain("\"RecycleDirectories\"");
+        restored!.ActionHistory.Should().HaveCount(2);
+        restored.ActionHistory[0].Kind.Should().Be(ActionHistoryKind.RecycleDirectories);
+        restored.ActionHistory[0].RecycledPaths.Should().ContainSingle().Which.Should().Be(@"D:\Media\Photos\2019\.thumbnails");
+        restored.ActionHistory[0].Summary.Should().Be("Recycled 1 folder");
+        restored.ActionHistory[0].Timestamp.Should().Be(new DateTime(2026, 3, 14, 9, 30, 0));
+        restored.ActionHistory[1].Kind.Should().Be(ActionHistoryKind.MoveFiles);
+        restored.ActionHistory[1].Moves.Should().ContainSingle();
+        restored.ActionHistory[1].Moves[0].Source.Should().Be(@"D:\Media\Photos\IMG_4821.jpg");
+        restored.ActionHistory[1].Moves[0].Destination.Should().Be(@"E:\Quarantine\IMG_4821.jpg");
     }
 }
