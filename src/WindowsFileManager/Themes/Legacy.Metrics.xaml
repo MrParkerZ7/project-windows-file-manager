@@ -13,18 +13,41 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=System.Runtime">
 
-    <!-- Corner radii in use -->
-    <CornerRadius x:Key="Legacy.Radius.Sm">2</CornerRadius>
-    <CornerRadius x:Key="Legacy.Radius.Md">3</CornerRadius>
-    <CornerRadius x:Key="Legacy.Radius.Lg">4</CornerRadius>
+    <!-- Corner radii in use - all 7 distinct values, measured from the views -->
+    <CornerRadius x:Key="Legacy.Radius.Sm">2</CornerRadius><!-- 4 uses -->
+    <CornerRadius x:Key="Legacy.Radius.Md">3</CornerRadius><!-- 19 uses -->
+    <CornerRadius x:Key="Legacy.Radius.Lg">4</CornerRadius><!-- 24 uses -->
+    <CornerRadius x:Key="Legacy.Radius.Xl">6</CornerRadius><!-- 4 uses -->
+    <CornerRadius x:Key="Legacy.Radius.Xxl">8</CornerRadius><!-- 2 uses -->
+    <CornerRadius x:Key="Legacy.Radius.LeftCap">2,0,0,2</CornerRadius><!-- 2 uses -->
+    <CornerRadius x:Key="Legacy.Radius.RightCap">0,2,2,0</CornerRadius><!-- 2 uses -->
 
-    <!-- Hairline / border thicknesses in use -->
-    <Thickness x:Key="Legacy.Thickness.Hairline">1</Thickness>
-    <Thickness x:Key="Legacy.Thickness.Border">1,1,1,1</Thickness>
+    <!-- Border thicknesses in use. Plain "0" and {TemplateBinding BorderThickness}
+         are not tokenised - the first is an absence, the second is a binding. -->
+    <Thickness x:Key="Legacy.Thickness.Hairline">1</Thickness><!-- 32 uses -->
+    <Thickness x:Key="Legacy.Thickness.BottomRule">0,0,0,1</Thickness><!-- 5 uses -->
+    <Thickness x:Key="Legacy.Thickness.BottomRuleThick">0,0,0,1.5</Thickness><!-- 2 uses -->
+    <Thickness x:Key="Legacy.Thickness.TopRule">0,1,0,0</Thickness><!-- 1 use -->
 
-    <!-- Font families in use. The shell declares no FontFamily except these, so the
-         effective UI face is the WPF default (Segoe UI on Windows). Recorded so the
-         substitution has somewhere to point and so T-003 can see what it is replacing. -->
+    <!-- Type scale in use - all 16 distinct sizes, measured. The shell declares no
+         FontFamily except Consolas, so the effective UI face is the WPF default. -->
+    <sys:Double x:Key="Legacy.FontSize.S8">8</sys:Double><!-- 4 uses -->
+    <sys:Double x:Key="Legacy.FontSize.S9">9</sys:Double><!-- 11 uses -->
+    <sys:Double x:Key="Legacy.FontSize.S10">10</sys:Double><!-- 66 uses -->
+    <sys:Double x:Key="Legacy.FontSize.S10p5">10.5</sys:Double><!-- 1 use -->
+    <sys:Double x:Key="Legacy.FontSize.S11">11</sys:Double><!-- 123 uses -->
+    <sys:Double x:Key="Legacy.FontSize.S11p5">11.5</sys:Double><!-- 2 uses -->
+    <sys:Double x:Key="Legacy.FontSize.S12">12</sys:Double><!-- 15 uses -->
+    <sys:Double x:Key="Legacy.FontSize.S13">13</sys:Double><!-- 10 uses -->
+    <sys:Double x:Key="Legacy.FontSize.S14">14</sys:Double><!-- 2 uses -->
+    <sys:Double x:Key="Legacy.FontSize.S16">16</sys:Double><!-- 3 uses -->
+    <sys:Double x:Key="Legacy.FontSize.S18">18</sys:Double><!-- 4 uses -->
+    <sys:Double x:Key="Legacy.FontSize.S20">20</sys:Double><!-- 6 uses -->
+    <sys:Double x:Key="Legacy.FontSize.S24">24</sys:Double><!-- 2 uses -->
+    <sys:Double x:Key="Legacy.FontSize.S32">32</sys:Double><!-- 1 use -->
+    <sys:Double x:Key="Legacy.FontSize.S36">36</sys:Double><!-- 1 use -->
+    <sys:Double x:Key="Legacy.FontSize.S48">48</sys:Double><!-- 2 uses -->
+
     <FontFamily x:Key="Legacy.FontFamily.Ui">Segoe UI</FontFamily>
     <FontFamily x:Key="Legacy.FontFamily.Mono">Consolas</FontFamily>
 

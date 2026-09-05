@@ -26,9 +26,12 @@
                     mc:Ignorable="po">
 
     <!-- Ground and ink -->
-    <SolidColorBrush x:Key="Broadsheet.Brush.Bg" Color="#FFF3F2F2" po:Freeze="True" /><!-- css: color-bg -->
-    <SolidColorBrush x:Key="Broadsheet.Brush.Surface" Color="#FFEAE9E9" po:Freeze="True" /><!-- css: color-surface -->
-    <SolidColorBrush x:Key="Broadsheet.Brush.Text" Color="#FF201E1D" po:Freeze="True" /><!-- css: color-text -->
+    <Color x:Key="Broadsheet.Color.Bg">#FFF3F2F2</Color><!-- css: color-bg -->
+    <SolidColorBrush x:Key="Broadsheet.Brush.Bg" Color="{StaticResource Broadsheet.Color.Bg}" po:Freeze="True" />
+    <Color x:Key="Broadsheet.Color.Surface">#FFEAE9E9</Color><!-- css: color-surface -->
+    <SolidColorBrush x:Key="Broadsheet.Brush.Surface" Color="{StaticResource Broadsheet.Color.Surface}" po:Freeze="True" />
+    <Color x:Key="Broadsheet.Color.Text">#FF201E1D</Color><!-- css: color-text -->
+    <SolidColorBrush x:Key="Broadsheet.Brush.Text" Color="{StaticResource Broadsheet.Color.Text}" po:Freeze="True" />
 
     <!--
         Divider. The design system declares this as
@@ -40,48 +43,86 @@
             over Surface #eae9e9    -> #CAC9C8
             over Neutral100 #f8f4f4 -> #D5D2D2
         0x29 = 41/255 = 16%.
+
+        NOTE - the T-001 spec states the opaque composite is #D3D2D2. It is not:
+        #D3D2D2 is the FIFTEEN percent composite. The design system declares 16%,
+        whose composite over Bg is #D1D0D0, which is what ships here. Verified:
+            14% -> #D5D4D4   15% -> #D3D2D2   16% -> #D1D0D0   17% -> #CFCECE
     -->
-    <SolidColorBrush x:Key="Broadsheet.Brush.Divider" Color="#29201E1D" po:Freeze="True" />
+    <Color x:Key="Broadsheet.Color.Divider.Alpha">#29201E1D</Color>
+    <SolidColorBrush x:Key="Broadsheet.Brush.Divider.Alpha" Color="{StaticResource Broadsheet.Color.Divider.Alpha}" po:Freeze="True" />
+    <Color x:Key="Broadsheet.Color.Divider">#FFD1D0D0</Color>
+    <SolidColorBrush x:Key="Broadsheet.Brush.Divider" Color="{StaticResource Broadsheet.Color.Divider}" po:Freeze="True" />
 
     <!-- Neutral ramp -->
-    <SolidColorBrush x:Key="Broadsheet.Brush.Neutral100" Color="#FFF8F4F4" po:Freeze="True" />
-    <SolidColorBrush x:Key="Broadsheet.Brush.Neutral200" Color="#FFEAE7E7" po:Freeze="True" />
-    <SolidColorBrush x:Key="Broadsheet.Brush.Neutral300" Color="#FFD7D3D3" po:Freeze="True" />
-    <SolidColorBrush x:Key="Broadsheet.Brush.Neutral400" Color="#FFBAB6B6" po:Freeze="True" />
-    <SolidColorBrush x:Key="Broadsheet.Brush.Neutral500" Color="#FF9B9797" po:Freeze="True" />
-    <SolidColorBrush x:Key="Broadsheet.Brush.Neutral600" Color="#FF7D7979" po:Freeze="True" />
-    <SolidColorBrush x:Key="Broadsheet.Brush.Neutral700" Color="#FF605D5D" po:Freeze="True" />
-    <SolidColorBrush x:Key="Broadsheet.Brush.Neutral800" Color="#FF444141" po:Freeze="True" />
-    <SolidColorBrush x:Key="Broadsheet.Brush.Neutral900" Color="#FF2D2B2B" po:Freeze="True" />
+    <Color x:Key="Broadsheet.Color.Neutral100">#FFF8F4F4</Color>
+    <SolidColorBrush x:Key="Broadsheet.Brush.Neutral100" Color="{StaticResource Broadsheet.Color.Neutral100}" po:Freeze="True" />
+    <Color x:Key="Broadsheet.Color.Neutral200">#FFEAE7E7</Color>
+    <SolidColorBrush x:Key="Broadsheet.Brush.Neutral200" Color="{StaticResource Broadsheet.Color.Neutral200}" po:Freeze="True" />
+    <Color x:Key="Broadsheet.Color.Neutral300">#FFD7D3D3</Color>
+    <SolidColorBrush x:Key="Broadsheet.Brush.Neutral300" Color="{StaticResource Broadsheet.Color.Neutral300}" po:Freeze="True" />
+    <Color x:Key="Broadsheet.Color.Neutral400">#FFBAB6B6</Color>
+    <SolidColorBrush x:Key="Broadsheet.Brush.Neutral400" Color="{StaticResource Broadsheet.Color.Neutral400}" po:Freeze="True" />
+    <Color x:Key="Broadsheet.Color.Neutral500">#FF9B9797</Color>
+    <SolidColorBrush x:Key="Broadsheet.Brush.Neutral500" Color="{StaticResource Broadsheet.Color.Neutral500}" po:Freeze="True" />
+    <Color x:Key="Broadsheet.Color.Neutral600">#FF7D7979</Color>
+    <SolidColorBrush x:Key="Broadsheet.Brush.Neutral600" Color="{StaticResource Broadsheet.Color.Neutral600}" po:Freeze="True" />
+    <Color x:Key="Broadsheet.Color.Neutral700">#FF605D5D</Color>
+    <SolidColorBrush x:Key="Broadsheet.Brush.Neutral700" Color="{StaticResource Broadsheet.Color.Neutral700}" po:Freeze="True" />
+    <Color x:Key="Broadsheet.Color.Neutral800">#FF444141</Color>
+    <SolidColorBrush x:Key="Broadsheet.Brush.Neutral800" Color="{StaticResource Broadsheet.Color.Neutral800}" po:Freeze="True" />
+    <Color x:Key="Broadsheet.Color.Neutral900">#FF2D2B2B</Color>
+    <SolidColorBrush x:Key="Broadsheet.Brush.Neutral900" Color="{StaticResource Broadsheet.Color.Neutral900}" po:Freeze="True" />
 
     <!-- Accent ramp (cyan) -->
-    <SolidColorBrush x:Key="Broadsheet.Brush.Accent100" Color="#FFE9F8FF" po:Freeze="True" />
-    <SolidColorBrush x:Key="Broadsheet.Brush.Accent200" Color="#FFCBEEFF" po:Freeze="True" />
-    <SolidColorBrush x:Key="Broadsheet.Brush.Accent300" Color="#FF99E0FF" po:Freeze="True" />
-    <SolidColorBrush x:Key="Broadsheet.Brush.Accent400" Color="#FF62C5EE" po:Freeze="True" />
-    <SolidColorBrush x:Key="Broadsheet.Brush.Accent500" Color="#FF38A6CF" po:Freeze="True" />
-    <SolidColorBrush x:Key="Broadsheet.Brush.Accent600" Color="#FF1186AC" po:Freeze="True" />
-    <SolidColorBrush x:Key="Broadsheet.Brush.Accent700" Color="#FF006786" po:Freeze="True" />
-    <SolidColorBrush x:Key="Broadsheet.Brush.Accent800" Color="#FF004961" po:Freeze="True" />
-    <SolidColorBrush x:Key="Broadsheet.Brush.Accent900" Color="#FF0A303E" po:Freeze="True" />
+    <Color x:Key="Broadsheet.Color.Accent100">#FFE9F8FF</Color>
+    <SolidColorBrush x:Key="Broadsheet.Brush.Accent100" Color="{StaticResource Broadsheet.Color.Accent100}" po:Freeze="True" />
+    <Color x:Key="Broadsheet.Color.Accent200">#FFCBEEFF</Color>
+    <SolidColorBrush x:Key="Broadsheet.Brush.Accent200" Color="{StaticResource Broadsheet.Color.Accent200}" po:Freeze="True" />
+    <Color x:Key="Broadsheet.Color.Accent300">#FF99E0FF</Color>
+    <SolidColorBrush x:Key="Broadsheet.Brush.Accent300" Color="{StaticResource Broadsheet.Color.Accent300}" po:Freeze="True" />
+    <Color x:Key="Broadsheet.Color.Accent400">#FF62C5EE</Color>
+    <SolidColorBrush x:Key="Broadsheet.Brush.Accent400" Color="{StaticResource Broadsheet.Color.Accent400}" po:Freeze="True" />
+    <Color x:Key="Broadsheet.Color.Accent500">#FF38A6CF</Color>
+    <SolidColorBrush x:Key="Broadsheet.Brush.Accent500" Color="{StaticResource Broadsheet.Color.Accent500}" po:Freeze="True" />
+    <Color x:Key="Broadsheet.Color.Accent600">#FF1186AC</Color>
+    <SolidColorBrush x:Key="Broadsheet.Brush.Accent600" Color="{StaticResource Broadsheet.Color.Accent600}" po:Freeze="True" />
+    <Color x:Key="Broadsheet.Color.Accent700">#FF006786</Color>
+    <SolidColorBrush x:Key="Broadsheet.Brush.Accent700" Color="{StaticResource Broadsheet.Color.Accent700}" po:Freeze="True" />
+    <Color x:Key="Broadsheet.Color.Accent800">#FF004961</Color>
+    <SolidColorBrush x:Key="Broadsheet.Brush.Accent800" Color="{StaticResource Broadsheet.Color.Accent800}" po:Freeze="True" />
+    <Color x:Key="Broadsheet.Color.Accent900">#FF0A303E</Color>
+    <SolidColorBrush x:Key="Broadsheet.Brush.Accent900" Color="{StaticResource Broadsheet.Color.Accent900}" po:Freeze="True" />
 
     <!-- Accent-2 ramp (magenta) -->
-    <SolidColorBrush x:Key="Broadsheet.Brush.Accent2100" Color="#FFFFF1F4" po:Freeze="True" />
-    <SolidColorBrush x:Key="Broadsheet.Brush.Accent2200" Color="#FFFFDEE6" po:Freeze="True" />
-    <SolidColorBrush x:Key="Broadsheet.Brush.Accent2300" Color="#FFFFC0D0" po:Freeze="True" />
-    <SolidColorBrush x:Key="Broadsheet.Brush.Accent2400" Color="#FFFF90B1" po:Freeze="True" />
-    <SolidColorBrush x:Key="Broadsheet.Brush.Accent2500" Color="#FFFF458E" po:Freeze="True" />
-    <SolidColorBrush x:Key="Broadsheet.Brush.Accent2600" Color="#FFD82071" po:Freeze="True" />
-    <SolidColorBrush x:Key="Broadsheet.Brush.Accent2700" Color="#FFAA0B56" po:Freeze="True" />
-    <SolidColorBrush x:Key="Broadsheet.Brush.Accent2800" Color="#FF790E3D" po:Freeze="True" />
-    <SolidColorBrush x:Key="Broadsheet.Brush.Accent2900" Color="#FF4B1528" po:Freeze="True" />
+    <Color x:Key="Broadsheet.Color.Accent2100">#FFFFF1F4</Color>
+    <SolidColorBrush x:Key="Broadsheet.Brush.Accent2100" Color="{StaticResource Broadsheet.Color.Accent2100}" po:Freeze="True" />
+    <Color x:Key="Broadsheet.Color.Accent2200">#FFFFDEE6</Color>
+    <SolidColorBrush x:Key="Broadsheet.Brush.Accent2200" Color="{StaticResource Broadsheet.Color.Accent2200}" po:Freeze="True" />
+    <Color x:Key="Broadsheet.Color.Accent2300">#FFFFC0D0</Color>
+    <SolidColorBrush x:Key="Broadsheet.Brush.Accent2300" Color="{StaticResource Broadsheet.Color.Accent2300}" po:Freeze="True" />
+    <Color x:Key="Broadsheet.Color.Accent2400">#FFFF90B1</Color>
+    <SolidColorBrush x:Key="Broadsheet.Brush.Accent2400" Color="{StaticResource Broadsheet.Color.Accent2400}" po:Freeze="True" />
+    <Color x:Key="Broadsheet.Color.Accent2500">#FFFF458E</Color>
+    <SolidColorBrush x:Key="Broadsheet.Brush.Accent2500" Color="{StaticResource Broadsheet.Color.Accent2500}" po:Freeze="True" />
+    <Color x:Key="Broadsheet.Color.Accent2600">#FFD82071</Color>
+    <SolidColorBrush x:Key="Broadsheet.Brush.Accent2600" Color="{StaticResource Broadsheet.Color.Accent2600}" po:Freeze="True" />
+    <Color x:Key="Broadsheet.Color.Accent2700">#FFAA0B56</Color>
+    <SolidColorBrush x:Key="Broadsheet.Brush.Accent2700" Color="{StaticResource Broadsheet.Color.Accent2700}" po:Freeze="True" />
+    <Color x:Key="Broadsheet.Color.Accent2800">#FF790E3D</Color>
+    <SolidColorBrush x:Key="Broadsheet.Brush.Accent2800" Color="{StaticResource Broadsheet.Color.Accent2800}" po:Freeze="True" />
+    <Color x:Key="Broadsheet.Color.Accent2900">#FF4B1528</Color>
+    <SolidColorBrush x:Key="Broadsheet.Brush.Accent2900" Color="{StaticResource Broadsheet.Color.Accent2900}" po:Freeze="True" />
 
     <!-- Base accents. Accent2 and ProcessYellow ship as PALETTE ENTRIES with no
          semantic name and no consumer - naming them Destructive/Warning would be the
          first row of the 4a colour-semantics layer. -->
-    <SolidColorBrush x:Key="Broadsheet.Brush.Accent" Color="#FF0088B0" po:Freeze="True" />
-    <SolidColorBrush x:Key="Broadsheet.Brush.Accent2" Color="#FFD6006C" po:Freeze="True" />
-    <SolidColorBrush x:Key="Broadsheet.Brush.ProcessYellow" Color="#FFEDBB00" po:Freeze="True" />
+    <Color x:Key="Broadsheet.Color.Accent">#FF0088B0</Color>
+    <SolidColorBrush x:Key="Broadsheet.Brush.Accent" Color="{StaticResource Broadsheet.Color.Accent}" po:Freeze="True" />
+    <Color x:Key="Broadsheet.Color.Accent2">#FFD6006C</Color>
+    <SolidColorBrush x:Key="Broadsheet.Brush.Accent2" Color="{StaticResource Broadsheet.Color.Accent2}" po:Freeze="True" />
+    <Color x:Key="Broadsheet.Color.ProcessYellow">#FFEDBB00</Color>
+    <SolidColorBrush x:Key="Broadsheet.Brush.ProcessYellow" Color="{StaticResource Broadsheet.Color.ProcessYellow}" po:Freeze="True" />
 
     <!-- Radii -->
     <CornerRadius x:Key="Broadsheet.Radius.Sm">1</CornerRadius>
@@ -95,6 +136,40 @@
     <sys:Double x:Key="Broadsheet.Space.4">20</sys:Double>
     <sys:Double x:Key="Broadsheet.Space.6">30</sys:Double>
     <sys:Double x:Key="Broadsheet.Space.8">40</sys:Double>
+
+    <!-- Hairline / rule thicknesses. 1px is every divider and both splitters;
+         2px is the active-tab underline (the only 2px rule in the 3a frame). -->
+    <Thickness x:Key="Broadsheet.Thickness.Hairline">1</Thickness>
+    <Thickness x:Key="Broadsheet.Thickness.TabUnderline">0,0,0,2</Thickness>
+
+    <!--
+        Type scale. The design system declares no font-size custom properties, so these
+        are transcribed from the 3a artboard itself (DESIGN-001 section Inventory of 3a)
+        rather than from :root - the five sizes the frame actually uses.
+    -->
+    <sys:Double x:Key="Broadsheet.FontSize.Title">14</sys:Double><!-- title-bar app name + tab labels -->
+    <sys:Double x:Key="Broadsheet.FontSize.Body">13</sys:Double><!-- card and panel body text -->
+    <sys:Double x:Key="Broadsheet.FontSize.Toolbar">12.5</sys:Double><!-- results toolbar controls -->
+    <sys:Double x:Key="Broadsheet.FontSize.Chrome">12</sys:Double><!-- status bar, action bar, header actions -->
+    <sys:Double x:Key="Broadsheet.FontSize.Label">11</sys:Double><!-- section labels + column headers (uppercase, tracked) -->
+
+    <!--
+        The twelve 3a frame numbers, transcribed from the artboard markup. These are the
+        measurements T-004 through T-009 build the tool-window frame from; defining them
+        here means the frame is described in one place rather than re-measured per task.
+    -->
+    <sys:Double x:Key="Broadsheet.Metric.TitleBar.Height">34</sys:Double><!-- app name, profile switcher, window controls -->
+    <sys:Double x:Key="Broadsheet.Metric.TabStrip.Height">38</sys:Double><!-- underlined editor tabs + right-aligned Scan -->
+    <sys:Double x:Key="Broadsheet.Metric.ToolWindowHeader.Height">30</sys:Double><!-- all four tool-window headers -->
+    <sys:Double x:Key="Broadsheet.Metric.ResultsToolbar.Height">36</sys:Double><!-- the single filter/mark toolbar row -->
+    <sys:Double x:Key="Broadsheet.Metric.ColumnHeader.Height">26</sys:Double><!-- the separate column-header strip -->
+    <sys:Double x:Key="Broadsheet.Metric.GroupRow.Height">32</sys:Double><!-- duplicate-group row -->
+    <sys:Double x:Key="Broadsheet.Metric.CopyRow.Height">30</sys:Double><!-- per-copy row -->
+    <sys:Double x:Key="Broadsheet.Metric.ActionBar.Height">40</sys:Double><!-- bottom marked-files action bar -->
+    <sys:Double x:Key="Broadsheet.Metric.StatusBar.Height">26</sys:Double><!-- the single full-width status bar -->
+    <sys:Double x:Key="Broadsheet.Metric.ScopePanel.Width">260</sys:Double><!-- left tool-window column -->
+    <sys:Double x:Key="Broadsheet.Metric.RightStack.Width">360</sys:Double><!-- Preview over Rules column -->
+    <sys:Double x:Key="Broadsheet.Metric.TabUnderline.Thickness">2</sys:Double><!-- active-tab rule -->
 
     <!--
         Typography. The design system sets both faces to "Source Serif 4", a

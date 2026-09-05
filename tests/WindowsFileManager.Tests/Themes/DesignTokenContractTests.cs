@@ -52,6 +52,24 @@ public class DesignTokenContractTests
 
     private static string ViewsDirectory => Path.Combine(RepositoryRoot, "src", "WindowsFileManager", "Views");
 
+    /// <summary>
+    /// Every XAML the shell owns, minus the dictionaries themselves and build output. Deliberately the
+    /// whole shell project rather than <c>Views/</c> alone: a colour literal or a resource reference in a
+    /// folder nobody thought to scan is exactly the kind of thing that survives a migration unnoticed.
+    /// </summary>
+    private static IEnumerable<string> ShellXamlFiles()
+    {
+        var shell = Path.Combine(RepositoryRoot, "src", "WindowsFileManager");
+        return Directory.GetFiles(shell, "*.xaml", SearchOption.AllDirectories)
+            .Where(f =>
+            {
+                var rel = Path.GetRelativePath(shell, f).Replace('\\', '/');
+                return !rel.StartsWith("Themes/", StringComparison.Ordinal)
+                       && !rel.StartsWith("bin/", StringComparison.Ordinal)
+                       && !rel.StartsWith("obj/", StringComparison.Ordinal);
+            });
+    }
+
     /// <summary>1. Every key referenced by a view exists in the dictionaries. This is the assertion the
     /// substitution is validated against, batch by batch, as it lands.</summary>
     [Fact]
@@ -61,7 +79,7 @@ public class DesignTokenContractTests
         var referencePattern = new Regex(@"\{(?:Dynamic|Static)Resource\s+([A-Za-z0-9_.]+)\s*\}", RegexOptions.Compiled);
         var dangling = new List<string>();
 
-        foreach (var view in Directory.GetFiles(ViewsDirectory, "*.xaml", SearchOption.AllDirectories))
+        foreach (var view in ShellXamlFiles())
         {
             var text = File.ReadAllText(view);
             foreach (Match match in referencePattern.Matches(text))
@@ -139,13 +157,36 @@ public class DesignTokenContractTests
         BrushColor(resourceKey).Should().Be("#FF" + expected.TrimStart('#').ToUpperInvariant());
     }
 
-    /// <summary>5. The divider is the alpha form. WPF has no color-mix, and one alpha brush composites
-    /// correctly over Bg, Surface and Neutral100 — three baked opaque values would each be right on
-    /// only one of them.</summary>
+    /// <summary>5. Both divider forms exist. WPF has no color-mix, so the token ships twice: the alpha
+    /// form composites correctly over Bg, Surface and Neutral100 alike, while the opaque form is there for
+    /// surfaces that cannot take a translucent brush.
+    /// <para>
+    /// The opaque value is <c>#D1D0D0</c>, not the <c>#D3D2D2</c> the T-001 spec states. <c>#D3D2D2</c> is
+    /// the <b>15%</b> composite of <c>#201e1d</c> over <c>#f3f2f2</c>; the design system declares
+    /// <b>16%</b>, which gives <c>#D1D0D0</c>. Verified across the ramp: 14% → #D5D4D4, 15% → #D3D2D2,
+    /// 16% → #D1D0D0, 17% → #CFCECE. The declared percentage wins over the spec's arithmetic.
+    /// </para></summary>
     [Fact]
-    public void DividerBrush_IsTheAlphaForm()
+    public void BothDividerForms_Exist_AndTheOpaqueOneMatchesTheDeclaredSixteenPercent()
     {
-        BrushColor("Broadsheet.Brush.Divider").Should().Be("#29201E1D");
+        BrushColor("Broadsheet.Brush.Divider.Alpha").Should().Be("#29201E1D");
+        BrushColor("Broadsheet.Brush.Divider").Should().Be("#FFD1D0D0");
+    }
+
+    /// <summary>9. Every Broadsheet brush indirects through a Color of the same name. That pairing is what
+    /// lets a value serve both a brush and a Color-typed consumer; a brush with an inline literal would
+    /// silently break the second use.</summary>
+    [Fact]
+    public void EveryBroadsheetBrush_HasAMatchingColorEntry()
+    {
+        var declared = DeclaredKeys().Keys.ToHashSet(StringComparer.Ordinal);
+        var orphans = declared
+            .Where(k => k.StartsWith("Broadsheet.Brush.", StringComparison.Ordinal))
+            .Select(k => "Broadsheet.Color." + k["Broadsheet.Brush.".Length..])
+            .Where(expected => !declared.Contains(expected))
+            .ToList();
+
+        orphans.Should().BeEmpty("every Broadsheet.Brush.X must have a Broadsheet.Color.X to indirect through");
     }
 
     /// <summary>6. The typeface decision is pinned. User decision 2026-09-04 (T-001 DECISION 1),
@@ -188,9 +229,7 @@ public class DesignTokenContractTests
             return;
         }
 
-        var views = Directory.GetFiles(ViewsDirectory, "*.xaml", SearchOption.AllDirectories)
-            .Select(File.ReadAllText)
-            .ToList();
+        var views = ShellXamlFiles().Select(File.ReadAllText).ToList();
 
         var referenced = views.Any(v => v.Contains("Resource Legacy.", StringComparison.Ordinal));
 
@@ -228,11 +267,24 @@ public class DesignTokenContractTests
         return keys;
     }
 
+    /// <summary>
+    /// The literal ARGB a brush resolves to. Brushes indirect through a <c>&lt;Color&gt;</c> entry
+    /// (<c>Color="{StaticResource Broadsheet.Color.X}"</c>) so the same value can serve a brush and a
+    /// <c>DropShadowEffect</c>, which takes a Color rather than a Brush. Resolving the indirection here
+    /// means these tests also prove the indirection is wired correctly, not just that a hex is present.
+    /// </summary>
     private static string BrushColor(string key)
     {
-        var element = FindByKey(key);
-        return element.Attribute("Color")?.Value.ToUpperInvariant()
-               ?? throw new InvalidOperationException($"'{key}' has no Color attribute");
+        var raw = FindByKey(key).Attribute("Color")?.Value
+                  ?? throw new InvalidOperationException($"'{key}' has no Color attribute");
+
+        var reference = Regex.Match(raw, @"^\{StaticResource\s+([A-Za-z0-9_.]+)\s*\}$");
+        if (reference.Success)
+        {
+            raw = FindByKey(reference.Groups[1].Value).Value.Trim();
+        }
+
+        return raw.ToUpperInvariant();
     }
 
     private static string ResourceText(string key) => FindByKey(key).Value.Trim();
