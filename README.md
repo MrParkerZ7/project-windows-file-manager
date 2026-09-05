@@ -86,6 +86,7 @@ A .NET 8 WPF desktop application for managing folders and files on Windows. It s
 | [docs/DEV.md](docs/DEV.md) | Local dev loop — prerequisites, build, run, test, package |
 | [docs/SECURITY.md](docs/SECURITY.md) | Guardrails: trust boundaries, destructive-operation rules, settings-file handling |
 | [docs/GLOSSARY.md](docs/GLOSSARY.md) | Domain terms used across the code (duplicate group, match type, profile, …) |
+| [docs/design/](docs/design/) | Design records (`DESIGN-NNN-*`) — frozen intent, what a change was *meant* to be before it was built |
 | [docs/adr/](docs/adr/) | Architectural Decision Records — *why* each load-bearing choice was made |
 | [docs/specs/](docs/specs/) | Feature specs (`SPEC-NNN-*`) — the current-truth behavior contract per feature |
 | [docs/modules/](docs/modules/) | Per-module mechanics — how the code in each project works |

@@ -28,11 +28,12 @@ Each documentation kind has exactly one home and is never duplicated across them
 
 | Kind | Home | Lifetime | Answers |
 |------|------|----------|---------|
+| Design | [`../design/`](../design/) | frozen at adoption | what was intended, before the code existed? |
 | Feature spec | `docs/specs/` | living — synced as behavior lands | how does this feature behave today? |
 | Decision | [`../adr/`](../adr/) | frozen at acceptance | why this way? |
 | Module doc | [`../modules/`](../modules/) | living, code-adjacent | how does this code work? |
 
-Specs are the current-truth contract; designs (when a project keeps them) are frozen intent; ADRs are frozen decisions; module docs describe code mechanics. A spec **links** to the other kinds — it never copies them. The dividing line that recurs: a spec describes feature behavior *across* modules, a module doc describes one module's mechanics.
+Specs are the current-truth contract; designs are frozen intent; ADRs are frozen decisions; module docs describe code mechanics. A spec **links** to the other kinds — it never copies them. The dividing line that recurs: a spec describes feature behavior *across* modules, a module doc describes one module's mechanics.
 
 Numbering is global and assigned in seeding order. A `SPEC-NNN` id is **never renumbered** — a retired feature's spec is marked superseded or removed, and its number is not reused.
 

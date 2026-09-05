@@ -16,6 +16,7 @@ What does **not** belong here:
 | Question | Home |
 |---|---|
 | Why this way? | `docs/adr/` (this folder) — frozen at acceptance |
+| What was **intended**, before the code existed? | [`../design/`](../design/) — frozen at adoption, never synced to the code |
 | How does this feature behave today? | [`../specs/`](../specs/) — living, updated with the code |
 | How does this module work? | [`../modules/`](../modules/) — living, code-adjacent |
 | What is the system shaped like? | [`../../ARCHITECTURE.md`](../../ARCHITECTURE.md) |

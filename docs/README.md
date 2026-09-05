@@ -26,18 +26,19 @@ Then, as the task demands:
 
 ---
 
-## The four documentation kinds
+## The five documentation kinds
 
-Every document here is exactly one of four kinds. The kind determines the home, the lifetime, and the question it answers. **Do not duplicate content across homes** — link instead. The recurring dividing line: a **spec** describes feature behavior *across* modules; a **module doc** describes one module's mechanics.
+Every document here is exactly one of five kinds. The kind determines the home, the lifetime, and the question it answers. **Do not duplicate content across homes** — link instead. The recurring dividing line: a **spec** describes feature behavior *across* modules; a **module doc** describes one module's mechanics.
 
 | Kind | Home | Lifetime | Answers |
 |------|------|----------|---------|
+| Design | [`design/`](design/_index.md) | Frozen at adoption; superseded, never rewritten | What was **intended**, before the code existed? |
 | Feature spec | [`specs/`](specs/_index.md) | Living — updated in the same commit that changes the behavior | How does this feature behave **today**? |
 | Decision | [`adr/`](adr/README.md) | Frozen at acceptance; superseded, never rewritten | **Why** was it built this way? |
 | Module doc | [`modules/`](modules/_index.md) | Living, code-adjacent — moves when the code moves | How does **this code** work, inside one module? |
 | Background | [`CONTEXT.md`](CONTEXT.md) (+ [`GLOSSARY.md`](GLOSSARY.md)) | Living, slow-changing | What is this **for**, for whom, and what do the terms mean? |
 
-The standard this repo follows also defines a fifth home, `docs/design/` — frozen design-time intent that seeds a spec's first version. **This repo has no `docs/design/`**: the features were built before the spec layer was reverse-engineered from the code, so there is no design-time snapshot to preserve. Specs here were seeded from the source tree and git history, not from designs.
+The fifth home, [`design/`](design/_index.md), was empty until 2026-09-04 and its emptiness used to be recorded here as deliberate: every feature predates the spec layer, so the specs in [`specs/`](specs/_index.md) were reverse-engineered from the source tree and git history rather than seeded from a design. That is still true of every SPEC-001..SPEC-010. It is no longer true of the repository: [`DESIGN-001`](design/DESIGN-001-ide-frame-redesign.md) is the first genuine design-time artifact this project has had — four rounds of shell redesign, of which option **3a** is adopted (built as `G-001`) and option **4a** deferred. A design record is the one kind here that is **never synced to the code**: it answers what was intended, and correcting it to match what shipped destroys the only question it exists to answer. Divergences are recorded in the spec, the ADR, or the record's own *Divergences* section — never by editing the artifact.
 
 ---
 
@@ -85,6 +86,19 @@ Frozen at acceptance. IDs are global, assigned in acceptance order, and **never 
 
 ---
 
+## `docs/design/` — frozen design intent
+
+What a change was **meant** to be, captured before it was built. The one home here that is never reconciled against
+the code — see the [freeze contract](design/_index.md#the-freeze-contract).
+
+| File | Role |
+|------|------|
+| [`design/_index.md`](design/_index.md) | The design home: the map, the freeze contract, the design-vs-ADR-vs-spec boundary, and how to open the canvas. |
+| [`design/DESIGN-001-ide-frame-redesign.md`](design/DESIGN-001-ide-frame-redesign.md) | DESIGN-001 — four turns of shell redesign on the Broadsheet system. Option **3a** (IDE-standard tool-window frame) adopted and realised by epic `G-001`; option **4a** (theme switch, colour-as-meaning) deferred. Carries the verbatim 3a inventory and the SHA-256 provenance manifest. |
+| [`design/canvas/`](design/canvas/) | The vendored canvas — 10 files, 343,869 bytes, byte-for-byte. Needs network to render (see the record). |
+
+---
+
 ## `docs/specs/` — feature specs
 
 Living current-truth contracts, one per feature. Shape is **flat**, numbering is global seeding order, and a `SPEC-NNN` is never renumbered. The sync surface in each file is `## Current behavior & invariants`.
@@ -128,6 +142,8 @@ How the code works inside one project. Dependencies point one way only: outward 
 2. **A new load-bearing decision gets an ADR** — one that is hard to reverse and hard to infer from the code, written from evidence (a commit, a config file, a CI workflow), with a new number and a row in [`adr/README.md`](adr/README.md).
 3. **Module docs move with the code** — renaming a type, changing a dependency edge, or shifting the coverage boundary updates the owning `modules/*.md` and, if the edge changed, [`../ARCHITECTURE.md`](../ARCHITECTURE.md).
 
-Adding a file to any home also adds its row here and in that home's index (`adr/README.md`, `specs/_index.md`, `modules/_index.md`). A doc that would be created empty is not created at all.
+Adding a file to any home also adds its row here and in that home's index (`adr/README.md`, `specs/_index.md`, `modules/_index.md`, `design/_index.md`). A doc that would be created empty is not created at all.
 
-**Deliberately absent.** `ROADMAP.md` does not exist: this repo holds no forward-work source — no planned-feature list, no issue export, no in-flight tracker — so a roadmap could only be invented. `docs/design/` does not exist for the reason given above. Both are omissions on purpose, not gaps to fill.
+4. **A design record is never updated to match the code** — when the build diverges from the design, record the divergence in the spec, the ADR, or the record's own *Divergences* section. This applies to automated doc-reconciliation passes as much as to people: `docs/design/**` is read-only to them.
+
+**Deliberately absent.** `ROADMAP.md` does not exist: forward work lives on the task board at `docs/todo/` (epic `G-001` and its tickets), which is finer-grained than a roadmap and is the thing a roadmap would have to summarise — so a roadmap would duplicate it, not add to it. That omission is on purpose, not a gap to fill.

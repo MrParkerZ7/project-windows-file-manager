@@ -233,6 +233,7 @@ Where each kind of knowledge lives. Read the one that matches the question — d
 
 | Question | Home | Notes |
 |----------|------|-------|
+| What was **intended**, before the code existed? | [docs/design/](docs/design/) — `DESIGN-NNN-<slug>.md` + `canvas/` | Frozen design-time intent. **Never** synced to the code — a divergence is recorded in the spec, not by rewriting the design. `docs/design/**` is outside the sync surface of any docs-refresh pass. |
 | How does this feature behave **today**? | [docs/specs/](docs/specs/) — `SPEC-NNN-<feature>.md` | The current-truth behavior contract per feature. Global `SPEC-NNN` numbering, never renumbered. |
 | **Why** was it built this way? | [docs/adr/](docs/adr/) — `ADR-NNN-*.md` | One record per load-bearing decision; frozen once accepted. |
 | How does this **code** work? | [docs/modules/](docs/modules/) | Per-module mechanics (Core / Application / Infrastructure / UI). A feature spans modules; a module doc covers one. |

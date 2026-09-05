@@ -1,0 +1,6 @@
+# The frozen design canvas is a byte-exact vendored artifact; its recorded
+# SHA-256 digests (docs/design/DESIGN-001-ide-frame-redesign.md § Provenance)
+# must reproduce on any clone. No EOL conversion, no diff/merge munging.
+docs/design/canvas/** -text
+docs/design/canvas/**/*.png binary
+docs/design/canvas/.thumbnail binary

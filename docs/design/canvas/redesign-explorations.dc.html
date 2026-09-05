@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300..900;1,8..60,300..900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/duotone/style.css">
+<link rel="stylesheet" href="_ds/broadsheet-20e204aa-d8f4-4c1f-9771-d781d63fcc9d/styles.css">
+<script src="_ds/broadsheet-20e204aa-d8f4-4c1f-9771-d781d63fcc9d/_ds_bundle.js"></script>
+<style>
+body{margin:0;background:#dcdad8;font-family:var(--font-body);color:var(--color-text)}
+a{color:var(--color-accent)}a:hover{color:var(--color-accent-600)}
+.dv-turn{padding:40px 44px 32px;border-bottom:1px solid rgba(0,0,0,.08);scroll-margin-top:16px}
+.dv-thd{display:flex;align-items:baseline;gap:10px;margin:0 0 20px}
+.dv-tid{font:600 10px ui-monospace,Menlo,monospace;padding:3px 7px;background:#1a1a1a;color:#fff;border-radius:4px;text-decoration:none}
+.dv-tname{font:600 13px/1.2 system-ui,sans-serif;color:#1a1a1a}
+.dv-opts{display:flex;flex-wrap:wrap;gap:36px;align-items:flex-start}
+.dv-opt{flex:none;display:flex;flex-direction:column;gap:9px;scroll-margin-top:16px}
+.dv-oid{font:600 10.5px ui-monospace,Menlo,monospace;padding:3px 7px;background:rgba(0,0,0,.08);color:#1a1a1a;border-radius:5px;text-decoration:none}
+.dv-olabel{display:flex;align-items:baseline;gap:8px;font:400 12px/1.4 system-ui,sans-serif;color:rgba(0,0,0,.6);max-width:900px}
+.dv-card{max-width:100%;background:var(--color-bg);border:1px solid rgba(0,0,0,.18);box-shadow:0 14px 44px rgba(0,0,0,.28);overflow:hidden;position:relative}
+.dv-opt:target .dv-oid{background:#2a78d6;color:#fff}
+.dv-next{margin:22px 0 0;font:12px/1.5 system-ui,sans-serif;color:rgba(0,0,0,.5)}
+.dv-brief{max-width:860px;font:13px/1.55 system-ui,sans-serif;color:rgba(0,0,0,.7);margin:0 0 26px}
+.dv-brief b{color:#1a1a1a}
+</style>
+</helmet>
+
+<section class="dv-turn" id="t4">
+<div class="dv-thd"><a class="dv-tid" href="#t4">4</a><span class="dv-tname">Colour + theme switch on <a class="dv-oid" href="#3a">3a</a></span></div>
+<p class="dv-brief"><b>Colour as meaning, IDE-style:</b> cyan = interactive / keep, magenta = remove / destructive, print-yellow = attention (marked totals, warnings); every tool-window title carries a Phosphor duotone icon in its own hue; file-type tags are tinted per type; selected rows tint. <b>Theme switch</b> in the title bar (also in Tweaks) flips the whole frame to a dark scheme built from the neutral ramp's 800–900 steps — a deliberate extension of the system, which ships light-only.</p>
+<div class="dv-opts">
+
+<!-- ═══════════════ 4a ═══════════════ -->
+<div class="dv-opt" id="4a"><div class="dv-olabel"><a class="dv-oid" href="#4a">4a</a>Duplicates · 1600×900 · click Light / Dark in the title bar.</div>
+<div class="dv-card" data-screen-label="4a Colourful IDE Duplicates" style="width:1600px;height:900px;display:flex;flex-direction:column;font-size:13px;color:var(--color-text);background:var(--color-bg); --color-bg: {{ tBg }}; --color-surface: {{ tSurface }}; --color-text: {{ tText }}; --color-divider: {{ tDivider }}; --color-neutral-100: {{ tN100 }}; --color-neutral-500: {{ tN500 }}; --color-neutral-600: {{ tN600 }}; --color-neutral-700: {{ tN700 }}; --color-accent-100: {{ tA100 }}; --color-accent-800: {{ tA800 }}; --color-accent-2-100: {{ tB100 }}; --color-accent-2-800: {{ tB800 }}; --y-100: {{ tY100 }}; --y-800: {{ tY800 }}; --color-neutral-800: {{ tN800 }}; --color-accent: {{ tAccent }}; --color-accent-2: {{ tAccent2 }}; --color-accent-600: {{ tA600 }}">
+  <div style="height:36px;display:flex;align-items:center;padding:0 14px;gap:14px;flex:none;background:var(--color-surface);border-bottom:1px solid var(--color-divider)">
+    <i class="ph-duotone ph-folders" style="font-size:20px;color:var(--color-accent)"></i>
+    <span style="font-family:var(--font-heading);font-weight:600;font-size:14px">Folder File Control</span>
+    <span style="display:inline-flex;align-items:center;gap:6px;color:var(--color-neutral-600)"><i class="ph-duotone ph-user-circle" style="font-size:16px;color:var(--color-accent-2)"></i>Photos cleanup ▾</span>
+    <span style="margin-left:auto;display:inline-flex;align-items:center;border:1px solid var(--color-divider);border-radius:var(--radius-md);overflow:hidden;font-size:12px">
+      <span onClick="{{ setLight }}" style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;cursor:pointer;background: {{ lightSegBg }}; color: {{ lightSegFg }}"><i class="ph-duotone ph-sun" style="font-size:14px"></i>Light</span>
+      <span onClick="{{ setDark }}" style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;cursor:pointer;background: {{ darkSegBg }}; color: {{ darkSegFg }}"><i class="ph-duotone ph-moon" style="font-size:14px"></i>Dark</span>
+    </span>
+    <span style="display:flex;gap:26px;font-size:12px;color:var(--color-neutral-600);margin-left:14px"><span>—</span><span>▢</span><span>✕</span></span>
+  </div>
+  <div style="height:40px;display:flex;align-items:stretch;padding:0 14px;flex:none;border-bottom:1px solid var(--color-divider)">
+    <span style="display:inline-flex;align-items:center;gap:8px;padding:0 16px;font-family:var(--font-heading);font-weight:600;font-size:14px;border-bottom:2px solid var(--color-accent);margin-bottom:-1px;background:var(--color-accent-100)"><i class="ph-duotone ph-copy" style="font-size:17px;color:var(--color-accent)"></i>Duplicates</span>
+    <span style="display:inline-flex;align-items:center;gap:8px;padding:0 16px;font-family:var(--font-heading);font-size:14px;color:var(--color-neutral-600)"><i class="ph-duotone ph-folder-open" style="font-size:17px;color:var(--y-800)"></i>Folders</span>
+    <span style="display:inline-flex;align-items:center;gap:8px;padding:0 16px;font-family:var(--font-heading);font-size:14px;color:var(--color-neutral-600)"><i class="ph-duotone ph-clock-counter-clockwise" style="font-size:17px;color:var(--color-accent-2)"></i>History</span>
+    <span style="margin-left:auto;display:inline-flex;align-items:center;gap:12px"><button class="btn btn-primary" style="min-height:28px;padding:0 14px;font-size:13px;gap:6px"><i class="ph-duotone ph-magnifying-glass" style="font-size:15px"></i>Scan</button><span style="color:var(--color-neutral-600)">last scan 10:12 · 4.2 s</span></span>
+  </div>
+  <div style="flex:1;display:grid;grid-template-columns:260px 1px 1fr 1px 360px;min-height:0">
+    <section style="display:flex;flex-direction:column;min-height:0">
+      <header style="height:32px;display:flex;align-items:center;gap:8px;padding:0 12px;border-bottom:1px solid var(--color-divider);flex:none;background:var(--color-surface)"><i class="ph-duotone ph-crosshair" style="font-size:16px;color:var(--color-accent)"></i><span style="font-weight:600">Scope</span><span style="margin-left:auto;display:flex;gap:12px;font-size:12px"><a href="#4a">+ Folder</a><a href="#4a" style="color:var(--color-neutral-600)">⋯</a></span></header>
+      <div style="padding:10px 12px 0">
+        <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-neutral-600);padding:4px 0">Target folders</div>
+        <div style="display:flex;flex-direction:column">
+          <div style="display:flex;align-items:center;gap:8px;padding:5px 6px;background:var(--color-accent-100);border-left:2px solid var(--color-accent)"><i class="ph-duotone ph-check-square" style="font-size:16px;color:var(--color-accent)"></i><span>D:\Photos</span></div>
+          <div style="display:flex;align-items:center;gap:8px;padding:5px 6px"><i class="ph-duotone ph-check-square" style="font-size:16px;color:var(--color-accent)"></i><span>D:\Backup\Photos</span></div>
+          <div style="display:flex;align-items:center;gap:8px;padding:5px 6px;color:var(--color-neutral-500)"><i class="ph-duotone ph-square" style="font-size:16px"></i><span>E:\OneDrive\Pictures</span></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;padding:8px 6px 0"><i class="ph-duotone ph-check-square" style="font-size:16px;color:var(--color-accent)"></i><span>Include subfolders</span></div>
+        <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-neutral-600);padding:4px 0;margin-top:18px;display:flex"><span>Skip folders named</span><a href="#4a" style="margin-left:auto;text-transform:none;letter-spacing:0">+ Add</a></div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;padding:4px 6px 0"><span class="tag" style="background:var(--y-100);color:var(--y-800)">node_modules</span><span class="tag" style="background:var(--y-100);color:var(--y-800)">.git</span><span class="tag" style="background:var(--y-100);color:var(--y-800)">bin</span></div>
+        <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-neutral-600);padding:4px 0;margin-top:18px">Match duplicates by</div>
+        <div class="seg" style="margin:4px 6px 0"><label class="seg-opt" style="padding:5px 10px;font-size:12.5px"><input type="radio" name="a4-match" checked>Content</label><label class="seg-opt" style="padding:5px 10px;font-size:12.5px"><input type="radio" name="a4-match">Name pattern</label></div>
+      </div>
+    </section>
+    <div style="background:var(--color-divider)"></div>
+    <section style="display:flex;flex-direction:column;min-width:0;min-height:0">
+      <header style="height:32px;display:flex;align-items:center;padding:0 12px;border-bottom:1px solid var(--color-divider);flex:none;gap:8px;background:var(--color-surface)"><i class="ph-duotone ph-copy" style="font-size:16px;color:var(--color-accent)"></i><span style="font-weight:600">Duplicate groups</span><span style="color:var(--color-neutral-600)">3 of 3</span><span style="display:inline-flex;align-items:center;gap:8px;margin-left:8px"><span style="width:140px;height:6px;border-radius:3px;background:var(--color-neutral-100);overflow:hidden;display:inline-block"><span style="display:block;width:67%;height:100%;background:var(--color-accent-2)"></span></span><span style="color:var(--color-accent-2);font-weight:600">27.5 MB</span><span style="color:var(--color-neutral-600)">of 41.2 MB marked</span></span><span style="margin-left:auto;display:flex;gap:12px;font-size:12px"><a href="#4a">Expand all</a><a href="#4a">Collapse all</a></span></header>
+      <div style="height:36px;display:flex;align-items:center;padding:0 12px;gap:8px;border-bottom:1px solid var(--color-divider);background:var(--color-neutral-100);flex:none;font-size:12.5px">
+        <i class="ph-duotone ph-funnel" style="font-size:15px;color:var(--color-neutral-600)"></i>
+        <span style="border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:2px 8px;background:var(--color-bg)">All types ▾</span>
+        <span style="border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:2px 8px;background:var(--color-bg)">Copies ≥ 2</span>
+        <span style="border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:2px 8px;background:var(--color-bg)">Size ≥ 0 MB ▾</span>
+        <span style="border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:2px 8px;background:var(--color-bg)"><i class="ph-duotone ph-sort-descending" style="font-size:13px;vertical-align:-2px"></i> Wasted space ▾</span>
+        <span style="width:1px;height:20px;background:var(--color-divider);margin:0 6px"></span>
+        <i class="ph-duotone ph-check-square-offset" style="font-size:15px;color:var(--color-accent-2)"></i><span style="color:var(--color-neutral-600)">Mark</span><a href="#4a">All</a><a href="#4a">Newer</a><a href="#4a">Older</a><a href="#4a">By rules</a><a href="#4a" style="color:var(--color-neutral-600)">None</a>
+      </div>
+      <div style="display:grid;grid-template-columns:28px 1fr 130px 90px 84px 90px;gap:10px;padding:0 12px;height:26px;align-items:center;border-bottom:1px solid var(--color-divider);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-neutral-600);flex:none"><span></span><span>File / copy</span><span>Modified</span><span style="text-align:right">Size</span><span>Decision</span><span></span></div>
+      <div style="flex:1;overflow:hidden">
+        <sc-for list="{{ groups }}" as="g" hint-placeholder-count="3">
+        <div>
+          <div style="display:grid;grid-template-columns:28px 1fr 130px 90px 84px 90px;gap:10px;padding:0 12px;height:34px;align-items:center;background:var(--color-surface);border-bottom:1px solid var(--color-divider)"><i class="ph-duotone ph-caret-down" style="font-size:12px;color:var(--color-neutral-600)"></i><span style="display:flex;align-items:center;gap:8px;min-width:0"><i class="{{ g.icon }}" style="font-size:18px;color: {{ g.tagFg }}"></i><span style="font-weight:600">{{ g.first }}</span><span class="tag" style="font-size:10px;padding:1px 6px;background: {{ g.tagBg }}; color: {{ g.tagFg }}">{{ g.ext }}</span><span style="color:var(--color-neutral-600);font-size:12px">{{ g.count }} copies · {{ g.size }} each</span></span><span></span><span style="text-align:right;color:var(--color-accent-2);font-weight:600">{{ g.wasted }}</span><span></span><span style="display:flex;gap:10px;font-size:12px;justify-content:flex-end"><a href="#4a"><i class="ph-duotone ph-eye" style="font-size:15px"></i></a><a href="#4a" style="color:var(--color-accent-2)"><i class="ph-duotone ph-trash" style="font-size:15px"></i></a></span></div>
+          <sc-for list="{{ g.files }}" as="f" hint-placeholder-count="2">
+          <div style="display:grid;grid-template-columns:28px 1fr 130px 90px 84px 90px;gap:10px;padding:0 12px;height:30px;align-items:center;border-bottom:1px solid color-mix(in srgb, var(--color-text) 6%, transparent);background: {{ f.rowBg }}"><span></span><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-left:26px;color: {{ f.pathColor }}">{{ f.path }}</span><span style="color:var(--color-neutral-600);font-size:12.5px">{{ f.date }}</span><span style="text-align:right">{{ f.size }}</span><span class="tag" style="font-size:10px;padding:1px 7px;letter-spacing:.06em;text-transform:uppercase;justify-self:start;background: {{ f.pillBg }}; color: {{ f.pillFg }}">{{ f.verb }}</span><span style="display:flex;gap:10px;font-size:12px;justify-content:flex-end"><a href="#4a"><i class="ph-duotone ph-folder-open" style="font-size:15px"></i></a><a href="#4a" style="color:var(--color-neutral-600)">⋯</a></span></div>
+          </sc-for>
+        </div>
+        </sc-for>
+      </div>
+      <div style="height:42px;display:flex;align-items:center;padding:0 12px;gap:10px;border-top:1px solid var(--color-divider);background:var(--y-100);flex:none"><i class="ph-duotone ph-warning" style="font-size:18px;color:var(--y-800)"></i><span style="font-weight:600;color:var(--y-800)">4 files marked · 27.5 MB</span><span style="color:var(--color-neutral-600)">goes to the Recycle Bin, undoable from History</span><span style="margin-left:auto"></span><button class="btn btn-secondary" style="min-height:28px;padding:0 12px;font-size:13px;gap:6px"><i class="ph-duotone ph-arrow-square-out" style="font-size:15px"></i>Move to…</button><button class="btn" style="min-height:28px;padding:0 12px;font-size:13px;gap:6px;background:var(--color-accent-2);color:var(--color-bg)"><i class="ph-duotone ph-trash" style="font-size:15px"></i>Recycle 4 files</button></div>
+    </section>
+    <div style="background:var(--color-divider)"></div>
+    <div style="display:grid;grid-template-rows:1fr 1px 1fr;min-height:0">
+      <section style="display:flex;flex-direction:column;min-height:0">
+        <header style="height:32px;display:flex;align-items:center;gap:8px;padding:0 12px;border-bottom:1px solid var(--color-divider);flex:none;background:var(--color-surface)"><i class="ph-duotone ph-eye" style="font-size:16px;color:var(--color-accent)"></i><span style="font-weight:600">Preview</span><span style="margin-left:auto;display:flex;gap:12px;font-size:12px"><a href="#4a">Auto ✓</a><a href="#4a" style="color:var(--color-neutral-600)">✕</a></span></header>
+        <div style="padding:12px;display:flex;flex-direction:column;gap:8px;min-height:0">
+          <div class="halftone" style="aspect-ratio:4/3;background:linear-gradient(160deg,var(--color-accent-300),var(--color-accent-700));display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--color-bg)">photo</div>
+          <div style="display:flex;align-items:center;gap:8px"><i class="ph-duotone ph-image" style="font-size:18px;color:var(--color-accent)"></i><span style="font-weight:600">IMG_2041.jpg</span><span class="tag tag-accent" style="font-size:10px;padding:1px 6px">.jpg</span></div>
+          <div style="display:grid;grid-template-columns:auto 1fr;gap:2px 14px;font-size:12.5px;color:var(--color-neutral-700)"><span style="color:var(--color-neutral-600)">Size</span><span>6.2 MB</span><span style="color:var(--color-neutral-600)">Pixels</span><span>4032 × 3024</span><span style="color:var(--color-neutral-600)">Modified</span><span>14 Mar 2019</span><span style="color:var(--color-neutral-600)">Path</span><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">D:\Photos\FamilyAlbum\IMG_2041.jpg</span></div>
+        </div>
+      </section>
+      <div style="background:var(--color-divider)"></div>
+      <section style="display:flex;flex-direction:column;min-height:0">
+        <header style="height:32px;display:flex;align-items:center;gap:8px;padding:0 12px;border-bottom:1px solid var(--color-divider);flex:none;background:var(--color-surface)"><i class="ph-duotone ph-funnel-simple" style="font-size:16px;color:var(--color-accent-2)"></i><span style="font-weight:600">Rules</span><span style="margin-left:auto;display:flex;gap:12px;font-size:12px"><a href="#4a">+ Rule</a><a href="#4a">Apply</a></span></header>
+        <div style="height:32px;display:flex;align-items:center;padding:0 12px;gap:12px;border-bottom:1px solid var(--color-divider);background:var(--color-neutral-100);font-size:12px;flex:none"><a href="#4a">Enable all</a><a href="#4a">Disable all</a><span style="margin-left:auto;color:var(--color-neutral-600)">first match wins</span></div>
+        <div style="display:flex;flex-direction:column;font-size:13px">
+          <div style="display:grid;grid-template-columns:22px 1fr auto auto;gap:8px;align-items:center;padding:7px 12px;border-bottom:1px solid color-mix(in srgb, var(--color-text) 6%, transparent)"><i class="ph-duotone ph-check-square" style="font-size:16px;color:var(--color-accent)"></i><span><span class="tag tag-accent-2" style="font-size:10px;padding:1px 6px;margin-right:6px">NEVER MARK</span>path contains <span style="font-family:ui-monospace,Menlo,monospace;font-size:12px">\Originals\</span></span><span class="tag tag-neutral" style="font-size:10px;padding:1px 6px">Aa</span><span></span></div>
+          <div style="display:grid;grid-template-columns:22px 1fr auto auto;gap:8px;align-items:center;padding:7px 12px;border-bottom:1px solid color-mix(in srgb, var(--color-text) 6%, transparent);color:var(--color-neutral-500)"><i class="ph-duotone ph-square" style="font-size:16px"></i><span><span class="tag tag-neutral" style="font-size:10px;padding:1px 6px;margin-right:6px">MARK</span>name matches <span style="font-family:ui-monospace,Menlo,monospace;font-size:12px">^IMG_\d+ \(\d\)</span></span><span class="tag tag-neutral" style="font-size:10px;padding:1px 6px">.*</span><span></span></div>
+        </div>
+        <div style="padding:10px 12px;display:flex;gap:6px;align-items:center;font-size:12.5px;flex-wrap:wrap"><span style="border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:2px 8px">Mark ▾</span><span style="border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:2px 8px">name ▾</span><input class="input" placeholder="text or /regex/" style="min-height:28px;font-size:12.5px;flex:1;min-width:120px;background:var(--color-bg);color:var(--color-text)"><button class="btn btn-secondary" style="min-height:28px;padding:0 10px;font-size:12.5px">Add</button></div>
+      </section>
+    </div>
+  </div>
+  <div style="height:28px;display:flex;align-items:center;padding:0 12px;gap:18px;font-size:12px;color:var(--color-neutral-600);border-top:1px solid var(--color-divider);background:var(--color-surface);flex:none"><span style="display:inline-flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:var(--color-accent)"></span>Ready</span><span style="display:inline-flex;align-items:center;gap:5px"><i class="ph-duotone ph-arrow-counter-clockwise" style="font-size:14px;color:var(--color-accent)"></i><a href="#1d">Undo</a> recycle of 4 files, 10:12</span><span style="margin-left:auto;display:inline-flex;align-items:center;gap:5px"><i class="ph-duotone ph-memory" style="font-size:14px;color:var(--color-accent)"></i>186 MB</span><span style="display:inline-flex;align-items:center;gap:5px"><i class="ph-duotone ph-cpu" style="font-size:14px;color:var(--y-800)"></i>0.4%</span><span>31 threads</span></div>
+</div></div>
+
+</div>
+<p class="dv-next">Try next: "carry <a class="dv-oid" href="#4a">4a</a>'s colour into the Folders screen <a class="dv-oid" href="#3b">3b</a>" · "less colour — icons only, no tinted rows" · "add a compact density toggle next to the theme switch"</p>
+</section>
+<section class="dv-turn" id="t3">
+<div class="dv-thd"><a class="dv-tid" href="#t3">3</a><span class="dv-tname">IDE-standard structure (IntelliJ conventions) in Broadsheet</span></div>
+<p class="dv-brief">Borrowed from IDE tool-window practice: <b>every panel has a 30px title bar</b> (name left, actions right, hairline under it); panels are separated by <b>1px splitters</b>; main tabs are underlined editor tabs; each panel gets one <b>toolbar row</b> for its controls; a single status bar at the bottom. The typography, colors and controls stay Broadsheet — only the framing is IDE-standard.</p>
+<div class="dv-opts">
+
+<!-- ═══════════════ 3a ═══════════════ -->
+<div class="dv-opt" id="3a"><div class="dv-olabel"><a class="dv-oid" href="#3a">3a</a>Duplicates · 1600×900. Scope tool-window left, results editor centre with filter toolbar, Preview + Rules tool-windows right, marked-files action bar bottom.</div>
+<div class="dv-card" data-screen-label="3a IDE Duplicates" style="width:1600px;height:900px;display:flex;flex-direction:column;font-size:13px">
+  <div style="height:34px;display:flex;align-items:center;padding:0 14px;gap:14px;flex:none;background:var(--color-surface);border-bottom:1px solid var(--color-divider)"><span style="font-family:var(--font-heading);font-weight:600;font-size:14px">Folder File Control</span><span style="color:var(--color-neutral-600)">Photos cleanup ▾</span><span style="margin-left:auto;display:flex;gap:26px;font-size:12px;color:var(--color-neutral-600)"><span>—</span><span>▢</span><span>✕</span></span></div>
+  <!-- main tabs -->
+  <div style="height:38px;display:flex;align-items:stretch;padding:0 14px;flex:none;border-bottom:1px solid var(--color-divider);background:var(--color-bg)">
+    <span style="display:inline-flex;align-items:center;padding:0 16px;font-family:var(--font-heading);font-weight:600;font-size:14px;border-bottom:2px solid var(--color-accent);margin-bottom:-1px">Duplicates</span>
+    <span style="display:inline-flex;align-items:center;padding:0 16px;font-family:var(--font-heading);font-size:14px;color:var(--color-neutral-600)">Folders</span>
+    <span style="display:inline-flex;align-items:center;padding:0 16px;font-family:var(--font-heading);font-size:14px;color:var(--color-neutral-600)">History</span>
+    <span style="margin-left:auto;display:inline-flex;align-items:center;gap:10px"><button class="btn btn-primary" style="min-height:28px;padding:0 14px;font-size:13px">Scan</button><span style="color:var(--color-neutral-600)">last scan 10:12 · 4.2 s</span></span>
+  </div>
+  <div style="flex:1;display:grid;grid-template-columns:260px 1px 1fr 1px 360px;min-height:0">
+    <!-- Scope tool window -->
+    <section style="display:flex;flex-direction:column;min-height:0;background:var(--color-bg)">
+      <header style="height:30px;display:flex;align-items:center;padding:0 12px;border-bottom:1px solid var(--color-divider);flex:none"><span style="font-weight:600">Scope</span><span style="margin-left:auto;display:flex;gap:12px;font-size:12px"><a href="#3a">+ Folder</a><a href="#3a" style="color:var(--color-neutral-600)">⋯</a></span></span></header>
+      <div style="padding:10px 12px 0">
+        <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-neutral-600);padding:4px 0">Target folders</div>
+        <div style="display:flex;flex-direction:column">
+          <div style="display:flex;align-items:center;gap:8px;padding:5px 6px;background:var(--color-accent-100)"><span style="display:inline-block;width:14px;height:14px;border:1.5px solid var(--color-accent);border-radius:2px;background:var(--color-accent)"></span><span>D:\Photos</span><span style="margin-left:auto;font-size:12px;color:var(--color-neutral-600)">2 sub</span></div>
+          <div style="display:flex;align-items:center;gap:8px;padding:5px 6px"><span style="display:inline-block;width:14px;height:14px;border:1.5px solid var(--color-accent);border-radius:2px;background:var(--color-accent)"></span><span>D:\Backup\Photos</span></div>
+          <div style="display:flex;align-items:center;gap:8px;padding:5px 6px;color:var(--color-neutral-500)"><span style="display:inline-block;width:14px;height:14px;border:1.5px solid var(--color-neutral-500);border-radius:2px"></span><span>E:\OneDrive\Pictures</span></div>
+        </div>
+        <label class="radio" style="margin:8px 6px 0;font-size:13px"><span class="dot" style="border-radius:2px;background:var(--color-accent);border-color:var(--color-accent)"></span>Include subfolders</label>
+        <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-neutral-600);padding:4px 0;margin-top:18px;display:flex"><span>Skip folders named</span><a href="#3a" style="margin-left:auto;text-transform:none;letter-spacing:0">+ Add</a></div>
+        <div style="display:flex;flex-direction:column">
+          <div style="display:flex;align-items:center;gap:8px;padding:5px 6px"><span style="display:inline-block;width:14px;height:14px;border:1.5px solid var(--color-accent);border-radius:2px;background:var(--color-accent)"></span><span>node_modules</span></div>
+          <div style="display:flex;align-items:center;gap:8px;padding:5px 6px"><span style="display:inline-block;width:14px;height:14px;border:1.5px solid var(--color-accent);border-radius:2px;background:var(--color-accent)"></span><span>.git</span></div>
+          <div style="display:flex;align-items:center;gap:8px;padding:5px 6px"><span style="display:inline-block;width:14px;height:14px;border:1.5px solid var(--color-accent);border-radius:2px;background:var(--color-accent)"></span><span>bin</span></div>
+        </div>
+        <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-neutral-600);padding:4px 0;margin-top:18px">Match duplicates by</div>
+        <div class="seg" style="margin:4px 6px 0"><label class="seg-opt" style="padding:5px 10px;font-size:12.5px"><input type="radio" name="a3-match" checked>Content</label><label class="seg-opt" style="padding:5px 10px;font-size:12.5px"><input type="radio" name="a3-match">Name pattern</label></div>
+      </div>
+    </section>
+    <div style="background:var(--color-divider)"></div>
+    <!-- Results editor -->
+    <section style="display:flex;flex-direction:column;min-width:0;min-height:0">
+      <header style="height:30px;display:flex;align-items:center;padding:0 12px;border-bottom:1px solid var(--color-divider);flex:none;gap:8px"><span style="font-weight:600">Duplicate groups</span><span style="color:var(--color-neutral-600)">3 of 3 · 41.2 MB reclaimable</span><span style="margin-left:auto;display:flex;gap:12px;font-size:12px"><a href="#3a">Expand all</a><a href="#3a">Collapse all</a></span></header>
+      <!-- toolbar -->
+      <div style="height:36px;display:flex;align-items:center;padding:0 12px;gap:8px;border-bottom:1px solid var(--color-divider);background:var(--color-neutral-100);flex:none;font-size:12.5px">
+        <span style="color:var(--color-neutral-600)">Type</span><span style="border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:2px 8px;background:var(--color-bg)">All ▾</span>
+        <span style="color:var(--color-neutral-600);margin-left:6px">Copies ≥</span><span style="border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:2px 8px;background:var(--color-bg);width:22px;text-align:center">2</span>
+        <span style="color:var(--color-neutral-600);margin-left:6px">Size ≥</span><span style="border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:2px 8px;background:var(--color-bg)">0 MB ▾</span>
+        <span style="color:var(--color-neutral-600);margin-left:6px">Sort</span><span style="border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:2px 8px;background:var(--color-bg)">Wasted space ↓ ▾</span>
+        <span style="width:1px;height:20px;background:var(--color-divider);margin:0 6px"></span>
+        <span style="color:var(--color-neutral-600)">Mark</span><a href="#3a">All</a><a href="#3a">Newer</a><a href="#3a">Older</a><a href="#3a">By rules</a><a href="#3a" style="color:var(--color-neutral-600)">None</a>
+      </div>
+      <!-- column header -->
+      <div style="display:grid;grid-template-columns:28px 1fr 130px 90px 70px 90px;gap:10px;padding:0 12px;height:26px;align-items:center;border-bottom:1px solid var(--color-divider);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-neutral-600);flex:none"><span></span><span>File / copy</span><span>Modified</span><span style="text-align:right">Size</span><span>Keep</span><span></span></div>
+      <div style="flex:1;overflow:hidden">
+        <sc-for list="{{ groups }}" as="g" hint-placeholder-count="3">
+        <div>
+          <div style="display:grid;grid-template-columns:28px 1fr 130px 90px 70px 90px;gap:10px;padding:0 12px;height:32px;align-items:center;background:var(--color-surface);border-bottom:1px solid var(--color-divider)"><span style="font-size:10px;color:var(--color-neutral-600)">▼</span><span style="display:flex;align-items:baseline;gap:8px;min-width:0"><span style="font-weight:600">{{ g.first }}</span><span class="tag tag-accent" style="font-size:10px;padding:1px 6px">{{ g.ext }}</span><span style="color:var(--color-neutral-600);font-size:12px">{{ g.count }} copies · {{ g.size }} each · {{ g.wasted }} wasted</span></span><span></span><span></span><span></span><span style="display:flex;gap:10px;font-size:12px;justify-content:flex-end"><a href="#3a">Preview</a><a href="#3a">Recycle</a></span></div>
+          <sc-for list="{{ g.files }}" as="f" hint-placeholder-count="2">
+          <div style="display:grid;grid-template-columns:28px 1fr 130px 90px 70px 90px;gap:10px;padding:0 12px;height:30px;align-items:center;border-bottom:1px solid color-mix(in srgb, var(--color-text) 6%, transparent)"><span></span><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-left:16px;color: {{ f.pathColor }}">{{ f.path }}</span><span style="color:var(--color-neutral-600);font-size:12.5px">{{ f.date }}</span><span style="text-align:right">{{ f.size }}</span><span style="display:inline-flex;width:15px;height:15px;border-radius:50%;border:1.5px solid var(--color-text);align-items:center;justify-content:center"><span style="width:7px;height:7px;border-radius:50%;background: {{ f.keepDot }}"></span></span><span style="display:flex;gap:10px;font-size:12px;justify-content:flex-end"><a href="#3a">Open</a><a href="#3a" style="color:var(--color-neutral-600)">⋯</a></span></div>
+          </sc-for>
+        </div>
+        </sc-for>
+      </div>
+      <!-- action bar -->
+      <div style="height:40px;display:flex;align-items:center;padding:0 12px;gap:10px;border-top:1px solid var(--color-divider);background:var(--color-neutral-100);flex:none"><span style="font-weight:600">4 marked</span><span style="color:var(--color-neutral-600)">27.5 MB · <span style="color:var(--color-accent-2)">will be recycled</span></span><span style="margin-left:auto"></span><button class="btn btn-secondary" style="min-height:28px;padding:0 12px;font-size:13px">Move to…</button><button class="btn btn-primary" style="min-height:28px;padding:0 12px;font-size:13px">Recycle 4 files</button></div>
+    </section>
+    <div style="background:var(--color-divider)"></div>
+    <!-- Right tool windows -->
+    <div style="display:grid;grid-template-rows:1fr 1px 1fr;min-height:0">
+      <section style="display:flex;flex-direction:column;min-height:0">
+        <header style="height:30px;display:flex;align-items:center;padding:0 12px;border-bottom:1px solid var(--color-divider);flex:none"><span style="font-weight:600">Preview</span><span style="margin-left:auto;display:flex;gap:12px;font-size:12px"><a href="#3a">Auto ✓</a><a href="#3a" style="color:var(--color-neutral-600)">✕</a></span></header>
+        <div style="padding:12px;display:flex;flex-direction:column;gap:8px;min-height:0">
+          <div class="halftone" style="aspect-ratio:4/3;background:linear-gradient(160deg,var(--color-neutral-300),var(--color-neutral-500));display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--color-bg)">photo</div>
+          <div style="font-weight:600">IMG_2041.jpg</div>
+          <div style="display:grid;grid-template-columns:auto 1fr;gap:2px 14px;font-size:12.5px;color:var(--color-neutral-700)"><span style="color:var(--color-neutral-600)">Size</span><span>6.2 MB</span><span style="color:var(--color-neutral-600)">Pixels</span><span>4032 × 3024</span><span style="color:var(--color-neutral-600)">Modified</span><span>14 Mar 2019</span><span style="color:var(--color-neutral-600)">Path</span><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">D:\Photos\FamilyAlbum\IMG_2041.jpg</span></div>
+        </div>
+      </section>
+      <div style="background:var(--color-divider)"></div>
+      <section style="display:flex;flex-direction:column;min-height:0">
+        <header style="height:30px;display:flex;align-items:center;padding:0 12px;border-bottom:1px solid var(--color-divider);flex:none"><span style="font-weight:600">Rules</span><span style="margin-left:auto;display:flex;gap:12px;font-size:12px"><a href="#3a">+ Rule</a><a href="#3a">Apply</a></span></header>
+        <div style="height:32px;display:flex;align-items:center;padding:0 12px;gap:12px;border-bottom:1px solid var(--color-divider);background:var(--color-neutral-100);font-size:12px;flex:none"><a href="#3a">Enable all</a><a href="#3a">Disable all</a><span style="margin-left:auto;color:var(--color-neutral-600)">first match wins</span></div>
+        <div style="display:flex;flex-direction:column;font-size:13px">
+          <div style="display:grid;grid-template-columns:22px 18px 1fr auto;gap:8px;align-items:center;padding:7px 12px;border-bottom:1px solid color-mix(in srgb, var(--color-text) 6%, transparent)"><span style="display:inline-block;width:14px;height:14px;border:1.5px solid var(--color-accent);border-radius:2px;background:var(--color-accent)"></span><span style="font-size:11px;color:var(--color-neutral-500)">1</span><span>Never mark path containing <span style="font-family:ui-monospace,Menlo,monospace;font-size:12px">\Originals\</span></span><span class="tag tag-neutral" style="font-size:10px;padding:1px 6px">Aa</span></div>
+          <div style="display:grid;grid-template-columns:22px 18px 1fr auto;gap:8px;align-items:center;padding:7px 12px;border-bottom:1px solid color-mix(in srgb, var(--color-text) 6%, transparent);color:var(--color-neutral-500)"><span style="display:inline-block;width:14px;height:14px;border:1.5px solid var(--color-neutral-500);border-radius:2px"></span><span style="font-size:11px">2</span><span>Mark name matching <span style="font-family:ui-monospace,Menlo,monospace;font-size:12px">^IMG_\d+ \(\d\)</span></span><span class="tag tag-neutral" style="font-size:10px;padding:1px 6px">.*</span></div>
+        </div>
+        <div style="padding:10px 12px;display:flex;gap:6px;align-items:center;font-size:12.5px;flex-wrap:wrap"><span style="border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:2px 8px">Mark ▾</span><span style="border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:2px 8px">name ▾</span><input class="input" placeholder="text or /regex/" style="min-height:28px;font-size:12.5px;flex:1;min-width:120px"><button class="btn btn-secondary" style="min-height:28px;padding:0 10px;font-size:12.5px">Add</button></div>
+      </section>
+    </div>
+  </div>
+  <div style="height:26px;display:flex;align-items:center;padding:0 12px;gap:18px;font-size:12px;color:var(--color-neutral-600);border-top:1px solid var(--color-divider);background:var(--color-surface);flex:none"><span>Ready</span><span><a href="#1d">↶ Undo</a> recycle of 4 files, 10:12</span><span style="margin-left:auto">RAM 186 MB</span><span>CPU 0.4%</span><span>31 threads</span></div>
+</div></div>
+
+<!-- ═══════════════ 3b ═══════════════ -->
+<div class="dv-opt" id="3b"><div class="dv-olabel"><a class="dv-oid" href="#3b">3b</a>Folders · 1600×900. Same frame; Search tool-window left (conditions as rows), results editor centre, Actions right as three stacked tool-windows — the open one shows its own toolbar.</div>
+<div class="dv-card" data-screen-label="3b IDE Folders" style="width:1600px;height:900px;display:flex;flex-direction:column;font-size:13px">
+  <div style="height:34px;display:flex;align-items:center;padding:0 14px;gap:14px;flex:none;background:var(--color-surface);border-bottom:1px solid var(--color-divider)"><span style="font-family:var(--font-heading);font-weight:600;font-size:14px">Folder File Control</span><span style="color:var(--color-neutral-600)">Photos cleanup ▾</span><span style="margin-left:auto;display:flex;gap:26px;font-size:12px;color:var(--color-neutral-600)"><span>—</span><span>▢</span><span>✕</span></span></div>
+  <div style="height:38px;display:flex;align-items:stretch;padding:0 14px;flex:none;border-bottom:1px solid var(--color-divider)">
+    <span style="display:inline-flex;align-items:center;padding:0 16px;font-family:var(--font-heading);font-size:14px;color:var(--color-neutral-600)">Duplicates</span>
+    <span style="display:inline-flex;align-items:center;padding:0 16px;font-family:var(--font-heading);font-weight:600;font-size:14px;border-bottom:2px solid var(--color-accent);margin-bottom:-1px">Folders</span>
+    <span style="display:inline-flex;align-items:center;padding:0 16px;font-family:var(--font-heading);font-size:14px;color:var(--color-neutral-600)">History</span>
+    <span style="margin-left:auto;display:inline-flex;align-items:center;gap:10px"><button class="btn btn-primary" style="min-height:28px;padding:0 14px;font-size:13px">Search</button><span style="color:var(--color-neutral-600)">6 folders in 1.1 s</span></span>
+  </div>
+  <div style="flex:1;display:grid;grid-template-columns:300px 1px 1fr 1px 400px;min-height:0">
+    <!-- Search tool window -->
+    <section style="display:flex;flex-direction:column;min-height:0">
+      <header style="height:30px;display:flex;align-items:center;padding:0 12px;border-bottom:1px solid var(--color-divider);flex:none"><span style="font-weight:600">Search</span><span style="margin-left:auto;display:flex;gap:12px;font-size:12px"><a href="#3b">+ Condition</a><a href="#3b" style="color:var(--color-neutral-600)">Clear</a></span></header>
+      <div style="padding:10px 12px 0">
+        <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-neutral-600);padding:4px 0">Conditions · all must match</div>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px">
+          <div style="display:grid;grid-template-columns:22px 1fr;gap:8px;align-items:start;padding:6px;background:var(--color-accent-100)"><span style="display:inline-block;width:14px;height:14px;border:1.5px solid var(--color-accent);border-radius:2px;background:var(--color-accent);margin-top:2px"></span><span><span style="border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:1px 6px;font-size:12px;background:var(--color-bg)">Contains ▾</span> <span style="font-family:ui-monospace,Menlo,monospace;font-size:12.5px">*.sln</span><div style="font-size:11.5px;color:var(--color-neutral-600);margin-top:3px">folder has a child item matching</div></span></div>
+          <div style="display:grid;grid-template-columns:22px 1fr;gap:8px;align-items:start;padding:6px"><span style="display:inline-block;width:14px;height:14px;border:1.5px solid var(--color-accent);border-radius:2px;background:var(--color-accent);margin-top:2px"></span><span><span style="border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:1px 6px;font-size:12px;background:var(--color-bg)">Exclude ▾</span> <span style="font-family:ui-monospace,Menlo,monospace;font-size:12.5px">archive</span><div style="font-size:11.5px;color:var(--color-neutral-600);margin-top:3px">folder name does not contain</div></span></div>
+        </div>
+        <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-neutral-600);padding:4px 0;margin-top:18px">Depth</div>
+        <div style="display:flex;align-items:center;gap:8px;padding:2px 6px"><span style="border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:2px 8px;width:36px;text-align:center;color:var(--color-neutral-500)">∞</span><span style="font-size:12.5px;color:var(--color-neutral-600)">layers · empty = whole tree</span></div>
+        <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-neutral-600);padding:4px 0;margin-top:18px;display:flex"><span>Scope</span><a href="#3a" style="margin-left:auto;text-transform:none;letter-spacing:0">Edit</a></div>
+        <div style="padding:2px 6px;line-height:1.7">D:\Photos<br>D:\Backup\Photos<br><span style="color:var(--color-neutral-600);font-size:12.5px">skipping node_modules, .git, bin</span></div>
+      </div>
+    </section>
+    <div style="background:var(--color-divider)"></div>
+    <!-- Results -->
+    <section style="display:flex;flex-direction:column;min-width:0;min-height:0">
+      <header style="height:30px;display:flex;align-items:center;padding:0 12px;border-bottom:1px solid var(--color-divider);flex:none;gap:8px"><span style="font-weight:600">Results</span><span style="color:var(--color-neutral-600)">6 folders · 3 selected · 3.9 GB</span><span style="margin-left:auto;display:flex;gap:12px;font-size:12px"><a href="#3b">Select all</a><a href="#3b">None</a></span></header>
+      <div style="display:grid;grid-template-columns:28px 200px 1fr 100px;gap:10px;padding:0 12px;height:26px;align-items:center;border-bottom:1px solid var(--color-divider);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-neutral-600);flex:none"><span></span><span>Folder ↑</span><span>Path</span><span style="text-align:right">Size</span></div>
+      <div style="flex:1;overflow:hidden">
+        <sc-for list="{{ folderRows }}" as="r" hint-placeholder-count="6">
+        <div style="display:grid;grid-template-columns:28px 200px 1fr 100px;gap:10px;padding:0 12px;height:30px;align-items:center;border-bottom:1px solid color-mix(in srgb, var(--color-text) 6%, transparent);background: {{ r.rowBg }}"><span style="display:inline-block;width:14px;height:14px;border:1.5px solid var(--color-text);border-radius:2px;background: {{ r.boxBg }}"></span><span style="font-weight:600">{{ r.name }}</span><span style="color:var(--color-neutral-700);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.path }}</span><span style="text-align:right">{{ r.size }}</span></div>
+        </sc-for>
+      </div>
+    </section>
+    <div style="background:var(--color-divider)"></div>
+    <!-- Actions -->
+    <div style="display:flex;flex-direction:column;min-height:0">
+      <section style="display:flex;flex-direction:column;flex:1;min-height:0">
+        <header style="height:30px;display:flex;align-items:center;padding:0 12px;border-bottom:1px solid var(--color-divider);flex:none;background:var(--color-surface)"><span style="font-size:10px;color:var(--color-neutral-600);margin-right:8px">▼</span><span style="font-weight:600">Recycle repeated subfolders</span><span style="margin-left:auto;font-size:12px;color:var(--color-neutral-600)">3 folders</span></header>
+        <div style="height:32px;display:flex;align-items:center;padding:0 12px;gap:12px;border-bottom:1px solid var(--color-divider);background:var(--color-neutral-100);font-size:12px;flex:none"><a href="#3b">Rescan</a><label class="radio" style="font-size:12px"><span class="dot" style="border-radius:2px;background:var(--color-accent);border-color:var(--color-accent);width:12px;height:12px"></span>nested too</label><span style="margin-left:auto"></span><a href="#3b">All</a><a href="#3b">None</a><input class="input" placeholder="Filter names" style="min-height:22px;font-size:12px;width:110px;padding:0 6px"></div>
+        <div style="display:grid;grid-template-columns:28px 1fr 100px 80px;gap:10px;padding:0 12px;height:24px;align-items:center;border-bottom:1px solid var(--color-divider);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-neutral-600);flex:none"><span></span><span>Name</span><span>Found in</span><span style="text-align:right">Size</span></div>
+        <div style="flex:1;overflow:hidden">
+          <sc-for list="{{ subfolders }}" as="s" hint-placeholder-count="4">
+          <div style="display:grid;grid-template-columns:28px 1fr 100px 80px;gap:10px;padding:0 12px;height:28px;align-items:center;border-bottom:1px solid color-mix(in srgb, var(--color-text) 6%, transparent)"><span style="display:inline-block;width:14px;height:14px;border:1.5px solid var(--color-text);border-radius:2px;background: {{ s.boxBg }}"></span><span style="font-weight:600">{{ s.name }}</span><span style="color:var(--color-neutral-600);font-size:12.5px">{{ s.count }} folders</span><span style="text-align:right">{{ s.size }}</span></div>
+          </sc-for>
+        </div>
+        <div style="height:40px;display:flex;align-items:center;padding:0 12px;gap:10px;border-top:1px solid var(--color-divider);background:var(--color-neutral-100);flex:none"><span style="color:var(--color-neutral-600)">2 names · 1.7 GB</span><span style="margin-left:auto"></span><a href="#3b" style="font-size:12.5px">By file type…</a><button class="btn btn-primary" style="min-height:28px;padding:0 12px;font-size:13px;white-space:nowrap">Recycle</button></div>
+      </section>
+      <header style="height:30px;display:flex;align-items:center;padding:0 12px;border-top:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider);flex:none;background:var(--color-surface)"><span style="font-size:10px;color:var(--color-neutral-600);margin-right:8px">▶</span><span style="font-weight:600;color:var(--color-neutral-700)">Flatten files to the root</span></header>
+      <header style="height:30px;display:flex;align-items:center;padding:0 12px;border-bottom:1px solid var(--color-divider);flex:none;background:var(--color-surface)"><span style="font-size:10px;color:var(--color-neutral-600);margin-right:8px">▶</span><span style="font-weight:600;color:var(--color-neutral-700)">Link sibling folders</span></header>
+    </div>
+  </div>
+  <div style="height:26px;display:flex;align-items:center;padding:0 12px;gap:18px;font-size:12px;color:var(--color-neutral-600);border-top:1px solid var(--color-divider);background:var(--color-surface);flex:none"><span>Ready</span><span><a href="#1d">↶ Undo</a> recycle of 14 subfolders, yesterday 18:22</span><span style="margin-left:auto">RAM 186 MB</span><span>CPU 0.4%</span><span>31 threads</span></div>
+</div></div>
+
+</div>
+<p class="dv-next">Try next: "History in the <a class="dv-oid" href="#3a">3a</a> frame" · "<a class="dv-oid" href="#3a">3a</a> at 1280×800 with Preview collapsed to a side stripe" · "add a left tool-window stripe with vertical tabs like an IDE"</p>
+</section>
+<section class="dv-turn" id="t2">
+<div class="dv-thd"><a class="dv-tid" href="#t2">2</a><span class="dv-tname">Clear section boundaries — <a class="dv-oid" href="#1a">1a</a> and <a class="dv-oid" href="#1c">1c</a> with structured regions</span></div>
+<p class="dv-brief">Regions now read at a glance: the nav rail and the right panel sit on the system's <b>surface tint</b>, control bands get a lighter tint, and every section carries an <b>underlined kicker</b> on the divider hairline (the same rule the design system's tables use). Still no boxes-in-boxes — one level of containment, then whitespace. Density is unchanged from turn 1.</p>
+<div class="dv-opts">
+
+<!-- ═══════════════ 2a ═══════════════ -->
+<div class="dv-opt" id="2a"><div class="dv-olabel"><a class="dv-oid" href="#2a">2a</a>Ledger with regions · Duplicates · 1600×900. Rail / workspace / inspector are distinct surfaces; filters and the mark-for-removal toolbar are a tinted band; groups separated by hairlines.</div>
+<div class="dv-card" data-screen-label="2a Ledger with regions" style="width:1600px;height:900px;display:flex;flex-direction:column">
+  <div style="height:34px;display:flex;align-items:center;padding:0 14px;gap:10px;flex:none;background:var(--color-surface)"><span style="font-family:var(--font-heading);font-weight:600;font-size:14px">Folder File Control</span><span style="font-size:12px;color:var(--color-neutral-600)">· Photos cleanup ▾</span><span style="margin-left:auto;display:flex;gap:26px;font-size:12px;color:var(--color-neutral-600)"><span>—</span><span>▢</span><span>✕</span></span></div>
+  <div style="flex:1;display:grid;grid-template-columns:220px 1fr 380px;min-height:0">
+    <!-- rail -->
+    <nav style="background:var(--color-surface);border-right:1px solid var(--color-divider);padding:22px 0 0 26px;display:flex;flex-direction:column;gap:4px">
+      <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-600);padding-bottom:6px;border-bottom:1px solid var(--color-divider);margin-right:26px">Jobs</div>
+      <a href="#2a" style="margin-top:8px;font-family:var(--font-heading);font-weight:600;font-size:22px;line-height:1.1;text-decoration:none;color:var(--color-text);padding:8px 0 8px 12px;border-left:3px solid var(--color-accent);margin-left:-15px">Duplicates</a>
+      <a href="#2b" style="font-family:var(--font-heading);font-size:22px;line-height:1.1;text-decoration:none;color:var(--color-neutral-600);padding:8px 0">Folders</a>
+      <a href="#1d" style="font-family:var(--font-heading);font-size:22px;line-height:1.1;text-decoration:none;color:var(--color-neutral-600);padding:8px 0">History</a>
+      <div style="margin-top:34px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-600);padding-bottom:6px;border-bottom:1px solid var(--color-divider);margin-right:26px">Scope</div>
+      <div style="margin-top:8px;font-size:13px;line-height:1.7"><div>D:\Photos</div><div>D:\Backup\Photos</div><div style="color:var(--color-neutral-500);text-decoration:line-through">E:\OneDrive\Pictures</div><div style="color:var(--color-neutral-600);margin-top:6px">skipping <i>node_modules, .git, bin</i></div><a href="#1d">Edit scope</a></div>
+      <div style="margin-top:auto;padding:0 26px 22px 0;font-size:12px;color:var(--color-neutral-600);line-height:1.6">RAM 186 MB<br>CPU 0.4% · 31 threads</div>
+    </nav>
+    <!-- workspace -->
+    <main style="display:flex;flex-direction:column;min-width:0;min-height:0">
+      <div style="padding:22px 34px 0 30px;display:flex;align-items:baseline;gap:18px;flex:none">
+        <h1 style="font-family:var(--font-heading);font-weight:600;font-size:40px;line-height:1;margin:0">41.2 MB reclaimable</h1>
+        <span style="font-size:14px;color:var(--color-neutral-600)">3 groups · 7 files · 12,480 files scanned in 4.2 s</span>
+        <button class="btn btn-primary" style="margin-left:auto">Scan again</button>
+      </div>
+      <!-- control band -->
+      <div style="margin:20px 34px 0 30px;background:var(--color-neutral-100);border-top:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider);padding:12px 16px;display:flex;flex-direction:column;gap:10px;flex:none">
+        <div style="display:flex;align-items:center;gap:6px;font-size:14px;flex-wrap:wrap">
+          <span style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-600);width:92px">Filter</span>
+          <span>groups of</span><span style="border-bottom:1px solid var(--color-accent);color:var(--color-accent)">all types ▾</span>
+          <span>with at least</span><span style="border-bottom:1px solid var(--color-accent);color:var(--color-accent)">2 copies</span>
+          <span>larger than</span><span style="border-bottom:1px solid var(--color-accent);color:var(--color-accent)">0 MB</span>
+          <span>, sorted by</span><span style="border-bottom:1px solid var(--color-accent);color:var(--color-accent)">size, largest first ▾</span>
+          <span style="margin-left:auto;font-size:12.5px;color:var(--color-neutral-600)">Match by <b style="font-weight:600;color:var(--color-text)">content</b> · <a href="#1f">name pattern</a></span>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px;font-size:13px">
+          <span style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-600);width:92px">Mark</span>
+          <a href="#2a">all copies</a><a href="#2a">newer copies</a><a href="#2a">older copies</a><a href="#2a">by rule…</a><a href="#2a" style="color:var(--color-neutral-600)">none</a>
+          <span style="margin-left:auto;color:var(--color-neutral-600)">1 rule active: never mark <i>\Originals\</i></span>
+        </div>
+      </div>
+      <!-- ledger -->
+      <div style="flex:1;overflow:hidden;padding:0 34px 0 30px;display:flex;flex-direction:column">
+        <div style="display:grid;grid-template-columns:130px 1fr;gap:0 22px;padding:14px 0 6px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-600)"><span>Wasted</span><span style="display:grid;grid-template-columns:78px 1fr auto auto;gap:14px"><span>Decision</span><span>Copy</span><span>Modified</span><span></span></span></div>
+        <sc-for list="{{ groups }}" as="g" hint-placeholder-count="3">
+        <article style="display:grid;grid-template-columns:130px 1fr;gap:0 22px;padding:16px 0 18px;border-top:1px solid var(--color-divider)">
+          <div><div style="font-family:var(--font-heading);font-weight:600;font-size:28px;line-height:1">{{ g.wasted }}</div><div style="font-size:12px;color:var(--color-neutral-600);margin-top:4px">{{ g.count }} copies · {{ g.size }} each</div></div>
+          <div style="min-width:0">
+            <div style="display:flex;align-items:baseline;gap:12px"><span style="font-family:var(--font-heading);font-weight:600;font-size:18px">{{ g.first }}</span><span class="tag tag-accent">{{ g.ext }}</span><a href="#2a" style="margin-left:auto;font-size:12.5px">Preview</a><a href="#2a" style="font-size:12.5px">Recycle marked</a></div>
+            <div style="display:flex;flex-direction:column;margin-top:6px">
+              <sc-for list="{{ g.files }}" as="f" hint-placeholder-count="2">
+              <div style="display:grid;grid-template-columns:78px 1fr auto auto;gap:14px;align-items:center;padding:4px 0;font-size:14px">
+                <span style="font-size:11px;letter-spacing:.06em;text-transform:uppercase;color: {{ f.color }}">{{ f.verb }}</span>
+                <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color: {{ f.pathColor }}">{{ f.path }}</span>
+                <span style="font-size:12.5px;color:var(--color-neutral-600)">{{ f.date }}</span>
+                <a href="#2a" style="font-size:12.5px">Open folder</a>
+              </div>
+              </sc-for>
+            </div>
+          </div>
+        </article>
+        </sc-for>
+      </div>
+      <!-- action bar -->
+      <div style="flex:none;background:var(--color-neutral-100);border-top:1px solid var(--color-divider);padding:10px 34px 10px 30px;display:flex;align-items:center;gap:12px;font-size:13px"><span style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-600)">Marked</span><span>4 files · 27.5 MB</span><span style="margin-left:auto"></span><button class="btn btn-secondary">Move to…</button><button class="btn btn-primary">Recycle 4 files</button></div>
+    </main>
+    <!-- inspector -->
+    <aside style="background:var(--color-surface);border-left:1px solid var(--color-divider);padding:22px 30px 0 26px;display:flex;flex-direction:column;gap:26px">
+      <div>
+        <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-600);padding-bottom:6px;border-bottom:1px solid var(--color-divider);display:flex"><span>Preview</span><span style="margin-left:auto;text-transform:none;letter-spacing:0">auto</span></div>
+        <div style="font-family:var(--font-heading);font-weight:600;font-size:18px;margin-top:12px">IMG_2041.jpg</div>
+        <div style="font-size:12.5px;color:var(--color-neutral-600)">6.2 MB · 4032×3024 · 14 Mar 2019</div>
+        <div class="halftone" style="margin-top:12px;aspect-ratio:4/3;background:linear-gradient(160deg,var(--color-neutral-300),var(--color-neutral-500));display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--color-bg)">photo</div>
+        <div style="display:flex;gap:16px;margin-top:10px;font-size:12.5px"><a href="#2a">Open</a><a href="#2a">Show in folder</a></div>
+      </div>
+      <div>
+        <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-600);padding-bottom:6px;border-bottom:1px solid var(--color-divider)">This scan</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px 20px;margin-top:14px">
+          <div><div style="font-family:var(--font-heading);font-weight:600;font-size:24px;line-height:1">12,480</div><div style="font-size:12px;color:var(--color-neutral-600)">files scanned</div></div>
+          <div><div style="font-family:var(--font-heading);font-weight:600;font-size:24px;line-height:1">0.1%</div><div style="font-size:12px;color:var(--color-neutral-600)">duplicated</div></div>
+          <div><div style="font-family:var(--font-heading);font-weight:600;font-size:24px;line-height:1">684 MB</div><div style="font-size:12px;color:var(--color-neutral-600)">total size</div></div>
+          <div><div style="font-family:var(--font-heading);font-weight:600;font-size:24px;line-height:1">4.2 s</div><div style="font-size:12px;color:var(--color-neutral-600)">scan time</div></div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-600);padding-bottom:6px;border-bottom:1px solid var(--color-divider)">By type</div>
+        <div style="margin-top:10px;font-size:13px;line-height:1.8;display:grid;grid-template-columns:auto 1fr auto;gap:0 12px"><span>.jpg</span><span style="color:var(--color-neutral-600)">4 files</span><span>24.8 MB</span><span>.mp4</span><span style="color:var(--color-neutral-600)">2 files</span><span>15.1 MB</span><span>.pdf</span><span style="color:var(--color-neutral-600)">1 file</span><span>1.3 MB</span></div>
+      </div>
+      <div style="margin-top:auto;padding-bottom:18px;font-size:12.5px;color:var(--color-neutral-600)"><a href="#1d">Undo</a> recycle of 4 files, 10:12</div>
+    </aside>
+  </div>
+</div></div>
+
+<!-- ═══════════════ 2b ═══════════════ -->
+<div class="dv-opt" id="2b"><div class="dv-olabel"><a class="dv-oid" href="#2b">2b</a>Folders desk with regions · 1600×900. Masthead nav kept; the search sentence sits in a tinted band, results are a ruled table, the action column is its own surface with each action a ruled accordion row.</div>
+<div class="dv-card" data-screen-label="2b Folders desk with regions" style="width:1600px;height:900px;display:flex;flex-direction:column">
+  <div style="height:34px;display:flex;align-items:center;padding:0 14px;gap:10px;flex:none;background:var(--color-surface)"><span style="font-family:var(--font-heading);font-weight:600;font-size:14px">Folder File Control</span><span style="margin-left:auto;display:flex;gap:26px;font-size:12px;color:var(--color-neutral-600)"><span>—</span><span>▢</span><span>✕</span></span></div>
+  <div style="margin:4px 40px 0;border-top:3px solid var(--color-text);flex:none">
+    <div style="display:flex;align-items:center;height:36px;font-size:13px;border-bottom:1px solid var(--color-text)">
+      <span style="color:var(--color-neutral-500);padding:0 14px 0 0">Duplicates</span><span style="font-family:var(--font-heading);font-weight:600;padding:0 14px;height:36px;display:inline-flex;align-items:center;border-bottom:3px solid var(--color-accent);box-sizing:border-box">Folders</span><span style="color:var(--color-neutral-500);padding:0 14px">History</span>
+      <span style="margin-left:auto;color:var(--color-neutral-600)">Profile <b style="color:var(--color-text);font-weight:600">Photos cleanup</b> ▾ · Thursday 4 September 2026</span>
+    </div>
+  </div>
+  <div style="flex:1;display:grid;grid-template-columns:1fr 460px;min-height:0">
+    <div style="display:flex;flex-direction:column;min-width:0;padding:0 0 0 40px">
+      <!-- search band -->
+      <div style="margin:22px 34px 0 0;background:var(--color-neutral-100);border-top:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider);padding:14px 18px 16px">
+        <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-600)">Search</div>
+        <p style="font-family:var(--font-heading);font-size:22px;line-height:1.45;margin:8px 0 0;max-width:900px">Find folders in <span style="border-bottom:1px solid var(--color-accent);color:var(--color-accent)">D:\Photos, D:\Backup\Photos</span> that <span style="border-bottom:1px solid var(--color-accent);color:var(--color-accent)">contain</span> <span style="border-bottom:1px solid var(--color-accent);color:var(--color-accent)">*.sln</span> and whose name <span style="border-bottom:1px solid var(--color-accent);color:var(--color-accent)">does not include</span> <span style="border-bottom:1px solid var(--color-accent);color:var(--color-accent)">archive</span>, searching <span style="border-bottom:1px solid var(--color-accent);color:var(--color-accent)">every layer</span> deep. <a href="#2b" style="font-size:14px;font-family:var(--font-body)">+ add a condition</a></p>
+        <div style="display:flex;align-items:center;gap:16px;margin-top:14px"><button class="btn btn-primary">Search</button><span style="font-size:13px;color:var(--color-neutral-600)">Found 6 folders in 1.1 s · skipped node_modules, .git, bin</span><a href="#2b" style="margin-left:auto;font-size:13px">Clear results</a></div>
+      </div>
+      <!-- results -->
+      <div style="margin:24px 34px 0 0;display:flex;align-items:baseline;gap:14px;font-size:13px;padding-bottom:8px;border-bottom:1px solid var(--color-divider)"><span style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-600)">Results</span><span style="font-family:var(--font-heading);font-weight:600;font-size:17px">6 folders</span><span style="color:var(--color-neutral-600)">3 selected · 3.9 GB</span><a href="#2b" style="margin-left:auto">select all</a><a href="#2b">none</a></div>
+      <table class="table" style="margin:0 34px 0 0;width:auto;font-size:14px">
+        <thead><tr><th style="width:30px"></th><th>Folder</th><th>Path</th><th style="text-align:right">Size</th></tr></thead>
+        <tbody>
+          <sc-for list="{{ folderRows }}" as="r" hint-placeholder-count="6">
+          <tr><td><span style="display:inline-block;width:14px;height:14px;border:1.5px solid var(--color-text);border-radius:2px;vertical-align:middle;background: {{ r.boxBg }}"></span></td><td style="font-weight:600">{{ r.name }}</td><td style="color:var(--color-neutral-700)"><a href="#2b" style="color:inherit;text-decoration:none">{{ r.path }}</a></td><td style="text-align:right">{{ r.size }}</td></tr>
+          </sc-for>
+        </tbody>
+      </table>
+      <div style="margin-top:auto;padding:10px 34px 10px 0;font-size:12.5px;color:var(--color-neutral-600);display:flex;gap:18px"><span>Ready</span><span style="margin-left:auto"><a href="#1d">Undo</a> recycle of 14 subfolders, yesterday 18:22</span><span>RAM 186 MB · CPU 0.4%</span></div>
+    </div>
+    <aside style="background:var(--color-surface);border-left:1px solid var(--color-divider);padding:22px 40px 0 28px;display:flex;flex-direction:column;min-height:0">
+      <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-600);padding-bottom:6px;border-bottom:1px solid var(--color-divider)">Actions · 3 selected folders</div>
+      <div style="padding:16px 0 18px;border-bottom:1px solid var(--color-divider)">
+        <div style="display:flex;align-items:baseline;gap:10px"><span style="font-family:var(--font-heading);font-weight:600;font-size:20px">Recycle repeated subfolders</span><span style="margin-left:auto;font-size:12px;color:var(--color-neutral-500)">▲</span></div>
+        <p style="margin:6px 0 0;font-size:13px;line-height:1.5;color:var(--color-neutral-700)">Subfolder names repeating across the selected folders. Checked names go to the Recycle Bin — restorable from History.</p>
+        <div style="display:flex;align-items:center;gap:12px;margin-top:12px;font-size:13px"><label class="radio"><span class="dot" style="border-radius:2px;background:var(--color-accent);border-color:var(--color-accent)"></span>Look inside nested folders too</label><a href="#2b" style="margin-left:auto">Rescan</a></div>
+        <div style="margin-top:10px;display:flex;flex-direction:column">
+          <sc-for list="{{ subfolders }}" as="s" hint-placeholder-count="4">
+          <div style="display:grid;grid-template-columns:22px 1fr auto auto;gap:10px;align-items:baseline;padding:6px 0;font-size:14px"><span style="display:inline-block;width:14px;height:14px;border:1.5px solid var(--color-text);border-radius:2px;background: {{ s.boxBg }}"></span><span style="font-weight:600">{{ s.name }}</span><span style="font-size:12.5px;color:var(--color-neutral-600)">in {{ s.count }} folders</span><span style="font-size:12.5px">{{ s.size }}</span></div>
+          </sc-for>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-start;gap:8px;margin-top:12px"><button class="btn btn-primary" style="white-space:nowrap">Recycle 2 names · 1.7 GB</button><a href="#2b" style="font-size:13px">Recycle files by type instead…</a></div>
+      </div>
+      <div style="padding:16px 0;border-bottom:1px solid var(--color-divider);display:flex;align-items:baseline;gap:10px"><span style="font-family:var(--font-heading);font-size:20px;color:var(--color-neutral-700)">Flatten files to the root</span><span style="margin-left:auto;font-size:12px;color:var(--color-neutral-500)">▼</span></div>
+      <div style="padding:16px 0;border-bottom:1px solid var(--color-divider);display:flex;align-items:baseline;gap:10px"><span style="font-family:var(--font-heading);font-size:20px;color:var(--color-neutral-700)">Link sibling folders</span><span style="margin-left:auto;font-size:12px;color:var(--color-neutral-500)">▼</span></div>
+    </aside>
+  </div>
+</div></div>
+
+</div>
+<p class="dv-next">Try next: "apply the <a class="dv-oid" href="#2a">2a</a> regions to the stepper <a class="dv-oid" href="#1b">1b</a>" · "stronger: full boxes around each region" · "show <a class="dv-oid" href="#2a">2a</a> at 1280×800"</p>
+</section>
+<section class="dv-turn" id="t1">
+<div class="dv-thd"><a class="dv-tid" href="#t1">1</a><span class="dv-tname">Folder File Control — simplified in Broadsheet</span></div>
+<p class="dv-brief"><b>Assumptions.</b> Three jobs (Duplicates, Folders, History) stay; the scope (target + exclude folders) stops being a permanent 2-box header and becomes one editable sentence. Every "✓ All / ✕ Clear / ↶ / ?" cluster collapses into one place. Undo lives once, in the status line. Help moves from 30 popups to short captions under controls. <b>Baseline</b> for comparison: <a href="Baseline - Current WPF UI.dc.html">Baseline - Current WPF UI</a>. Options below vary navigation (sidebar / stepper / masthead), density and the results presentation.</p>
+<div class="dv-opts">
+
+<!-- ═══════════════ 1a ═══════════════ -->
+<div class="dv-opt" id="1a"><div class="dv-olabel"><a class="dv-oid" href="#1a">1a</a>Ledger · sidebar index · Duplicates screen · 1600×900 · airy. Groups read as ledger entries: headline file, big wasted numeral, keep/remove per copy.</div>
+<div class="dv-card" data-screen-label="1a Ledger Duplicates" style="width:1600px;height:900px;display:flex;flex-direction:column">
+  <div style="height:34px;display:flex;align-items:center;padding:0 14px;gap:10px;flex:none"><span style="font-family:var(--font-heading);font-weight:600;font-size:14px">Folder File Control</span><span style="margin-left:auto;display:flex;gap:26px;font-size:12px;color:var(--color-neutral-600)"><span>—</span><span>▢</span><span>✕</span></span></div>
+  <div style="flex:1;display:grid;grid-template-columns:220px 1fr 380px;min-height:0">
+    <!-- sidebar -->
+    <nav style="padding:14px 0 0 30px;display:flex;flex-direction:column;gap:6px">
+      <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-600);margin-bottom:12px">Profile · Photos cleanup ▾</div>
+      <a href="#1a" style="font-family:var(--font-heading);font-weight:600;font-size:24px;line-height:1.1;text-decoration:none;color:var(--color-text)">Duplicates</a>
+      <a href="#1c" style="font-family:var(--font-heading);font-size:24px;line-height:1.1;text-decoration:none;color:var(--color-neutral-500)">Folders</a>
+      <a href="#1d" style="font-family:var(--font-heading);font-size:24px;line-height:1.1;text-decoration:none;color:var(--color-neutral-500)">History</a>
+      <div style="margin-top:auto;padding:0 0 26px;font-size:12.5px;line-height:1.6;color:var(--color-neutral-600)">
+        <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">Scope</div>
+        <div style="color:var(--color-text)">D:\Photos</div><div style="color:var(--color-text)">D:\Backup\Photos</div><div style="text-decoration:line-through">E:\OneDrive\Pictures</div>
+        <div style="margin-top:8px">skipping <i>node_modules, .git, bin</i></div>
+        <a href="#1a" style="font-size:12.5px">Edit scope</a>
+      </div>
+    </nav>
+    <!-- main -->
+    <main style="padding:14px 40px 0 30px;display:flex;flex-direction:column;min-width:0;min-height:0">
+      <div style="display:flex;align-items:baseline;gap:18px;flex:none">
+        <h1 style="font-family:var(--font-heading);font-weight:600;font-size:44px;line-height:1;margin:0">41.2 MB reclaimable</h1>
+        <span style="font-size:14px;color:var(--color-neutral-600)">3 groups · 7 files · scanned 12,480 files in 4.2 s</span>
+        <button class="btn btn-primary" style="margin-left:auto">Scan again</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;margin:22px 0 0;font-size:14px;flex-wrap:wrap;flex:none">
+        <span>Show groups of</span><span style="border-bottom:1px solid var(--color-accent);color:var(--color-accent)">all types ▾</span>
+        <span>with at least</span><span style="border-bottom:1px solid var(--color-accent);color:var(--color-accent)">2 copies</span>
+        <span>larger than</span><span style="border-bottom:1px solid var(--color-accent);color:var(--color-accent)">0 MB</span>
+        <span>, sorted by</span><span style="border-bottom:1px solid var(--color-accent);color:var(--color-accent)">size, largest first ▾</span>
+        <span style="margin-left:auto;font-size:12.5px;color:var(--color-neutral-600)">Match by <a href="#1a">content hash</a> · <a href="#1a">name pattern</a></span>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px;margin:16px 0 0;font-size:13px;flex:none">
+        <span style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-600)">Mark for removal</span>
+        <a href="#1a">all copies</a><a href="#1a">newer copies</a><a href="#1a">older copies</a><a href="#1a">by rule…</a><span style="color:var(--color-neutral-500)">1 rule active: ignore <i>\Originals\</i></span>
+      </div>
+      <!-- ledger -->
+      <div style="flex:1;overflow:hidden;margin-top:22px;display:flex;flex-direction:column;gap:30px">
+        <sc-for list="{{ groups }}" as="g" hint-placeholder-count="3">
+        <article style="display:grid;grid-template-columns:130px 1fr;gap:0 22px">
+          <div><div style="font-family:var(--font-heading);font-weight:600;font-size:30px;line-height:1">{{ g.wasted }}</div><div style="font-size:12px;color:var(--color-neutral-600);margin-top:4px">wasted · {{ g.count }} copies · {{ g.size }} each</div></div>
+          <div style="min-width:0">
+            <div style="display:flex;align-items:baseline;gap:12px"><span style="font-family:var(--font-heading);font-weight:600;font-size:19px">{{ g.first }}</span><span class="tag tag-accent">{{ g.ext }}</span><a href="#1a" style="margin-left:auto;font-size:12.5px">Preview</a><a href="#1a" style="font-size:12.5px">Recycle marked</a></div>
+            <div style="display:flex;flex-direction:column;margin-top:8px">
+              <sc-for list="{{ g.files }}" as="f" hint-placeholder-count="2">
+              <div style="display:grid;grid-template-columns:78px 1fr auto auto;gap:14px;align-items:center;padding:5px 0;font-size:14px">
+                <span style="font-size:11px;letter-spacing:.06em;text-transform:uppercase;color: {{ f.color }}">{{ f.verb }}</span>
+                <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color: {{ f.pathColor }}">{{ f.path }}</span>
+                <span style="font-size:12.5px;color:var(--color-neutral-600)">{{ f.date }}</span>
+                <a href="#1a" style="font-size:12.5px">Open folder</a>
+              </div>
+              </sc-for>
+            </div>
+          </div>
+        </article>
+        </sc-for>
+      </div>
+    </main>
+    <!-- preview column -->
+    <aside style="padding:14px 34px 0 0;display:flex;flex-direction:column;gap:22px">
+      <div>
+        <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-600)">Preview</div>
+        <div style="font-family:var(--font-heading);font-weight:600;font-size:19px;margin-top:6px">IMG_2041.jpg</div>
+        <div style="font-size:12.5px;color:var(--color-neutral-600)">6.2 MB · 4032×3024 · 14 Mar 2019</div>
+        <div class="halftone" style="margin-top:12px;aspect-ratio:4/3;background:linear-gradient(160deg,var(--color-neutral-300),var(--color-neutral-500));display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--color-bg)">photo</div>
+        <div style="display:flex;gap:16px;margin-top:10px;font-size:12.5px"><a href="#1a">Open</a><a href="#1a">Show in folder</a><span style="margin-left:auto;color:var(--color-neutral-500)">auto-preview on</span></div>
+      </div>
+      <div>
+        <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-600)">This scan</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 20px;margin-top:10px">
+          <div><div style="font-family:var(--font-heading);font-weight:600;font-size:26px;line-height:1">12,480</div><div style="font-size:12px;color:var(--color-neutral-600)">files scanned</div></div>
+          <div><div style="font-family:var(--font-heading);font-weight:600;font-size:26px;line-height:1">0.1%</div><div style="font-size:12px;color:var(--color-neutral-600)">duplicated</div></div>
+          <div><div style="font-family:var(--font-heading);font-weight:600;font-size:26px;line-height:1">684 MB</div><div style="font-size:12px;color:var(--color-neutral-600)">total size</div></div>
+          <div><div style="font-family:var(--font-heading);font-weight:600;font-size:26px;line-height:1">4.2 s</div><div style="font-size:12px;color:var(--color-neutral-600)">scan time</div></div>
+        </div>
+        <div style="margin-top:16px;font-size:12.5px;line-height:1.7"><span style="color:var(--color-neutral-600)">By type</span><br>.jpg 24.8 MB in 4 files<br>.mp4 15.1 MB in 2 files<br>.pdf 1.3 MB in 1 file</div>
+      </div>
+    </aside>
+  </div>
+  <div style="height:30px;display:flex;align-items:center;padding:0 30px;gap:18px;font-size:12.5px;color:var(--color-neutral-600);flex:none"><span>4 files marked · 27.5 MB</span><button class="btn btn-secondary" style="min-height:24px;padding:2px 10px;font-size:12px">Recycle 4 files</button><button class="btn btn-ghost" style="min-height:24px;padding:2px 6px;font-size:12px">Move to…</button><span style="margin-left:auto"><a href="#1d">Undo</a> recycle of 4 files, 10:12</span><span>RAM 186 MB · CPU 0.4%</span></div>
+</div></div>
+
+<!-- ═══════════════ 1b ═══════════════ -->
+<div class="dv-opt" id="1b"><div class="dv-olabel"><a class="dv-oid" href="#1b">1b</a>Stepper · Where → Scan → Review · 1280×800 · compact. The whole duplicate job as three pages; review is a dense table with a keep column. For smaller windows.</div>
+<div class="dv-card" data-screen-label="1b Stepper Review" style="width:1280px;height:800px;display:flex;flex-direction:column">
+  <div style="height:34px;display:flex;align-items:center;padding:0 14px;gap:10px;flex:none"><span style="font-family:var(--font-heading);font-weight:600;font-size:14px">Folder File Control</span><span style="font-size:12px;color:var(--color-neutral-600)">· Photos cleanup</span><span style="margin-left:auto;display:flex;gap:26px;font-size:12px;color:var(--color-neutral-600)"><span>—</span><span>▢</span><span>✕</span></span></div>
+  <div style="display:flex;align-items:center;gap:0;padding:6px 30px 0;flex:none">
+    <div class="seg"><label class="seg-opt"><input type="radio" name="b-job" checked>Duplicates</label><label class="seg-opt"><input type="radio" name="b-job">Folders</label><label class="seg-opt"><input type="radio" name="b-job">History</label></div>
+    <div style="margin-left:40px;display:flex;align-items:baseline;gap:28px;font-family:var(--font-heading);font-size:17px">
+      <span style="color:var(--color-neutral-500)"><span style="font-size:12px;letter-spacing:.1em">1</span> Where</span>
+      <span style="color:var(--color-neutral-500)"><span style="font-size:12px;letter-spacing:.1em">2</span> Scan</span>
+      <span style="font-weight:600;border-bottom:2px solid var(--color-text);padding-bottom:2px"><span style="font-size:12px;letter-spacing:.1em">3</span> Review &amp; act</span>
+    </div>
+  </div>
+  <div style="padding:20px 30px 0;display:flex;align-items:baseline;gap:16px;flex:none">
+    <h1 style="font-family:var(--font-heading);font-weight:600;font-size:30px;margin:0;line-height:1">3 groups, 41.2 MB reclaimable</h1>
+    <span style="font-size:13px;color:var(--color-neutral-600)">in D:\Photos and D:\Backup\Photos · <a href="#1b">change</a></span>
+    <span style="margin-left:auto;font-size:13px">Mark: <a href="#1b">newer</a> · <a href="#1b">older</a> · <a href="#1b">all</a> · <a href="#1b">by rule</a> · <a href="#1b">none</a></span>
+  </div>
+  <div style="padding:12px 30px 0;display:flex;gap:18px;align-items:center;font-size:13px;flex:none">
+    <label class="field" style="display:flex;align-items:center;gap:8px;flex-direction:row"><span style="font-size:12px;color:var(--color-neutral-600)">Type</span><span style="border-bottom:1px solid var(--color-accent);color:var(--color-accent)">all ▾</span></label>
+    <label class="field" style="display:flex;align-items:center;gap:8px;flex-direction:row"><span style="font-size:12px;color:var(--color-neutral-600)">Copies ≥</span><span style="border-bottom:1px solid var(--color-accent);color:var(--color-accent)">2</span></label>
+    <label class="field" style="display:flex;align-items:center;gap:8px;flex-direction:row"><span style="font-size:12px;color:var(--color-neutral-600)">Size ≥</span><span style="border-bottom:1px solid var(--color-accent);color:var(--color-accent)">0 MB</span></label>
+    <label class="field" style="display:flex;align-items:center;gap:8px;flex-direction:row"><span style="font-size:12px;color:var(--color-neutral-600)">Sort</span><span style="border-bottom:1px solid var(--color-accent);color:var(--color-accent)">size ↓</span></label>
+    <span style="margin-left:auto;font-size:12px;color:var(--color-neutral-600)">Showing 3 of 3 groups</span>
+  </div>
+  <div style="flex:1;padding:14px 30px 0;overflow:hidden;min-height:0">
+    <table class="table" style="font-size:13px">
+      <thead><tr><th style="width:36px"></th><th>File</th><th>Location</th><th style="width:100px">Modified</th><th style="width:80px;text-align:right">Size</th><th style="width:70px">Keep</th></tr></thead>
+      <tbody>
+        <sc-for list="{{ tableRows }}" as="r" hint-placeholder-count="7">
+        <tr style="background: {{ r.bg }}">
+          <td style="font-size:11px;color:var(--color-neutral-500)">{{ r.n }}</td>
+          <td style="font-weight: {{ r.weight }}">{{ r.name }}</td>
+          <td style="color:var(--color-neutral-700);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:420px">{{ r.dir }}</td>
+          <td style="color:var(--color-neutral-600)">{{ r.date }}</td>
+          <td style="text-align:right">{{ r.size }}</td>
+          <td><span style="display:inline-flex;width:15px;height:15px;border-radius:50%;border:1.5px solid var(--color-text);align-items:center;justify-content:center;vertical-align:middle"><span style="width:7px;height:7px;border-radius:50%;background: {{ r.keepDot }}"></span></span></td>
+        </tr>
+        </sc-for>
+      </tbody>
+    </table>
+  </div>
+  <div style="padding:12px 30px 16px;display:flex;align-items:center;gap:12px;flex:none;font-size:13px"><span style="color:var(--color-neutral-600)">4 files not kept · 27.5 MB</span><span style="margin-left:auto"></span><button class="btn btn-secondary">Move them to…</button><button class="btn btn-primary">Recycle 4 files</button></div>
+</div></div>
+
+<!-- ═══════════════ 1c ═══════════════ -->
+<div class="dv-opt" id="1c"><div class="dv-olabel"><a class="dv-oid" href="#1c">1c</a>Folders desk · masthead nav · 1600×900. Search is a sentence you edit; results table left; the three folder actions (Recycle subfolders / Flatten / Link siblings) are one accordion — only one open at a time, replacing the 640px stacked panel.</div>
+<div class="dv-card" data-screen-label="1c Folders desk" style="width:1600px;height:900px;display:flex;flex-direction:column">
+  <div style="height:34px;display:flex;align-items:center;padding:0 14px;gap:10px;flex:none"><span style="font-family:var(--font-heading);font-weight:600;font-size:14px">Folder File Control</span><span style="margin-left:auto;display:flex;gap:26px;font-size:12px;color:var(--color-neutral-600)"><span>—</span><span>▢</span><span>✕</span></span></div>
+  <!-- masthead with thick-thin rule pair -->
+  <div style="margin:4px 40px 0;border-top:3px solid var(--color-text);flex:none">
+    <div style="display:flex;align-items:center;height:34px;font-size:13px;border-bottom:1px solid var(--color-text)">
+      <span style="font-family:var(--font-heading);font-weight:600">Folders</span><span style="margin:0 22px;color:var(--color-neutral-500)">Duplicates</span><span style="color:var(--color-neutral-500)">History</span>
+      <span style="margin-left:auto;color:var(--color-neutral-600)">Profile <b style="color:var(--color-text);font-weight:600">Photos cleanup</b> ▾ · Thursday 4 September 2026</span>
+    </div>
+  </div>
+  <div style="flex:1;display:grid;grid-template-columns:1fr 440px;gap:50px;padding:26px 40px 0;min-height:0">
+    <div style="display:flex;flex-direction:column;min-width:0">
+      <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-600)">Search</div>
+      <p style="font-family:var(--font-heading);font-size:24px;line-height:1.45;margin:8px 0 0;max-width:900px">Find folders in <span style="border-bottom:1px solid var(--color-accent);color:var(--color-accent)">D:\Photos, D:\Backup\Photos</span> that <span style="border-bottom:1px solid var(--color-accent);color:var(--color-accent)">contain</span> <span style="border-bottom:1px solid var(--color-accent);color:var(--color-accent)">*.sln</span> and whose name <span style="border-bottom:1px solid var(--color-accent);color:var(--color-accent)">does not include</span> <span style="border-bottom:1px solid var(--color-accent);color:var(--color-accent)">archive</span>, searching <span style="border-bottom:1px solid var(--color-accent);color:var(--color-accent)">every layer</span> deep. <a href="#1c" style="font-size:14px;font-family:var(--font-body)">+ add a condition</a></p>
+      <div style="display:flex;align-items:center;gap:16px;margin-top:16px"><button class="btn btn-primary">Search</button><span style="font-size:13px;color:var(--color-neutral-600)">Found 6 folders in 1.1 s · skipped node_modules, .git, bin</span><a href="#1c" style="margin-left:auto;font-size:13px">Clear results</a></div>
+      <div style="margin-top:28px;display:flex;align-items:baseline;gap:14px;font-size:13px"><span style="font-family:var(--font-heading);font-weight:600;font-size:17px">6 folders</span><span style="color:var(--color-neutral-600)">3 selected · 3.9 GB</span><a href="#1c">select all</a><a href="#1c">none</a></div>
+      <table class="table" style="margin-top:10px;font-size:14px">
+        <thead><tr><th style="width:30px"></th><th>Folder</th><th>Path</th><th style="text-align:right">Size</th></tr></thead>
+        <tbody>
+          <sc-for list="{{ folderRows }}" as="r" hint-placeholder-count="6">
+          <tr><td><span style="display:inline-block;width:14px;height:14px;border:1.5px solid var(--color-text);border-radius:2px;vertical-align:middle;background: {{ r.boxBg }}"></span></td><td style="font-weight:600">{{ r.name }}</td><td style="color:var(--color-neutral-700)"><a href="#1c" style="color:inherit;text-decoration:none">{{ r.path }}</a></td><td style="text-align:right">{{ r.size }}</td></tr>
+          </sc-for>
+        </tbody>
+      </table>
+    </div>
+    <aside style="display:flex;flex-direction:column;min-height:0">
+      <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-600)">Act on the 3 selected folders</div>
+      <!-- accordion: open -->
+      <div style="margin-top:14px">
+        <div style="display:flex;align-items:baseline;gap:10px"><span style="font-family:var(--font-heading);font-weight:600;font-size:22px">Recycle repeated subfolders</span><span style="margin-left:auto;font-size:12px;color:var(--color-neutral-500)">▲</span></div>
+        <p style="margin:6px 0 0;font-size:13px;line-height:1.5;color:var(--color-neutral-700)">Subfolder names that repeat across the selected folders. Check the ones to send to the Recycle Bin — restorable from History.</p>
+        <div style="display:flex;align-items:center;gap:12px;margin-top:12px;font-size:13px"><label class="radio"><span class="dot" style="border-radius:2px;background:var(--color-accent);border-color:var(--color-accent)"></span>Look inside nested folders too</label><a href="#1c" style="margin-left:auto">Rescan</a></div>
+        <div style="margin-top:10px;display:flex;flex-direction:column">
+          <sc-for list="{{ subfolders }}" as="s" hint-placeholder-count="4">
+          <div style="display:grid;grid-template-columns:22px 1fr auto auto;gap:10px;align-items:baseline;padding:6px 0;font-size:14px"><span style="display:inline-block;width:14px;height:14px;border:1.5px solid var(--color-text);border-radius:2px;background: {{ s.boxBg }}"></span><span style="font-weight:600">{{ s.name }}</span><span style="font-size:12.5px;color:var(--color-neutral-600)">in {{ s.count }} folders</span><span style="font-size:12.5px">{{ s.size }}</span></div>
+          </sc-for>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-start;gap:8px;margin-top:12px"><button class="btn btn-primary" style="white-space:nowrap">Recycle 2 names · 1.7 GB</button><a href="#1c" style="font-size:13px">Also recycle files by type…</a></div>
+      </div>
+      <!-- accordion: closed -->
+      <div style="margin-top:30px;display:flex;align-items:baseline;gap:10px"><span style="font-family:var(--font-heading);font-size:22px;color:var(--color-neutral-600)">Flatten files to the root</span><span style="margin-left:auto;font-size:12px;color:var(--color-neutral-500)">▼</span></div>
+      <div style="margin-top:18px;display:flex;align-items:baseline;gap:10px"><span style="font-family:var(--font-heading);font-size:22px;color:var(--color-neutral-600)">Link sibling folders</span><span style="margin-left:auto;font-size:12px;color:var(--color-neutral-500)">▼</span></div>
+    </aside>
+  </div>
+  <div style="height:30px;display:flex;align-items:center;padding:0 40px;gap:18px;font-size:12.5px;color:var(--color-neutral-600);flex:none"><span>Ready</span><span style="margin-left:auto"><a href="#1d">Undo</a> recycle of 14 subfolders, yesterday 18:22</span><span>RAM 186 MB · CPU 0.4%</span></div>
+</div></div>
+
+<!-- ═══════════════ 1d ═══════════════ -->
+<div class="dv-opt" id="1d"><div class="dv-olabel"><a class="dv-oid" href="#1d">1d</a>History as a dated column · masthead nav · 1600×900. Counts become a statistics row; each action is a sentence with an inline Undo; grouped by day. Also the scope editor as a proper page section (the "Edit scope" target in <a class="dv-oid" href="#1a">1a</a>).</div>
+<div class="dv-card" data-screen-label="1d History column" style="width:1600px;height:900px;display:flex;flex-direction:column">
+  <div style="height:34px;display:flex;align-items:center;padding:0 14px;gap:10px;flex:none"><span style="font-family:var(--font-heading);font-weight:600;font-size:14px">Folder File Control</span><span style="margin-left:auto;display:flex;gap:26px;font-size:12px;color:var(--color-neutral-600)"><span>—</span><span>▢</span><span>✕</span></span></div>
+  <div style="margin:4px 40px 0;border-top:3px solid var(--color-text);flex:none">
+    <div style="display:flex;align-items:center;height:34px;font-size:13px;border-bottom:1px solid var(--color-text)">
+      <span style="color:var(--color-neutral-500)">Folders</span><span style="margin:0 22px;color:var(--color-neutral-500)">Duplicates</span><span style="font-family:var(--font-heading);font-weight:600">History</span>
+      <span style="margin-left:auto;color:var(--color-neutral-600)">Shared across profiles · 30 most recent actions kept</span>
+    </div>
+  </div>
+  <div style="flex:1;display:grid;grid-template-columns:1fr 420px;gap:60px;padding:26px 40px 0;min-height:0">
+    <div style="min-width:0;display:flex;flex-direction:column">
+      <div style="display:flex;gap:44px;align-items:flex-end">
+        <div><div style="font-family:var(--font-heading);font-weight:600;font-size:54px;line-height:1">4</div><div style="font-size:12.5px;color:var(--color-neutral-600);margin-top:4px">actions, all undoable</div></div>
+        <div><div style="font-family:var(--font-heading);font-weight:600;font-size:34px;line-height:1">12</div><div style="font-size:12.5px;color:var(--color-neutral-600);margin-top:4px">files moved</div></div>
+        <div><div style="font-family:var(--font-heading);font-weight:600;font-size:34px;line-height:1">9</div><div style="font-size:12.5px;color:var(--color-neutral-600);margin-top:4px">files recycled</div></div>
+        <div><div style="font-family:var(--font-heading);font-weight:600;font-size:34px;line-height:1">14</div><div style="font-size:12.5px;color:var(--color-neutral-600);margin-top:4px">subfolders recycled</div></div>
+        <div style="margin-left:auto;display:flex;gap:10px"><button class="btn btn-secondary">Undo last</button><button class="btn btn-ghost">Clear list</button></div>
+      </div>
+      <div style="margin-top:34px;display:flex;flex-direction:column;gap:26px">
+        <sc-for list="{{ historyDays }}" as="d" hint-placeholder-count="2">
+        <div style="display:grid;grid-template-columns:150px 1fr;gap:20px">
+          <div style="font-family:var(--font-heading);font-weight:600;font-size:17px">{{ d.day }}</div>
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <sc-for list="{{ d.items }}" as="h" hint-placeholder-count="2">
+            <div style="display:grid;grid-template-columns:52px 1fr auto;gap:16px;align-items:baseline;font-size:15px;line-height:1.45"><span style="font-size:12.5px;color:var(--color-neutral-600)">{{ h.time }}</span><span>{{ h.text }} <span style="color:var(--color-neutral-600)">{{ h.detail }}</span></span><a href="#1d" style="font-size:13px">Undo</a></div>
+            </sc-for>
+          </div>
+        </div>
+        </sc-for>
+      </div>
+    </div>
+    <aside>
+      <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-600)">Scope · Photos cleanup</div>
+      <p style="margin:8px 0 0;font-size:13px;line-height:1.5;color:var(--color-neutral-700)">Where every scan and search in this profile looks. Untick a folder to leave it out without removing it.</p>
+      <div style="margin-top:14px;display:flex;flex-direction:column">
+        <div style="display:grid;grid-template-columns:22px 1fr auto;gap:10px;align-items:baseline;padding:6px 0;font-size:14px"><span style="display:inline-block;width:14px;height:14px;border:1.5px solid var(--color-accent);border-radius:2px;background:var(--color-accent)"></span><span>D:\Photos</span><a href="#1d" style="font-size:12.5px">remove</a></div>
+        <div style="display:grid;grid-template-columns:22px 1fr auto;gap:10px;align-items:baseline;padding:6px 0;font-size:14px"><span style="display:inline-block;width:14px;height:14px;border:1.5px solid var(--color-accent);border-radius:2px;background:var(--color-accent)"></span><span>D:\Backup\Photos</span><a href="#1d" style="font-size:12.5px">remove</a></div>
+        <div style="display:grid;grid-template-columns:22px 1fr auto;gap:10px;align-items:baseline;padding:6px 0;font-size:14px;color:var(--color-neutral-500)"><span style="display:inline-block;width:14px;height:14px;border:1.5px solid var(--color-neutral-500);border-radius:2px"></span><span>E:\OneDrive\Pictures</span><a href="#1d" style="font-size:12.5px">remove</a></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:10px;align-items:center"><input class="input" placeholder="Paste a path or browse…" style="min-height:32px;font-size:13px"><button class="btn btn-secondary" style="min-height:32px;padding:0 12px;font-size:13px">Browse</button></div>
+      <div style="margin-top:26px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-600)">Always skip folders named</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px"><span class="tag tag-neutral">node_modules ✕</span><span class="tag tag-neutral">.git ✕</span><span class="tag tag-neutral">bin ✕</span><span class="tag tag-outline">+ add</span></div>
+      <p style="margin:10px 0 0;font-size:12.5px;color:var(--color-neutral-600);line-height:1.5">Matched by folder name only, case-insensitive. Any nested folder with the name is skipped entirely.</p>
+      <div style="margin-top:26px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-600)">Include nested folders</div>
+      <div class="seg" style="margin-top:8px"><label class="seg-opt"><input type="radio" name="d-nest" checked>Yes</label><label class="seg-opt"><input type="radio" name="d-nest">Top level only</label></div>
+    </aside>
+  </div>
+  <div style="height:30px;display:flex;align-items:center;padding:0 40px;gap:18px;font-size:12.5px;color:var(--color-neutral-600);flex:none"><span>Ready</span><span style="margin-left:auto">RAM 186 MB · CPU 0.4% · 31 threads</span></div>
+</div></div>
+
+<!-- ═══════════════ 1e ═══════════════ -->
+<div class="dv-opt" id="1e"><div class="dv-olabel"><a class="dv-oid" href="#1e">1e</a>Plates · sidebar index · Duplicates · 1600×900 · the most editorial take. Each group prints as a contact sheet: thumbnails side by side, the kept copy in full ink, the others screened back; rules live in a drawer on the right. Magenta is the one spot color, reserved for "will be removed".</div>
+<div class="dv-card" data-screen-label="1e Plates Duplicates" style="width:1600px;height:900px;display:flex;flex-direction:column">
+  <div style="height:34px;display:flex;align-items:center;padding:0 14px;gap:10px;flex:none"><span style="font-family:var(--font-heading);font-weight:600;font-size:14px">Folder File Control</span><span style="margin-left:auto;display:flex;gap:26px;font-size:12px;color:var(--color-neutral-600)"><span>—</span><span>▢</span><span>✕</span></span></div>
+  <div style="flex:1;display:grid;grid-template-columns:200px 1fr 360px;min-height:0">
+    <nav style="padding:14px 0 0 30px;display:flex;flex-direction:column;gap:6px">
+      <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-600);margin-bottom:12px">Photos cleanup ▾</div>
+      <a href="#1e" style="font-family:var(--font-heading);font-weight:600;font-size:24px;line-height:1.1;text-decoration:none;color:var(--color-text)">Duplicates</a>
+      <a href="#1c" style="font-family:var(--font-heading);font-size:24px;line-height:1.1;text-decoration:none;color:var(--color-neutral-500)">Folders</a>
+      <a href="#1d" style="font-family:var(--font-heading);font-size:24px;line-height:1.1;text-decoration:none;color:var(--color-neutral-500)">History</a>
+      <div style="margin-top:36px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-600)">Types</div>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px;font-size:13.5px"><span>.jpg <span style="color:var(--color-neutral-500)">4</span></span><span>.mp4 <span style="color:var(--color-neutral-500)">2</span></span><span>.pdf <span style="color:var(--color-neutral-500)">1</span></span></div>
+      <div style="margin-top:26px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-600)">Sort</div>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px;font-size:13.5px"><span style="font-weight:600">Wasted space</span><span style="color:var(--color-neutral-500)">Size</span><span style="color:var(--color-neutral-500)">Copies</span><span style="color:var(--color-neutral-500)">Name</span></div>
+    </nav>
+    <main style="padding:14px 30px 0 20px;display:flex;flex-direction:column;min-width:0;min-height:0">
+      <div style="display:flex;align-items:baseline;gap:16px;flex:none"><h1 style="font-family:var(--font-heading);font-weight:600;font-size:40px;margin:0;line-height:1">Three duplicates</h1><span style="font-size:14px;color:var(--color-neutral-600)">41.2 MB reclaimable · 4 copies marked</span><button class="btn btn-primary" style="margin-left:auto">Scan again</button></div>
+      <div style="flex:1;margin-top:26px;display:flex;flex-direction:column;gap:34px;overflow:hidden">
+        <sc-for list="{{ groups }}" as="g" hint-placeholder-count="3">
+        <article>
+          <div style="display:flex;align-items:baseline;gap:12px"><span style="font-family:var(--font-heading);font-weight:600;font-size:19px">{{ g.first }}</span><span style="font-size:13px;color:var(--color-neutral-600)">{{ g.count }} copies · {{ g.size }} each · <b style="font-weight:600;color:var(--color-text)">{{ g.wasted }}</b> wasted</span><a href="#1e" style="margin-left:auto;font-size:12.5px">Keep newest</a><a href="#1e" style="font-size:12.5px">Keep oldest</a></div>
+          <div style="display:flex;gap:18px;margin-top:12px">
+            <sc-for list="{{ g.files }}" as="f" hint-placeholder-count="2">
+            <div style="width:220px">
+              <div style="height:120px;background:linear-gradient(160deg,var(--color-neutral-300),var(--color-neutral-500));display:flex;align-items:flex-end;padding:8px;box-sizing:border-box;opacity: {{ f.plateOpacity }}"><span style="font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--color-bg)">{{ g.ext }}</span></div>
+              <div style="margin-top:8px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color: {{ f.color }}">{{ f.verb }}</div>
+              <div style="font-size:12.5px;line-height:1.4;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="{{ f.path }}">{{ f.dir }}</div>
+              <div style="font-size:12px;color:var(--color-neutral-600)">{{ f.date }} · {{ f.size }}</div>
+            </div>
+            </sc-for>
+          </div>
+        </article>
+        </sc-for>
+      </div>
+    </main>
+    <aside style="padding:14px 30px 0 0;display:flex;flex-direction:column">
+      <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-600)">Rules</div>
+      <p style="margin:6px 0 0;font-size:13px;line-height:1.5;color:var(--color-neutral-700)">Applied top to bottom; the first match decides. Ignore always beats keep-marking.</p>
+      <div style="margin-top:14px;display:flex;flex-direction:column;gap:10px">
+        <div style="display:grid;grid-template-columns:18px 1fr auto;gap:10px;align-items:baseline;font-size:14px"><span style="font-size:12px;color:var(--color-neutral-500)">1</span><span>Never mark paths containing <span style="font-family:ui-monospace,Menlo,monospace;font-size:13px">\Originals\</span> <span class="tag tag-neutral" style="font-size:10px;padding:1px 6px">Aa</span></span><a href="#1e" style="font-size:12.5px">edit</a></div>
+        <div style="display:grid;grid-template-columns:18px 1fr auto;gap:10px;align-items:baseline;font-size:14px;color:var(--color-neutral-500)"><span style="font-size:12px">2</span><span>Mark names matching <span style="font-family:ui-monospace,Menlo,monospace;font-size:13px">^IMG_\d+ \(\d\)</span> <span class="tag tag-neutral" style="font-size:10px;padding:1px 6px">.*</span> — off</span><a href="#1e" style="font-size:12.5px">edit</a></div>
+      </div>
+      <div style="margin-top:14px;display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;gap:6px;align-items:center;font-size:13px"><span style="border-bottom:1px solid var(--color-accent);color:var(--color-accent)">Mark ▾</span><span>files whose</span><span style="border-bottom:1px solid var(--color-accent);color:var(--color-accent)">name ▾</span><span>contains</span></div>
+        <div style="display:flex;gap:8px"><input class="input" placeholder="text or /regex/" style="min-height:32px;font-size:13px"><button class="btn btn-secondary" style="min-height:32px;padding:0 12px;font-size:13px">Add rule</button></div>
+        <a href="#1e" style="font-size:12.5px">Apply rules to this scan</a>
+      </div>
+      <div style="margin-top:auto;padding-bottom:20px">
+        <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-600)">Match by</div>
+        <div class="seg" style="margin-top:8px"><label class="seg-opt"><input type="radio" name="e-match" checked>Content</label><label class="seg-opt"><input type="radio" name="e-match">Name pattern</label></div>
+        <p style="margin:8px 0 0;font-size:12.5px;color:var(--color-neutral-600);line-height:1.5">Content compares SHA-256 hashes; two files with different names but identical bytes are duplicates.</p>
+      </div>
+    </aside>
+  </div>
+  <div style="height:30px;display:flex;align-items:center;padding:0 30px;gap:18px;font-size:12.5px;flex:none"><span style="color:var(--color-accent-2)">4 copies will be removed · 27.5 MB</span><button class="btn btn-secondary" style="min-height:24px;padding:2px 10px;font-size:12px">Recycle</button><button class="btn btn-ghost" style="min-height:24px;padding:2px 6px;font-size:12px">Move to…</button><span style="margin-left:auto;color:var(--color-neutral-600)"><a href="#1d">Undo</a> recycle of 4 files, 10:12 · RAM 186 MB</span></div>
+</div></div>
+
+<!-- ═══════════════ 1f ═══════════════ -->
+<div class="dv-opt" id="1f"><div class="dv-olabel"><a class="dv-oid" href="#1f">1f</a>Small parts: the profile-name dialog and the help popover, restyled. Help becomes a one-paragraph note with a "Learn more" link instead of a 20-line yellow box.</div>
+<div style="display:flex;gap:28px;align-items:flex-start">
+  <div class="dv-card" data-screen-label="1f Profile dialog" style="width:520px;height:340px;background:color-mix(in srgb,var(--color-neutral-900) 50%,var(--color-bg));display:grid;place-items:center">
+    <div class="dialog" style="width:440px">
+      <div class="dialog-title">Name the new profile</div>
+      <div class="dialog-body">A profile keeps its own folders, filters, rules and searches. Window size and History are shared.</div>
+      <div class="field"><label for="f-name">Profile name</label><input class="input" id="f-name" value="Photos cleanup"><div style="font-size:12.5px;color:var(--color-accent-2);margin-top:6px">A profile named “Photos cleanup” already exists.</div></div>
+      <div class="dialog-actions"><button class="btn btn-ghost">Cancel</button><button class="btn btn-primary" disabled>Create</button></div>
+    </div>
+  </div>
+  <div class="dv-card" data-screen-label="1f Help popover" style="width:520px;height:340px;padding:40px 44px;box-sizing:border-box">
+    <div style="display:flex;align-items:center;gap:8px;font-size:14px"><span>Match by</span><span style="border-bottom:1px solid var(--color-accent);color:var(--color-accent)">name pattern ▾</span><span style="width:18px;height:18px;border-radius:50%;border:1px solid var(--color-accent);color:var(--color-accent);font-size:11px;display:inline-flex;align-items:center;justify-content:center;font-style:italic">i</span></div>
+    <div class="elev-md" style="margin-top:12px;width:380px;padding:14px 16px;background:var(--color-surface);border-radius:var(--radius-md);box-shadow:var(--shadow-md);font-size:13.5px;line-height:1.55">
+      <div style="font-family:var(--font-heading);font-weight:600;font-size:15px">Group by a name pattern instead of content</div>
+      <p style="margin:6px 0 0">Files whose captured groups are equal land together — <span style="font-family:ui-monospace,Menlo,monospace;font-size:12.5px">(?i)(abc).*?(\d{7,8})</span> puts <i>abc-12345678.jpg</i> and <i>bla abc 12345678.png</i> in one group. Sizes needn't match. Files that don't match the pattern are skipped.</p>
+      <div style="margin-top:10px;display:flex;gap:16px;font-size:12.5px"><a href="#1f">Learn regex at regex101.com</a><a href="#1f">Switch back to content</a></div>
+    </div>
+  </div>
+</div></div>
+
+</div>
+<p class="dv-next">Try next: "build the Where and Scan steps of <a class="dv-oid" href="#1b">1b</a>" · "take <a class="dv-oid" href="#1a">1a</a>'s ledger into <a class="dv-oid" href="#1c">1c</a>'s masthead nav" · "make <a class="dv-oid" href="#1e">1e</a> at 1280×800" · "show the scanning-in-progress state"</p>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Light&quot;,&quot;Dark&quot;],&quot;default&quot;:&quot;Light&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;4a theme&quot;}}">
+class Component extends DCLogic {
+  state = { theme: null };
+  renderVals() {
+    const theme = this.state.theme ?? this.props.theme ?? 'Light';
+    const dark = theme === 'Dark';
+    const T = dark ? {
+      tBg: '#2d2b2b', tSurface: '#444141', tText: '#f8f4f4', tDivider: 'color-mix(in srgb, #f8f4f4 16%, transparent)',
+      tN100: '#3a3737', tN500: '#9b9797', tN600: '#bab6b6', tN700: '#d7d3d3',
+      tA100: '#0a303e', tA800: '#99e0ff', tB100: '#3e0a22', tB800: '#ffb3d6', tY100: '#3e3200', tY800: '#ffd84d',
+      tN800: '#eae7e7', tAccent: '#62c5ee', tAccent2: '#ff5aa8', tA600: '#99e0ff',
+    } : {
+      tBg: '#f3f2f2', tSurface: '#eae9e9', tText: '#201e1d', tDivider: 'color-mix(in srgb, #201e1d 16%, transparent)',
+      tN100: '#f8f4f4', tN500: '#9b9797', tN600: '#7d7979', tN700: '#605d5d',
+      tA100: '#e9f8ff', tA800: '#004961', tB100: '#fff1f4', tB800: '#7a0040', tY100: '#fff6d6', tY800: '#7a5e00',
+      tN800: '#444141', tAccent: '#0088b0', tAccent2: '#d6006c', tA600: '#1186ac',
+    };
+    const segOn = { bg: 'var(--color-accent)', fg: 'var(--color-bg)' }, segOff = { bg: 'transparent', fg: 'var(--color-neutral-600)' };
+    const themeVals = { ...T,
+      lightSegBg: dark ? segOff.bg : segOn.bg, lightSegFg: dark ? segOff.fg : segOn.fg,
+      darkSegBg: dark ? segOn.bg : segOff.bg, darkSegFg: dark ? segOn.fg : segOff.fg,
+      setLight: () => this.setState({ theme: 'Light' }), setDark: () => this.setState({ theme: 'Dark' }) };
+    const KEEP = { verb: 'keep', color: 'var(--color-accent-700)', pathColor: 'var(--color-text)', plateOpacity: 1, pillBg: 'var(--color-accent-100)', pillFg: 'var(--color-accent-800)', rowBg: 'transparent' };
+    const RM = { verb: 'remove', color: 'var(--color-accent-2)', pathColor: 'var(--color-neutral-600)', plateOpacity: 0.35, pillBg: 'var(--color-accent-2-100)', pillFg: 'var(--color-accent-2-800)', rowBg: 'color-mix(in srgb, var(--color-accent-2) 5%, transparent)' };
+    const f = (k, path, date, size) => ({ ...k, path, dir: path.replace(/\\[^\\]+$/, ''), date, size });
+    const groups = [
+      { first: 'IMG_2041.jpg', ext: '.jpg', count: 3, size: '6.2 MB', wasted: '12.4 MB', files: [
+        f(KEEP, 'D:\\Photos\\FamilyAlbum\\IMG_2041.jpg', '14 Mar 2019', '6.2 MB'),
+        f(RM, 'D:\\Backup\\Photos\\Phone-export\\IMG_2041.jpg', '2 Jun 2021', '6.2 MB'),
+        f(RM, 'D:\\Backup\\Photos\\Phone-export\\Originals\\IMG_2041 (1).jpg', '2 Jun 2021', '6.2 MB') ] },
+      { first: 'beach-clip.mp4', ext: '.mp4', count: 2, size: '15.1 MB', wasted: '15.1 MB', files: [
+        f(KEEP, 'D:\\Photos\\Trip-2019\\beach-clip.mp4', '8 Aug 2019', '15.1 MB'),
+        f(RM, 'D:\\Backup\\Photos\\Phone-export\\VID_0091.mp4', '2 Jun 2021', '15.1 MB') ] },
+      { first: 'passport-scan.pdf', ext: '.pdf', count: 2, size: '1.3 MB', wasted: '1.3 MB', files: [
+        f(KEEP, 'D:\\Photos\\Scans\\passport-scan.pdf', '11 Jan 2020', '1.3 MB'),
+        f(RM, 'D:\\Backup\\Photos\\Scans\\passport-scan.pdf', '2 Jun 2021', '1.3 MB') ] },
+    ];
+    groups.forEach(g => g.files.forEach(x => { x.keepDot = x.verb === 'keep' ? 'var(--color-text)' : 'transparent'; }));
+    const typeStyle = { '.jpg': ['ph-duotone ph-image', 'var(--color-accent-100)', 'var(--color-accent-800)'], '.mp4': ['ph-duotone ph-film-strip', 'var(--color-accent-2-100)', 'var(--color-accent-2-800)'], '.pdf': ['ph-duotone ph-file-pdf', 'var(--y-100)', 'var(--y-800)'] };
+    groups.forEach(g => { const [icon, tagBg, tagFg] = typeStyle[g.ext]; Object.assign(g, { icon, tagBg, tagFg }); });
+    const tableRows = [];
+    groups.forEach((g, gi) => g.files.forEach((x, i) => tableRows.push({
+      n: i === 0 ? String(gi + 1) : '', name: x.path.split('\\').pop(), dir: x.dir, date: x.date, size: x.size,
+      weight: i === 0 ? 600 : 400, bg: gi % 2 ? 'color-mix(in srgb, var(--color-text) 3%, transparent)' : 'transparent',
+      keepDot: x.verb === 'keep' ? 'var(--color-text)' : 'transparent' })));
+    const on = 'var(--color-accent)', off = 'transparent';
+    return { ...themeVals,
+      groups, tableRows,
+      folderRows: [
+        { boxBg: on, rowBg: 'var(--color-accent-100)', name: 'FamilyAlbum', size: '2.4 GB', path: 'D:\\Photos\\FamilyAlbum' },
+        { boxBg: on, rowBg: 'transparent', name: 'Trip-2019', size: '1.1 GB', path: 'D:\\Photos\\Trip-2019' },
+        { boxBg: on, rowBg: 'transparent', name: 'Scans', size: '388 MB', path: 'D:\\Photos\\Scans' },
+        { boxBg: off, rowBg: 'transparent', name: 'Wallpapers', size: '212 MB', path: 'D:\\Backup\\Photos\\Wallpapers' },
+        { boxBg: off, rowBg: 'transparent', name: 'Phone-export', size: '5.7 GB', path: 'D:\\Backup\\Photos\\Phone-export' },
+        { boxBg: off, rowBg: 'transparent', name: 'Raw', size: '14.2 GB', path: 'D:\\Backup\\Photos\\Raw' } ],
+      subfolders: [
+        { boxBg: on, name: 'node_modules', count: 14, size: '1.6 GB' }, { boxBg: off, name: '.vs', count: 6, size: '88 MB' },
+        { boxBg: on, name: 'bin', count: 9, size: '112 MB' }, { boxBg: off, name: 'obj', count: 9, size: '41 MB' } ],
+      historyDays: [
+        { day: 'Today', items: [
+          { time: '10:12', text: 'Recycled 4 duplicate files', detail: '— 24.8 MB from D:\\Backup\\Photos' },
+          { time: '09:58', text: 'Flattened 12 files to the root of Trip-2019', detail: '— 2 renamed (2), (3)' } ] },
+        { day: 'Yesterday', items: [
+          { time: '18:22', text: 'Recycled node_modules from 14 folders', detail: '— 1.6 GB' },
+          { time: '18:05', text: 'Recycled 5 files of type .log, .tmp', detail: '— across 3 folders' } ] } ],
+    };
+  }
+}
+</script>
+</body>
+</html>

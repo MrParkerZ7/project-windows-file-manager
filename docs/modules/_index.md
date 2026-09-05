@@ -2,10 +2,11 @@
 
 The solution (`WindowsFileManager.sln`) holds four production projects under `src/` and one test project under `tests/`. Dependencies point in one direction only — outward layers reference inward ones, never the reverse.
 
-This directory is the **module-doc** home: how the code in each project actually works. It is one of four documentation kinds, each with exactly one home:
+This directory is the **module-doc** home: how the code in each project actually works. It is one of five documentation kinds, each with exactly one home:
 
 | Kind | Home | Answers |
 |------|------|---------|
+| Design | [`../design/`](../design/) | what was intended, before the code existed? |
 | Feature spec | [`../specs/`](../specs/) | how does this feature behave today, across modules? |
 | Decision | [`../adr/`](../adr/) | why was it built this way? |
 | Module doc | `docs/modules/` (here) | how does this code work, inside one module? |

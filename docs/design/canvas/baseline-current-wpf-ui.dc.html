@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<style>
+body{margin:0;background:#c9ccd1;font-family:"Segoe UI",system-ui,sans-serif;font-size:12px;color:#000}
+a{color:#1565C0}a:hover{color:#0D47A1}
+</style>
+</helmet>
+<div style="padding:40px;display:flex;flex-direction:column;gap:14px;align-items:flex-start">
+<div style="font:600 13px system-ui,sans-serif;color:#1a1a1a">Baseline — Folder File Control as it ships today (recreated from <span style="font-family:ui-monospace,Menlo,monospace;font-size:11px">Views/MainWindow.xaml</span>). Switch tab / panels / dialog in Tweaks.</div>
+
+<div data-screen-label="Main window" style="width: {{ winW }}px; height: {{ winH }}px; background:#fff;border:1px solid #6b6b6b;box-shadow:0 12px 40px rgba(0,0,0,.35);display:flex;flex-direction:column;position:relative;overflow:hidden">
+  <!-- Win11 title bar -->
+  <div style="height:32px;background:#fff;display:flex;align-items:center;padding-left:10px;gap:8px;flex:none">
+    <img src="assets/app-icon.png" alt="" style="width:16px;height:16px">
+    <span style="font-size:12px;color:#000">Folder File Control</span>
+    <div style="margin-left:auto;display:flex;height:32px">
+      <div style="width:46px;display:flex;align-items:center;justify-content:center;font-size:12px">&#xFF3F;</div>
+      <div style="width:46px;display:flex;align-items:center;justify-content:center;font-size:11px">&#x25A1;</div>
+      <div style="width:46px;display:flex;align-items:center;justify-content:center;font-size:13px">&#x2715;</div>
+    </div>
+  </div>
+
+  <!-- DockPanel Margin=4 -->
+  <div style="flex:1;display:flex;flex-direction:column;margin:4px;min-height:0">
+    <!-- Profile bar -->
+    <div style="background:#ECEFF1;border-bottom:1px solid #CFD8DC;padding:4px 8px;margin-bottom:4px;display:flex;align-items:center;flex:none">
+      <span style="flex:1;font-size:10.5px;font-style:italic;color:#558B2F;margin-right:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Switched to 'Photos cleanup'.</span>
+      <span style="font-weight:700;font-size:11px;color:#37474F;margin-right:6px">Profile:</span>
+      <div style="min-width:180px;height:22px;background:linear-gradient(#F0F0F0,#E5E5E5);border:1px solid #ACACAC;display:flex;align-items:center;padding:2px 4px;font-size:11px;box-sizing:border-box"><span style="flex:1">Photos cleanup</span><span style="font-size:8px;color:#000">&#x25BC;</span></div>
+      <div style="display:flex;align-items:center;gap:4px;margin-left:8px">
+        <button onClick="{{ openDialog }}" style="background:#DDDDDD;border:1px solid #707070;padding:3px 8px;font:600 11px 'Segoe UI',system-ui;color:#1565C0;cursor:pointer">+ New</button>
+        <button style="background:#DDDDDD;border:1px solid #707070;padding:3px 8px;font:600 11px 'Segoe UI',system-ui;color:#2E7D32">&#x2398; Clone</button>
+        <button style="background:#DDDDDD;border:1px solid #707070;padding:3px 8px;font:11px 'Segoe UI',system-ui;color:#455A64">&#x270E; Rename</button>
+        <button style="background:#DDDDDD;border:1px solid #707070;padding:3px 8px;font:11px 'Segoe UI',system-ui;color:#C62828">&#x1F5D1; Delete</button>
+        <span style="margin-left:8px;width:16px;height:16px;border-radius:8px;background:#E3F2FD;border:1px solid #90CAF9;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#1565C0;box-sizing:border-box">?</span>
+      </div>
+    </div>
+
+    <!-- Main 3-column grid -->
+    <div style="flex:1;display:flex;min-height:0">
+      <!-- Column 0 -->
+      <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+        <!-- Target + Exclude -->
+        <div style="display:flex;margin:4px;gap:4px;flex:none">
+          <div style="flex:1;border:1px solid #C0C0C0;border-radius:4px;padding:8px;min-width:0">
+            <div style="display:flex;align-items:center;margin-bottom:6px">
+              <span style="font-weight:700;font-size:12px">Target Folders</span>
+              <div style="margin-left:auto;display:flex;align-items:center;gap:4px">
+                <label style="display:inline-flex;align-items:center;gap:4px;font-size:12px"><span style="width:13px;height:13px;border:1px solid #333;background:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:10px;line-height:1">&#x2713;</span>Include subdirectories</label>
+                <span style="width:16px;height:16px;border-radius:8px;background:#E3F2FD;border:1px solid #90CAF9;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#1565C0;box-sizing:border-box;margin-right:4px">?</span>
+                <button style="background:#DDDDDD;border:1px solid #707070;padding:2px 6px;font:10px 'Segoe UI',system-ui">&#x2713; All</button>
+                <button style="background:#DDDDDD;border:1px solid #707070;padding:2px 6px;font:10px 'Segoe UI',system-ui;color:#888">&#x2715; Clear</button>
+              </div>
+            </div>
+            <div style="display:flex;margin-bottom:6px;gap:6px">
+              <div style="flex:1;border:1px solid #ABADB3;background:#fff;padding:4px 6px;font-size:12px;color:#000;height:24px;box-sizing:border-box">D:\Archive\2019</div>
+              <button style="background:#DDDDDD;border:1px solid #707070;padding:4px 12px;font:12px 'Segoe UI',system-ui">Add</button>
+              <button style="background:#DDDDDD;border:1px solid #707070;padding:4px 12px;font:12px 'Segoe UI',system-ui">Browse...</button>
+            </div>
+            <div style="display:flex;flex-wrap:wrap">
+              <div style="background:#E8EAF6;border-radius:3px;padding:3px 6px;margin:0 6px 4px 0;display:flex;align-items:center;gap:4px"><span style="width:13px;height:13px;border:1px solid #333;background:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:10px;line-height:1">&#x2713;</span><span style="font-size:11px;color:#333">D:\Photos</span><span style="margin-left:6px;font-size:9px;color:#C62828">&#x2715;</span></div>
+              <div style="background:#E8EAF6;border-radius:3px;padding:3px 6px;margin:0 6px 4px 0;display:flex;align-items:center;gap:4px"><span style="width:13px;height:13px;border:1px solid #333;background:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:10px;line-height:1">&#x2713;</span><span style="font-size:11px;color:#333">D:\Backup\Photos</span><span style="margin-left:6px;font-size:9px;color:#C62828">&#x2715;</span></div>
+              <div style="background:#EEEEEE;opacity:.6;border-radius:3px;padding:3px 6px;margin:0 6px 4px 0;display:flex;align-items:center;gap:4px"><span style="width:13px;height:13px;border:1px solid #333;background:#fff;display:inline-block"></span><span style="font-size:11px;color:#333">E:\OneDrive\Pictures</span><span style="margin-left:6px;font-size:9px;color:#C62828">&#x2715;</span></div>
+            </div>
+          </div>
+          <div style="flex:1;border:1px solid #C0C0C0;border-radius:4px;padding:8px;min-width:0">
+            <div style="display:flex;align-items:center;margin-bottom:6px">
+              <span style="font-weight:700;font-size:12px;color:#E65100">Exclude Folders</span>
+              <div style="margin-left:auto;display:flex;gap:4px">
+                <button style="background:#DDDDDD;border:1px solid #707070;padding:2px 6px;font:10px 'Segoe UI',system-ui;color:#E65100">&#x2713; All</button>
+                <button style="background:#DDDDDD;border:1px solid #707070;padding:2px 6px;font:10px 'Segoe UI',system-ui;color:#888">&#x2715; Clear</button>
+              </div>
+            </div>
+            <div style="display:flex;margin-bottom:6px;gap:6px;align-items:center">
+              <div style="flex:1;border:1px solid #ABADB3;background:#fff;padding:4px 6px;font-size:11px;height:24px;box-sizing:border-box"></div>
+              <button style="background:#DDDDDD;border:1px solid #707070;padding:4px 8px;font:600 11px 'Segoe UI',system-ui;color:#E65100">+ Add</button>
+              <span style="width:16px;height:16px;border-radius:8px;background:#E3F2FD;border:1px solid #90CAF9;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#1565C0;box-sizing:border-box">?</span>
+            </div>
+            <div style="display:flex;flex-wrap:wrap">
+              <div style="background:#FFE0B2;border-radius:3px;padding:2px 6px;margin:0 6px 4px 0;display:flex;align-items:center;gap:4px"><span style="width:13px;height:13px;border:1px solid #333;background:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:10px;line-height:1">&#x2713;</span><span style="font-size:11px;color:#BF360C;font-weight:600">node_modules</span><span style="margin-left:6px;font-size:9px;color:#C62828">&#x2715;</span></div>
+              <div style="background:#FFE0B2;border-radius:3px;padding:2px 6px;margin:0 6px 4px 0;display:flex;align-items:center;gap:4px"><span style="width:13px;height:13px;border:1px solid #333;background:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:10px;line-height:1">&#x2713;</span><span style="font-size:11px;color:#BF360C;font-weight:600">.git</span><span style="margin-left:6px;font-size:9px;color:#C62828">&#x2715;</span></div>
+              <div style="background:#FFE0B2;border-radius:3px;padding:2px 6px;margin:0 6px 4px 0;display:flex;align-items:center;gap:4px"><span style="width:13px;height:13px;border:1px solid #333;background:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:10px;line-height:1">&#x2713;</span><span style="font-size:11px;color:#BF360C;font-weight:600">bin</span><span style="margin-left:6px;font-size:9px;color:#C62828">&#x2715;</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TabControl -->
+        <div style="flex:1;display:flex;flex-direction:column;margin:0 4px 4px;min-height:0">
+          <div style="display:flex;align-items:flex-end;height:22px;flex:none;position:relative;z-index:1">
+            <div onClick="{{ setFolder }}" style="padding:2px 6px;border:1px solid #D9D9D9;border-bottom:none;margin-right:-1px;font-size:12px;cursor:pointer;height: {{ folderTabH }}px; background: {{ folderTabBg }};display:flex;align-items:center">Folder</div>
+            <div onClick="{{ setDup }}" style="padding:2px 6px;border:1px solid #D9D9D9;border-bottom:none;margin-right:-1px;font-size:12px;cursor:pointer;height: {{ dupTabH }}px; background: {{ dupTabBg }};display:flex;align-items:center">Duplication</div>
+            <div onClick="{{ setHistory }}" style="padding:2px 6px;border:1px solid #DAA520;border-bottom:none;font-size:12px;cursor:pointer;height: {{ histTabH }}px; background: {{ histTabBg }};display:flex;align-items:center;color:#B8860B;font-weight:700">&#x1F558; History</div>
+          </div>
+          <div style="flex:1;border:1px solid #D9D9D9;background:#fff;min-height:0;display:flex;flex-direction:column;margin-top:-1px">
+
+            <!-- ===== Tab: Folder ===== -->
+            <sc-if value="{{ isFolder }}" hint-placeholder-val="{{ true }}">
+            <div data-screen-label="Folder tab" style="flex:1;display:flex;flex-direction:column;margin:8px;min-height:0">
+              <div style="background:#E8EAF6;border:1px solid #C5CAE9;border-radius:4px;padding:2px 8px;margin-bottom:4px;flex:none">
+                <div style="display:flex;flex-wrap:wrap;align-items:center">
+                  <div style="display:flex;align-items:center;margin:2px 0"><span style="font-size:11px;font-weight:700;color:#1565C0;margin-right:4px">Folder Search</span><span style="width:16px;height:16px;border-radius:8px;background:#E3F2FD;border:1px solid #90CAF9;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#1565C0;box-sizing:border-box;margin-left:4px">?</span><span style="width:1px;background:#C5CAE9;height:18px;margin:2px 8px"></span></div>
+                  <div style="display:flex;align-items:center;margin:2px 0;gap:4px">
+                    <div style="width:92px;height:22px;background:linear-gradient(#F0F0F0,#E5E5E5);border:1px solid #ACACAC;display:flex;align-items:center;padding:0 4px;font-size:11px;box-sizing:border-box;margin-right:-2px"><span style="flex:1">Include</span><span style="font-size:8px">&#x25BC;</span></div>
+                    <span style="width:16px;height:16px;border-radius:8px;background:#E3F2FD;border:1px solid #90CAF9;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#1565C0;box-sizing:border-box">?</span>
+                    <span style="font-weight:600;font-size:11px;color:#333">name:</span>
+                    <div style="width:180px;height:22px;border:1px solid #ABADB3;background:#fff;padding:3px 6px;font-size:11px;color:#AAAAAA;box-sizing:border-box">folder name or pattern...</div>
+                    <button style="background:#DDDDDD;border:1px solid #707070;padding:3px 8px;font:600 11px 'Segoe UI',system-ui;color:#1565C0">+ Add</button>
+                    <span style="width:1px;background:#C5CAE9;height:18px;margin:2px 8px"></span>
+                  </div>
+                  <div style="display:flex;align-items:center;margin:2px 0;gap:4px">
+                    <span style="font-weight:600;font-size:11px;color:#333">layers:</span>
+                    <div style="width:56px;height:22px;border:1px solid #ABADB3;background:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;color:#AAAAAA;box-sizing:border-box">&#x221E;</div>
+                    <span style="width:16px;height:16px;border-radius:8px;background:#E3F2FD;border:1px solid #90CAF9;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#1565C0;box-sizing:border-box;margin-right:4px">?</span>
+                    <button style="background:#1565C0;border:none;border-radius:4px;padding:5px 10px;font:700 12px 'Segoe UI',system-ui;color:#fff">&#x25B6; Search</button>
+                    <span style="width:16px;height:16px;border-radius:8px;background:#E3F2FD;border:1px solid #90CAF9;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#1565C0;box-sizing:border-box;margin-left:2px">?</span>
+                    <button style="background:#DDDDDD;border:1px solid #707070;padding:3px 8px;font:600 11px 'Segoe UI',system-ui;color:#C62828;margin-left:4px">&#x2715; Clear</button>
+                    <span style="font-size:10px;color:#666;margin-left:4px">Found 6 folders matching 2 patterns.</span>
+                  </div>
+                </div>
+                <div style="display:flex;flex-wrap:wrap;margin-top:4px">
+                  <div style="background:#C5CAE9;border:1px solid #7986CB;border-radius:3px;padding:3px 6px;margin:0 6px 4px 0;display:flex;align-items:center;gap:4px">
+                    <span style="width:13px;height:13px;border:1px solid #333;background:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:10px;line-height:1">&#x2713;</span>
+                    <span style="width:20px;background:#424242;border-radius:3px;color:#fff;font-size:9px;font-weight:700;text-align:center;padding:1px 0;box-sizing:border-box">1</span>
+                    <span style="display:inline-flex"><span style="background:#E0E0E0;border-radius:2px 0 0 2px;padding:1px 3px;font-size:8px;color:#555">&#x25B2;</span><span style="background:#E0E0E0;border-radius:0 2px 2px 0;padding:1px 3px;font-size:8px;color:#555">&#x25BC;</span></span>
+                    <div style="width:80px;height:20px;background:linear-gradient(#F0F0F0,#E5E5E5);border:1px solid #ACACAC;display:flex;align-items:center;padding:0 4px;font-size:9px;box-sizing:border-box"><span style="flex:1">Contains</span><span style="font-size:7px">&#x25BC;</span></div>
+                    <span style="min-width:80px;padding:2px 4px;font-size:11px;font-weight:600;color:#283593;border-bottom:1.5px solid #7986CB">*.sln</span>
+                    <span style="margin-left:6px;font-size:9px;color:#C62828">&#x2715;</span>
+                  </div>
+                  <div style="background:#C5CAE9;border:1px solid #7986CB;border-radius:3px;padding:3px 6px;margin:0 6px 4px 0;display:flex;align-items:center;gap:4px">
+                    <span style="width:13px;height:13px;border:1px solid #333;background:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:10px;line-height:1">&#x2713;</span>
+                    <span style="width:20px;background:#424242;border-radius:3px;color:#fff;font-size:9px;font-weight:700;text-align:center;padding:1px 0;box-sizing:border-box">2</span>
+                    <span style="display:inline-flex"><span style="background:#E0E0E0;border-radius:2px 0 0 2px;padding:1px 3px;font-size:8px;color:#555">&#x25B2;</span><span style="background:#E0E0E0;border-radius:0 2px 2px 0;padding:1px 3px;font-size:8px;color:#555">&#x25BC;</span></span>
+                    <div style="width:80px;height:20px;background:linear-gradient(#F0F0F0,#E5E5E5);border:1px solid #ACACAC;display:flex;align-items:center;padding:0 4px;font-size:9px;box-sizing:border-box"><span style="flex:1">Exclude</span><span style="font-size:7px">&#x25BC;</span></div>
+                    <span style="min-width:80px;padding:2px 4px;font-size:11px;font-weight:600;color:#283593;border-bottom:1.5px solid #7986CB">archive</span>
+                    <span style="margin-left:6px;font-size:9px;color:#C62828">&#x2715;</span>
+                  </div>
+                </div>
+              </div>
+              <!-- Results ListView -->
+              <div style="flex:1;border:1px solid #E0E0E0;background:#fff;min-height:0;overflow:hidden;font-size:12px">
+                <div style="display:grid;grid-template-columns:30px 200px 90px 600px;border-bottom:1px solid #E5E5E5;background:#fff">
+                  <div style="padding:3px 6px;border-right:1px solid #E5E5E5;display:flex;align-items:center"><span style="width:13px;height:13px;border:1px solid #333;background:#fff;display:inline-block"></span></div>
+                  <div style="padding:3px 6px;border-right:1px solid #E5E5E5">Folder Name</div>
+                  <div style="padding:3px 6px;border-right:1px solid #E5E5E5">Size</div>
+                  <div style="padding:3px 6px;border-right:1px solid #E5E5E5">Full Path</div>
+                </div>
+                <sc-for list="{{ folderRows }}" as="r" hint-placeholder-count="6">
+                <div style="display:grid;grid-template-columns:30px 200px 90px 600px;align-items:center">
+                  <div style="padding:3px 6px"><span style="width:13px;height:13px;border:1px solid #333;background:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:10px;line-height:1">{{ r.chk }}</span></div>
+                  <div style="padding:3px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.name }}</div>
+                  <div style="padding:3px 6px">{{ r.size }}</div>
+                  <div style="padding:3px 6px;color:#1565C0;text-decoration:underline;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.path }}</div>
+                </div>
+                </sc-for>
+              </div>
+            </div>
+            </sc-if>
+
+            <!-- ===== Tab: Duplication ===== -->
+            <sc-if value="{{ isDup }}" hint-placeholder-val="{{ false }}">
+            <div data-screen-label="Duplication tab" style="flex:1;display:flex;flex-direction:column;margin:8px;margin-right:16px;min-height:0">
+              <!-- Row 0 -->
+              <div style="display:flex;align-items:center;margin-bottom:8px;flex:none">
+                <button style="background:#DDDDDD;border:1px solid #707070;padding:6px 16px;font:600 12px 'Segoe UI',system-ui;margin-right:8px">Scan for Duplicates</button>
+                <span style="width:16px;height:16px;border-radius:8px;background:#E3F2FD;border:1px solid #90CAF9;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#1565C0;box-sizing:border-box;margin-left:16px">?</span>
+                <span style="margin-left:16px;background:#0277BD;border:1px solid #01579B;border-radius:3px;padding:3px 8px;font:600 11px 'Segoe UI',system-ui;color:#fff">&#x2726; Mini Preview</span>
+                <span onClick="{{ togglePreview }}" style="margin-left:4px;cursor:pointer;border-radius:3px;padding:3px 8px;font:11px 'Segoe UI',system-ui;background: {{ prevBtnBg }}; color: {{ prevBtnFg }}; border:1px solid {{ prevBtnBd }}">{{ prevBtnLabel }}</span>
+                <span onClick="{{ toggleAnalytics }}" style="margin-left:4px;cursor:pointer;border-radius:3px;padding:3px 8px;font:11px 'Segoe UI',system-ui;background: {{ anaBtnBg }}; color: {{ anaBtnFg }}; border:1px solid {{ anaBtnBd }}">{{ anaBtnLabel }}</span>
+                <span style="margin-left:4px;background:#F5F5F5;border:1px solid #CCCCCC;border-radius:3px;padding:3px 8px;font:11px 'Segoe UI',system-ui;color:#555">Auto Play</span>
+              </div>
+              <!-- Base Filters -->
+              <div style="background:#F0F4FF;border:1px solid #C5CAE9;border-radius:4px;padding:2px 8px;margin-bottom:4px;display:flex;flex-wrap:wrap;align-items:center;flex:none">
+                <div style="display:flex;align-items:center;margin:2px 8px 2px 0">
+                  <button style="background:#FFF8E1;border:1px solid #FFB74D;padding:2px 6px;font:10px 'Segoe UI',system-ui;color:#E65100;margin-right:8px">&#x1F504; Use Regex</button>
+                  <span style="font-weight:700;font-size:11px;color:#1565C0;margin-right:4px">Base Filters</span>
+                  <span style="width:16px;height:16px;border-radius:8px;background:#E3F2FD;border:1px solid #90CAF9;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#1565C0;box-sizing:border-box;margin-left:4px">?</span>
+                  <span style="width:1px;background:#C5CAE9;height:18px;margin:2px 8px"></span>
+                </div>
+                <div style="display:flex;align-items:center;margin:2px 8px 2px 0">
+                  <span style="font-weight:600;font-size:11px;color:#666;margin-right:4px">Sort:</span>
+                  <div style="width:155px;height:22px;background:linear-gradient(#F0F0F0,#E5E5E5);border:1px solid #ACACAC;display:flex;align-items:center;padding:0 4px;font-size:11px;box-sizing:border-box"><span style="flex:1">Size (largest)</span><span style="font-size:8px">&#x25BC;</span></div>
+                  <span style="width:1px;background:#D0D0D0;height:18px;margin:2px 8px"></span>
+                  <span style="font-size:11px;color:#888">Showing 3 of 3 groups</span>
+                </div>
+                <div style="display:flex;align-items:center;margin:2px 8px 2px 0">
+                  <span style="width:1px;background:#D0D0D0;height:18px;margin:2px 8px 2px 0"></span>
+                  <span style="font-weight:600;font-size:11px;color:#1565C0;margin-right:2px">Types:</span>
+                  <span style="width:16px;height:16px;border-radius:8px;background:#E3F2FD;border:1px solid #90CAF9;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#1565C0;box-sizing:border-box;margin-left:4px">?</span>
+                  <button style="background:#DDDDDD;border:1px solid #707070;padding:2px 4px;font:10px 'Segoe UI',system-ui;margin:0 2px 0 4px">All</button>
+                  <button style="background:#DDDDDD;border:1px solid #707070;padding:2px 4px;font:10px 'Segoe UI',system-ui">None</button>
+                </div>
+                <div style="display:flex;align-items:center;margin:2px 0">
+                  <span style="width:1px;background:#D0D0D0;height:18px;margin:2px 8px 2px 0"></span>
+                  <span style="font-weight:600;font-size:11px;color:#333;margin-right:4px">Min size:</span>
+                  <span style="width:16px;height:16px;border-radius:8px;background:#E3F2FD;border:1px solid #90CAF9;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#1565C0;box-sizing:border-box;margin-right:4px">?</span>
+                  <div style="width:50px;height:22px;border:1px solid #ABADB3;background:#fff;padding:3px 4px;font-size:11px;box-sizing:border-box">0</div>
+                  <div style="width:50px;height:22px;background:linear-gradient(#F0F0F0,#E5E5E5);border:1px solid #ACACAC;display:flex;align-items:center;padding:0 4px;font-size:11px;box-sizing:border-box;margin-left:4px"><span style="flex:1">MB</span><span style="font-size:8px">&#x25BC;</span></div>
+                  <span style="width:1px;background:#D0D0D0;height:18px;margin:2px 8px"></span>
+                  <span style="font-weight:600;font-size:11px;color:#333;margin-right:4px">Min dups:</span>
+                  <div style="width:35px;height:22px;border:1px solid #ABADB3;background:#fff;padding:3px 4px;font-size:11px;box-sizing:border-box">2</div>
+                  <button style="background:#DDDDDD;border:1px solid #707070;padding:3px 6px;font:11px 'Segoe UI',system-ui;margin-left:8px">Apply</button>
+                </div>
+              </div>
+              <!-- Extension checkboxes -->
+              <div style="background:#F8F9FC;border:1px solid #E8E8E8;border-radius:4px;padding:4px 8px;margin-bottom:4px;display:flex;flex-wrap:wrap;flex:none">
+                <sc-for list="{{ exts }}" as="e" hint-placeholder-count="5">
+                <label style="display:inline-flex;align-items:center;gap:4px;margin:1px 12px 1px 0"><span style="width:13px;height:13px;border:1px solid #333;background:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:10px;line-height:1">&#x2713;</span><span style="font-weight:600;font-size:11px;color:#1565C0">{{ e.ext }}</span><span style="font-size:10px;color:#888">{{ e.count }}</span></label>
+                </sc-for>
+              </div>
+              <!-- Custom Rules -->
+              <div style="background:#FFFBF0;border:1px solid #FFE082;border-radius:4px;padding:2px 8px;margin-bottom:4px;flex:none;position:relative">
+                <div style="display:flex;flex-wrap:wrap;align-items:center">
+                  <div style="display:flex;align-items:center;margin:2px 0">
+                    <span style="font-size:11px;font-weight:700;color:#E65100;margin-right:4px">Custom Rules</span>
+                    <span onClick="{{ toggleHelp }}" style="cursor:pointer;width:16px;height:16px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;box-sizing:border-box;margin-left:4px;background: {{ helpBtnBg }}; color: {{ helpBtnFg }}; border:1px solid {{ helpBtnBd }}">?</span>
+                    <span style="width:1px;background:#E0D0A0;height:18px;margin:2px 8px"></span>
+                  </div>
+                  <div style="display:flex;align-items:center;margin:2px 0;gap:4px">
+                    <div style="width:70px;height:22px;background:linear-gradient(#F0F0F0,#E5E5E5);border:1px solid #ACACAC;display:flex;align-items:center;padding:0 4px;font-size:11px;box-sizing:border-box"><span style="flex:1">Include</span><span style="font-size:8px">&#x25BC;</span></div>
+                    <span style="font-size:10px;color:#999">on</span>
+                    <div style="width:80px;height:22px;background:linear-gradient(#F0F0F0,#E5E5E5);border:1px solid #ACACAC;display:flex;align-items:center;padding:0 4px;font-size:11px;box-sizing:border-box"><span style="flex:1">Filename</span><span style="font-size:8px">&#x25BC;</span></div>
+                    <span style="font-size:10px;color:#999">matching</span>
+                    <div style="width:180px;height:22px;border:1px solid #AAAAAA;background:#fff;padding:3px 4px;font-size:11px;box-sizing:border-box"></div>
+                    <span style="background:#F5F5F5;border:1px solid #CCCCCC;border-radius:3px;padding:2px 6px;font:10px 'Segoe UI',system-ui;color:#555">.* Regex</span>
+                    <span style="width:16px;height:16px;border-radius:8px;background:#E3F2FD;border:1px solid #90CAF9;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#1565C0;box-sizing:border-box">?</span>
+                    <span style="background:#E65100;border:1px solid #BF360C;border-radius:3px;padding:2px 6px;font:600 10px 'Segoe UI',system-ui;color:#fff">&#x2726; Aa</span>
+                    <span style="width:16px;height:16px;border-radius:8px;background:#E3F2FD;border:1px solid #90CAF9;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#1565C0;box-sizing:border-box">?</span>
+                    <button style="background:#DDDDDD;border:1px solid #707070;padding:3px 8px;font:600 11px 'Segoe UI',system-ui;color:#2E7D32">+ Add</button>
+                    <span style="width:1px;background:#E0D0A0;height:18px;margin:2px 8px"></span>
+                  </div>
+                  <div style="display:flex;align-items:center;margin:2px 0;gap:4px">
+                    <button style="background:#DDDDDD;border:1px solid #707070;padding:3px 6px;font:11px 'Segoe UI',system-ui;color:#2E7D32">&#x2713; All</button>
+                    <button style="background:#DDDDDD;border:1px solid #707070;padding:3px 6px;font:11px 'Segoe UI',system-ui;color:#888">&#x2715; None</button>
+                    <span style="width:1px;background:#E0D0A0;height:18px;margin:2px 8px"></span>
+                    <button style="background:#DDDDDD;border:1px solid #707070;padding:3px 6px;font:600 11px 'Segoe UI',system-ui;color:#1565C0">&#x25B6; Apply</button>
+                  </div>
+                </div>
+                <div style="display:flex;flex-wrap:wrap;margin-top:4px">
+                  <div style="background:#E3F2FD;border:1px solid #42A5F5;border-radius:4px;padding:3px 6px;margin:0 6px 4px 0;display:flex;align-items:center;gap:4px">
+                    <span style="width:13px;height:13px;border:1px solid #333;background:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:10px;line-height:1">&#x2713;</span>
+                    <span style="width:20px;background:#424242;border-radius:3px;color:#fff;font-size:9px;font-weight:700;text-align:center;padding:1px 0;box-sizing:border-box">1</span>
+                    <span style="display:inline-flex"><span style="background:#E0E0E0;border-radius:2px 0 0 2px;padding:1px 3px;font-size:8px;color:#555">&#x25B2;</span><span style="background:#E0E0E0;border-radius:0 2px 2px 0;padding:1px 3px;font-size:8px;color:#555">&#x25BC;</span></span>
+                    <div style="width:70px;height:20px;background:linear-gradient(#F0F0F0,#E5E5E5);border:1px solid #ACACAC;display:flex;align-items:center;padding:0 4px;font-size:9px;box-sizing:border-box"><span style="flex:1">Exclude</span><span style="font-size:7px">&#x25BC;</span></div>
+                    <div style="width:72px;height:20px;background:linear-gradient(#F0F0F0,#E5E5E5);border:1px solid #ACACAC;display:flex;align-items:center;padding:0 4px;font-size:9px;box-sizing:border-box"><span style="flex:1">Filepath</span><span style="font-size:7px">&#x25BC;</span></div>
+                    <span style="min-width:80px;padding:2px 4px;font-size:11px;font-weight:600;border-bottom:1.5px solid #42A5F5">\Originals\</span>
+                    <span style="background:#F0F0F0;border:1px solid #D0D0D0;border-radius:3px;padding:1px 4px;font:9px Consolas,monospace;color:#999">.*</span>
+                    <span style="background:#E65100;border:1px solid #BF360C;border-radius:3px;padding:1px 4px;font:600 9px Consolas,monospace;color:#fff">&#x2726; Aa</span>
+                    <span style="width:16px;height:16px;border-radius:8px;background:#E0E0E0;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#757575;margin-left:2px">&#x2715;</span>
+                  </div>
+                </div>
+                <!-- Help popup -->
+                <sc-if value="{{ showHelp }}" hint-placeholder-val="{{ false }}">
+                <div style="position:absolute;left:96px;top:26px;z-index:5;background:#FFFDE7;border:1px solid #FFD54F;border-radius:6px;padding:10px 12px;max-width:380px;box-shadow:0 2px 8px rgba(0,0,0,.15);font-size:11.5px;line-height:18px;color:#333">
+                  <div style="font-weight:600;color:#0D47A1">CUSTOM FILTER RULES</div>
+                  <div>Build rules to find or ignore files by pattern.</div>
+                  <div style="height:18px"></div>
+                  <div><b>Action:</b> Contains (check matching files) or Ignore (uncheck matching files)</div>
+                  <div><b>Target:</b> Filename only or full Filepath</div>
+                  <div><b>Pattern:</b> Text to match against</div>
+                  <div><b>Regex:</b> Use regular expressions</div>
+                  <div><b>Ignore Case:</b> Case-insensitive matching</div>
+                  <div style="height:18px"></div>
+                  <div style="font-weight:600;color:#0D47A1">How it works:</div>
+                  <div>1. Set action, target, pattern, and options</div>
+                  <div>2. Click <b>+ Add</b> to add the rule to the list</div>
+                  <div>3. Repeat to add more rules</div>
+                  <div>4. Click <b>Apply Rules</b> to execute all rules</div>
+                  <div style="height:18px"></div>
+                  <div><span style="font-weight:600;color:#C62828;background:#FFEBEE">Ignore ALWAYS overrides Contains.</span> If a file matches both, it stays unchecked.</div>
+                </div>
+                </sc-if>
+              </div>
+              <!-- Action -->
+              <div style="background:#FFF3E0;border-radius:4px;padding:2px 8px;margin-bottom:4px;display:flex;flex-wrap:wrap;align-items:center;flex:none">
+                <div style="display:flex;align-items:center;margin:2px 0">
+                  <span style="font-size:11px;font-weight:700;color:#E65100;margin-right:4px">Action</span>
+                  <span style="width:16px;height:16px;border-radius:8px;background:#E3F2FD;border:1px solid #90CAF9;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#1565C0;box-sizing:border-box;margin-left:4px">?</span>
+                  <span style="font-size:10px;color:#555;margin-left:8px">4 files selected</span>
+                  <span style="width:1px;background:#E0D0A0;height:18px;margin:2px 8px"></span>
+                </div>
+                <div style="display:flex;align-items:center;margin:2px 0;gap:4px">
+                  <button style="background:#DDDDDD;border:1px solid #707070;padding:3px 6px;font:11px 'Segoe UI',system-ui">&#x2713; All</button>
+                  <button style="background:#DDDDDD;border:1px solid #707070;padding:3px 6px;font:11px 'Segoe UI',system-ui">&#x2713; Newer</button>
+                  <button style="background:#DDDDDD;border:1px solid #707070;padding:3px 6px;font:11px 'Segoe UI',system-ui">&#x2713; Older</button>
+                  <button style="background:#DDDDDD;border:1px solid #707070;padding:3px 6px;font:11px 'Segoe UI',system-ui;color:#888">&#x2715; Clear</button>
+                  <span style="width:1px;background:#E0D0A0;height:18px;margin:2px 8px"></span>
+                </div>
+                <div style="display:flex;align-items:center;margin:2px 0;gap:4px">
+                  <button style="background:#DDDDDD;border:1px solid #707070;padding:3px 6px;font:11px 'Segoe UI',system-ui;color:#C62828">&#x1F5D1; Delete</button>
+                  <button style="background:#DDDDDD;border:1px solid #707070;padding:3px 6px;font:700 13px 'Segoe UI',system-ui;color:#388E3C">&#x21B6;</button>
+                  <span style="width:1px;background:#E0D0A0;height:18px;margin:2px 8px"></span>
+                  <span style="font-size:11px;font-weight:600;color:#E65100">Move to:</span>
+                  <div style="width:200px;height:22px;border:1px solid #ABADB3;background:#fff;padding:3px 4px;font-size:11px;box-sizing:border-box">D:\Duplicates</div>
+                  <button style="background:#DDDDDD;border:1px solid #707070;padding:3px 6px;font:11px 'Segoe UI',system-ui">...</button>
+                  <button style="background:#DDDDDD;border:1px solid #707070;padding:3px 6px;font:11px 'Segoe UI',system-ui;color:#1565C0">&#x1F4C1; Move</button>
+                  <button style="background:#DDDDDD;border:1px solid #707070;padding:3px 6px;font:700 13px 'Segoe UI',system-ui;color:#388E3C">&#x21B6;</button>
+                </div>
+              </div>
+              <!-- GroupBox Duplicate Groups -->
+              <div style="flex:1;border:1px solid #D5DFE5;border-radius:4px;padding:4px;position:relative;min-height:0;margin-top:8px;display:flex;flex-direction:column">
+                <span style="position:absolute;top:-9px;left:8px;background:#fff;padding:0 3px;font-size:12px">Duplicate Groups</span>
+                <div style="flex:1;border:1px solid #828790;overflow:hidden;min-height:0">
+                  <sc-for list="{{ groups }}" as="g" hint-placeholder-count="3">
+                  <div style="border-bottom:1px solid #DDDDDD;padding:8px 4px;margin-bottom:4px">
+                    <div style="display:flex;align-items:center;margin-bottom:4px;font-size:12px">
+                      <span style="font-weight:600">{{ g.count }} files</span><span style="color:gray"> — </span><span style="color:#1565C0">{{ g.size }}</span><span style="color:gray"> each — </span><span style="color:#C62828;font-weight:600">wasted: {{ g.wasted }}</span>
+                      <button style="background:#DDDDDD;border:1px solid #707070;padding:2px 6px;font:11px 'Segoe UI',system-ui;color:#2E7D32;margin:0 4px 0 12px">&#x2713; Select All</button>
+                      <button style="background:#DDDDDD;border:1px solid #707070;padding:2px 6px;font:11px 'Segoe UI',system-ui;color:#888;margin-right:4px">&#x2715; Clear</button>
+                      <button style="background:#DDDDDD;border:1px solid #707070;padding:2px 6px;font:600 11px 'Segoe UI',system-ui;color:#C62828;margin-left:4px">{{ g.deleteLabel }}</button>
+                    </div>
+                    <div style="margin:2px 0 6px 16px;padding:6px;border-radius:4px;background:#F5F7FA;border:1px solid #E8E8E8;display:inline-flex;align-items:center;gap:8px">
+                      <div style="width:60px;height:60px;background:#dfe3e8;display:flex;align-items:center;justify-content:center;font-size:32px">{{ g.icon }}</div>
+                      <div><div style="font-size:11px;font-weight:600">{{ g.first }}</div><div style="font-size:10px;color:#1565C0">{{ g.ext }}</div><div style="font-size:10px;color:#888">{{ g.size }}</div></div>
+                    </div>
+                    <sc-for list="{{ g.files }}" as="f" hint-placeholder-count="2">
+                    <div style="display:flex;align-items:center;margin:2px 0 2px 16px">
+                      <span style="width:13px;height:13px;border:1px solid #333;background:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:10px;line-height:1;margin-right:4px">{{ f.chk }}</span>
+                      <button style="background:#DDDDDD;border:1px solid #707070;padding:2px 6px;font:11px 'Segoe UI',system-ui;margin-right:4px">&#x1F4C2; Open</button>
+                      <button style="background:#DDDDDD;border:1px solid #707070;padding:2px 6px;font:11px 'Segoe UI',system-ui;color:#1565C0;margin-right:4px">&#x1F441; Preview</button>
+                      <button style="background:#DDDDDD;border:1px solid #707070;padding:2px 6px;font:11px 'Segoe UI',system-ui;color:#C62828;margin-right:8px">&#x1F5D1; Delete</button>
+                      <span style="flex:1;color:#333;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ f.path }}</span>
+                      <span style="color:#1565C0;font-size:11px;font-weight:600;margin:0 4px 0 12px;min-width:60px;text-align:right">{{ f.size }}</span>
+                    </div>
+                    </sc-for>
+                  </div>
+                  </sc-for>
+                </div>
+              </div>
+              <!-- inner status bar -->
+              <div style="background:#F5F5F5;border-radius:4px;padding:4px 8px;margin-top:8px;display:flex;align-items:center;flex:none">
+                <span style="flex:1;color:#666">Found 3 duplicate groups (7 files, 41.2 MB wasted) in 00:04.2.</span>
+                <span style="color:#1565C0;font-size:11px;margin-right:12px">RAM: 186 MB</span><span style="color:#E65100;font-size:11px;margin-right:12px">CPU: 0.4%</span><span style="color:#666;font-size:11px">Threads: 31</span>
+              </div>
+            </div>
+            </sc-if>
+
+            <!-- ===== Tab: History ===== -->
+            <sc-if value="{{ isHistory }}" hint-placeholder-val="{{ false }}">
+            <div data-screen-label="History tab" style="flex:1;display:flex;flex-direction:column;margin:8px;min-height:0">
+              <div style="background:#E8EAF6;border:1px solid #C5CAE9;border-radius:4px;padding:8px 12px;margin-bottom:6px;display:flex;align-items:center;flex:none">
+                <span style="font-size:12px;font-weight:700;color:#1565C0;margin-right:20px">&#x1F4CA; Analytics</span>
+                <div style="margin-right:24px"><div style="font-size:18px;font-weight:700;color:#1565C0">4</div><div style="font-size:10px;color:#666">Operations</div></div>
+                <div style="margin-right:24px"><div style="font-size:18px;font-weight:700;color:#388E3C">12</div><div style="font-size:10px;color:#666">files moved (1 ops)</div></div>
+                <div style="margin-right:24px"><div style="font-size:18px;font-weight:700;color:#C62828">9</div><div style="font-size:10px;color:#666">files recycled (2 ops)</div></div>
+                <div style="margin-right:24px"><div style="font-size:18px;font-weight:700;color:#C62828">14</div><div style="font-size:10px;color:#666">subfolders recycled (1 ops)</div></div>
+              </div>
+              <div style="display:flex;align-items:center;margin-bottom:6px;flex:none">
+                <span style="font-size:13px;font-weight:700;color:#333;margin-right:16px">Transaction History</span>
+                <button style="background:#DDDDDD;border:1px solid #707070;padding:4px 10px;font:600 11px 'Segoe UI',system-ui;color:#388E3C;margin-right:6px">&#x21B6; Undo Last</button>
+                <button style="background:#DDDDDD;border:1px solid #707070;padding:4px 10px;font:11px 'Segoe UI',system-ui;color:#888">&#x1F5D1; Clear History</button>
+              </div>
+              <div style="flex:1;border:1px solid #E0E0E0;border-radius:4px;overflow:hidden;font-size:12px">
+                <div style="display:grid;grid-template-columns:140px 150px 60px 500px 80px;border-bottom:1px solid #E5E5E5">
+                  <div style="padding:3px 6px;border-right:1px solid #E5E5E5">Time</div><div style="padding:3px 6px;border-right:1px solid #E5E5E5">Action</div><div style="padding:3px 6px;border-right:1px solid #E5E5E5">Items</div><div style="padding:3px 6px;border-right:1px solid #E5E5E5">Summary</div><div style="padding:3px 6px;border-right:1px solid #E5E5E5">Undo</div>
+                </div>
+                <sc-for list="{{ history }}" as="h" hint-placeholder-count="4">
+                <div style="display:grid;grid-template-columns:140px 150px 60px 500px 80px;align-items:center">
+                  <div style="padding:3px 6px;font-size:11px">{{ h.time }}</div><div style="padding:3px 6px">{{ h.kind }}</div><div style="padding:3px 6px">{{ h.items }}</div><div style="padding:3px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ h.summary }}</div>
+                  <div style="padding:3px 6px"><button style="background:#DDDDDD;border:1px solid #707070;padding:2px 6px;font:600 10px 'Segoe UI',system-ui;color:#388E3C">&#x21B6; Undo</button></div>
+                </div>
+                </sc-for>
+              </div>
+            </div>
+            </sc-if>
+          </div>
+        </div>
+      </div>
+
+      <!-- Column 1: Analytics (Duplication) -->
+      <sc-if value="{{ showAnalytics }}" hint-placeholder-val="{{ false }}">
+      <div data-screen-label="Analytics panel" style="width:320px;flex:none;background:#FAFAFA;border:1px solid #E0E0E0;border-radius:6px;padding:12px;margin:4px;box-sizing:border-box;overflow:hidden">
+        <div style="display:flex;align-items:center;margin-bottom:12px"><span style="font-size:16px;font-weight:700;color:#1A237E;flex:1">Analytics</span><button onClick="{{ toggleAnalytics }}" style="background:#DDDDDD;border:1px solid #707070;padding:4px 8px;font:11px 'Segoe UI',system-ui;color:#666;cursor:pointer">&#x2715; Close</button></div>
+        <div style="background:#fff;border:1px solid #E0E0E0;border-radius:4px;padding:10px;margin-bottom:8px;display:grid;grid-template-columns:1fr 1fr;row-gap:8px">
+          <div><div style="color:#999;font-size:10px">Total Files</div><div style="font-size:20px;font-weight:700;color:#333">12,480</div></div>
+          <div><div style="color:#999;font-size:10px">Duplicates</div><div style="font-size:20px;font-weight:700;color:#C62828">7</div></div>
+          <div><div style="color:#999;font-size:10px">Groups</div><div style="font-size:20px;font-weight:700;color:#1565C0">3</div></div>
+          <div><div style="color:#999;font-size:10px">Scan Time</div><div style="font-size:20px;font-weight:700;color:#333">00:04.2</div></div>
+          <div><div style="color:#999;font-size:10px">Wasted Space</div><div style="font-size:20px;font-weight:700;color:#C62828">41.2 MB</div></div>
+          <div><div style="color:#999;font-size:10px">Duplicate %</div><div style="font-size:20px;font-weight:700;color:#E65100">0.1%</div></div>
+        </div>
+        <div style="background:#fff;border:1px solid #E0E0E0;border-radius:4px;padding:10px;margin-bottom:8px">
+          <div style="font-weight:600;font-size:11px;color:#555;margin-bottom:6px">Wasted vs Total</div>
+          <div style="height:20px;background:#E8F5E9;border-radius:3px;position:relative"><div style="position:absolute;left:0;top:0;bottom:0;width:6%;background:#EF9A9A;border-radius:3px"></div></div>
+          <div style="display:flex;align-items:center;gap:4px;margin-top:4px;font-size:10px;color:#666"><span style="width:10px;height:10px;background:#EF9A9A;border-radius:2px"></span>Wasted: 41.2 MB<span style="width:10px;height:10px;background:#E8F5E9;border-radius:2px;margin-left:8px"></span>Total: 684 MB</div>
+        </div>
+        <div style="background:#fff;border:1px solid #E0E0E0;border-radius:4px;padding:10px;margin-bottom:8px">
+          <div style="font-weight:600;font-size:11px;color:#555;margin-bottom:6px">Top Duplicate Types</div>
+          <div style="display:grid;grid-template-columns:60px auto 1fr;align-items:center;margin:2px 0;font-size:10px"><span style="background:#E3F2FD;border-radius:3px;padding:2px 4px;color:#1565C0;font-weight:600;justify-self:start">.jpg</span><span style="color:#888;margin-left:8px">4 files</span><span style="color:#666;text-align:right">24.8 MB</span></div>
+          <div style="display:grid;grid-template-columns:60px auto 1fr;align-items:center;margin:2px 0;font-size:10px"><span style="background:#E3F2FD;border-radius:3px;padding:2px 4px;color:#1565C0;font-weight:600;justify-self:start">.mp4</span><span style="color:#888;margin-left:8px">2 files</span><span style="color:#666;text-align:right">15.1 MB</span></div>
+          <div style="display:grid;grid-template-columns:60px auto 1fr;align-items:center;margin:2px 0;font-size:10px"><span style="background:#E3F2FD;border-radius:3px;padding:2px 4px;color:#1565C0;font-weight:600;justify-self:start">.pdf</span><span style="color:#888;margin-left:8px">1 files</span><span style="color:#666;text-align:right">1.3 MB</span></div>
+        </div>
+        <div style="background:#fff;border:1px solid #E0E0E0;border-radius:4px;padding:10px">
+          <div style="font-weight:600;font-size:11px;color:#555;margin-bottom:6px">Size Distribution</div>
+          <div style="margin:3px 0"><div style="font-size:10px;color:#666">&lt; 1 MB <span style="color:#999">(2)</span></div><div style="height:8px;background:#EEEEEE;border-radius:2px;margin-top:2px;position:relative"><div style="position:absolute;left:0;top:0;bottom:0;width:28%;background:#7986CB;border-radius:2px"></div></div></div>
+          <div style="margin:3px 0"><div style="font-size:10px;color:#666">1–10 MB <span style="color:#999">(4)</span></div><div style="height:8px;background:#EEEEEE;border-radius:2px;margin-top:2px;position:relative"><div style="position:absolute;left:0;top:0;bottom:0;width:57%;background:#7986CB;border-radius:2px"></div></div></div>
+          <div style="margin:3px 0"><div style="font-size:10px;color:#666">10–100 MB <span style="color:#999">(1)</span></div><div style="height:8px;background:#EEEEEE;border-radius:2px;margin-top:2px;position:relative"><div style="position:absolute;left:0;top:0;bottom:0;width:14%;background:#7986CB;border-radius:2px"></div></div></div>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- Column 1: Folder Action panel -->
+      <sc-if value="{{ isFolder }}" hint-placeholder-val="{{ true }}">
+      <div data-screen-label="Folder Action panel" style="width: {{ folderPanelW }}px; flex:none;background:#FAFAFA;border:1px solid #E0E0E0;border-radius:6px;padding:12px;margin:4px;box-sizing:border-box;overflow:hidden">
+        <div style="font-size:16px;font-weight:700;color:#E65100;margin-bottom:12px">Folder Action</div>
+        <div style="display:flex;gap:8px">
+          <div style="flex:1;min-width:0">
+            <div style="background:#fff;border:1px solid #E0E0E0;border-radius:4px;padding:10px;margin-bottom:8px">
+              <div style="font-size:12px;font-weight:600;color:#333;margin-bottom:6px">Selection</div>
+              <div style="font-size:24px;font-weight:700;color:#E65100;margin-bottom:4px">3</div>
+              <div style="font-size:11px;color:#888;margin-bottom:8px">folders selected</div>
+              <div style="display:flex;gap:6px"><button style="background:#DDDDDD;border:1px solid #707070;padding:4px 8px;font:11px 'Segoe UI',system-ui">&#x2713; All</button><button style="background:#DDDDDD;border:1px solid #707070;padding:4px 8px;font:11px 'Segoe UI',system-ui;color:#888">&#x2715; Clear</button></div>
+            </div>
+            <div style="background:#fff;border:1px solid #E0E0E0;border-radius:4px;padding:10px;margin-bottom:8px">
+              <div style="font-size:12px;font-weight:600;color:#C62828;margin-bottom:4px">Scan Action</div>
+              <div style="font-size:10px;color:#888;margin-bottom:8px">Click Scan Folders to discover subfolder names and file types inside selected result folders. Select items and clear them.</div>
+              <label style="display:flex;align-items:center;gap:4px;font-size:11px;margin-bottom:6px"><span style="width:13px;height:13px;border:1px solid #333;background:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:10px;line-height:1">&#x2713;</span>Include Subdirectories</label>
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px"><button style="flex:1;background:#DDDDDD;border:1px solid #707070;padding:6px 10px;font:600 11px 'Segoe UI',system-ui;color:#1565C0">&#x1F50D; Scan Folders</button><span style="width:16px;height:16px;border-radius:8px;background:#E3F2FD;border:1px solid #90CAF9;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#1565C0;box-sizing:border-box">?</span></div>
+              <div style="font-size:10px;color:#666;margin-bottom:8px">Found 5 subfolder names (1.8 GB) and 7 file types (412 MB) across 3 folders.</div>
+              <div style="font-size:11px;font-weight:600;color:#1565C0;margin-bottom:4px">Subfolders</div>
+              <div style="border:1px solid #ABADB3;background:#fff;padding:4px 8px;font-size:11px;color:#AAAAAA;margin-bottom:6px;height:24px;box-sizing:border-box">&#x1F50D; Filter subfolder names...</div>
+              <div style="display:flex;gap:6px;margin-bottom:6px"><button style="background:#DDDDDD;border:1px solid #707070;padding:3px 8px;font:10px 'Segoe UI',system-ui">&#x2713; All</button><button style="background:#DDDDDD;border:1px solid #707070;padding:3px 8px;font:10px 'Segoe UI',system-ui;color:#888">&#x2715; None</button></div>
+              <div style="border:1px solid #E0E0E0;border-radius:3px">
+                <sc-for list="{{ subfolders }}" as="s" hint-placeholder-count="4">
+                <div style="padding:2px 4px;border-bottom:1px solid #F0F0F0;display:flex;align-items:center;gap:6px;height:24px;box-sizing:border-box"><span style="font-size:9px;color:#333">&#x25B6;</span><span style="width:13px;height:13px;border:1px solid #333;background:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:10px;line-height:1">{{ s.chk }}</span><span style="font-size:11px;font-weight:600;color:#333">{{ s.name }}</span><span style="font-size:10px;color:#888">in {{ s.count }} folders</span><span style="font-size:10px;color:#CCC">·</span><span style="font-size:10px;color:#1565C0;font-weight:600">{{ s.size }}</span></div>
+                </sc-for>
+              </div>
+              <div style="display:flex;align-items:center;gap:4px;margin:6px 0 12px"><button style="flex:1;background:#DDDDDD;border:1px solid #707070;padding:6px 10px;font:600 11px 'Segoe UI',system-ui;color:#C62828">&#x1F5D1; Clear Selected Subfolders</button><button style="background:#DDDDDD;border:1px solid #707070;padding:3px 6px;font:700 13px 'Segoe UI',system-ui;color:#388E3C">&#x21B6;</button><span style="width:16px;height:16px;border-radius:8px;background:#E3F2FD;border:1px solid #90CAF9;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#1565C0;box-sizing:border-box;margin-left:2px">?</span></div>
+              <div style="display:flex;align-items:center;margin-bottom:4px;font-size:11px;color:#333"><span style="margin-right:8px">Layers deep:</span><div style="width:60px;height:22px;border:1px solid #ABADB3;background:#fff;padding:3px 6px;box-sizing:border-box">1</div><span style="margin:0 8px 0 12px">Prefix:</span><div style="width:110px;height:22px;border:1px solid #ABADB3;background:#fff;padding:3px 6px;box-sizing:border-box"></div></div>
+              <div style="display:flex;align-items:center;gap:4px;margin-bottom:12px"><button style="flex:1;background:#DDDDDD;border:1px solid #707070;padding:6px 10px;font:600 11px 'Segoe UI',system-ui;color:#6A1B9A">&#x1F517; Link Sibling Subfolders</button><button style="background:#DDDDDD;border:1px solid #707070;padding:3px 6px;font:700 13px 'Segoe UI',system-ui;color:#388E3C">&#x21B6;</button><span style="width:16px;height:16px;border-radius:8px;background:#E3F2FD;border:1px solid #90CAF9;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#1565C0;box-sizing:border-box;margin-left:2px">?</span></div>
+              <div style="font-size:11px;font-weight:600;color:#1565C0;margin-bottom:4px">File Types</div>
+              <div style="border:1px solid #ABADB3;background:#fff;padding:4px 8px;font-size:11px;color:#AAAAAA;margin-bottom:6px;height:24px;box-sizing:border-box">&#x1F50D; Filter extensions (e.g. .log)...</div>
+              <div style="display:flex;gap:6px;margin-bottom:6px"><button style="background:#DDDDDD;border:1px solid #707070;padding:3px 8px;font:10px 'Segoe UI',system-ui">&#x2713; All</button><button style="background:#DDDDDD;border:1px solid #707070;padding:3px 8px;font:10px 'Segoe UI',system-ui;color:#888">&#x2715; None</button></div>
+              <div style="border:1px solid #E0E0E0;border-radius:3px">
+                <sc-for list="{{ filetypes }}" as="t" hint-placeholder-count="3">
+                <div style="padding:2px 4px;border-bottom:1px solid #F0F0F0;display:flex;align-items:center;gap:6px;height:24px;box-sizing:border-box"><span style="font-size:9px;color:#333">&#x25B6;</span><span style="width:13px;height:13px;border:1px solid #333;background:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:10px;line-height:1">{{ t.chk }}</span><span style="font-size:11px;font-weight:600;color:#333">{{ t.name }}</span><span style="font-size:10px;color:#888">{{ t.count }} files</span><span style="font-size:10px;color:#CCC">·</span><span style="font-size:10px;color:#1565C0;font-weight:600">{{ t.size }}</span></div>
+                </sc-for>
+              </div>
+              <div style="display:flex;align-items:center;gap:4px;margin-top:6px"><button style="flex:1;background:#DDDDDD;border:1px solid #707070;padding:6px 10px;font:600 11px 'Segoe UI',system-ui;color:#C62828">&#x1F5D1; Clear Selected Files</button><button style="background:#DDDDDD;border:1px solid #707070;padding:3px 6px;font:700 13px 'Segoe UI',system-ui;color:#388E3C">&#x21B6;</button><span style="width:16px;height:16px;border-radius:8px;background:#E3F2FD;border:1px solid #90CAF9;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#1565C0;box-sizing:border-box;margin-left:2px">?</span></div>
+            </div>
+          </div>
+          <div style="flex:1;min-width:0">
+            <div style="background:#fff;border:1px solid #E0E0E0;border-radius:4px;padding:10px;margin-bottom:8px">
+              <div style="font-size:12px;font-weight:600;color:#C62828;margin-bottom:4px">Flatten Folders</div>
+              <div style="font-size:10px;color:#888;margin-bottom:8px">Move files from subdirectories up to the root of each selected folder. Name conflicts resolved with (2), (3).</div>
+              <label style="display:flex;align-items:center;gap:4px;font-size:11px;margin-bottom:4px"><span style="width:13px;height:13px;border:1px solid #333;background:#fff;display:inline-block"></span>Remove empty subfolders after move</label>
+              <div style="font-size:10px;color:#888;font-style:italic;margin-bottom:8px">If any file types are checked below, only those are moved. If none are checked, all files move.</div>
+              <button style="width:100%;background:#DDDDDD;border:1px solid #707070;padding:5px 8px;font:600 11px 'Segoe UI',system-ui;color:#1565C0;margin-bottom:4px">&#x1F50D; Scan Subfolder File Types</button>
+              <div style="border:1px solid #ABADB3;background:#fff;padding:3px 8px;font-size:11px;color:#AAAAAA;margin:4px 0;height:22px;box-sizing:border-box">&#x1F50D; Filter extensions (e.g. .mp4)...</div>
+              <div style="display:flex;gap:6px;margin-bottom:4px"><button style="background:#DDDDDD;border:1px solid #707070;padding:3px 8px;font:10px 'Segoe UI',system-ui">&#x2713; All</button><button style="background:#DDDDDD;border:1px solid #707070;padding:3px 8px;font:10px 'Segoe UI',system-ui;color:#888">&#x2715; None</button></div>
+              <div style="border:1px solid #E0E0E0;border-radius:3px;margin-bottom:8px">
+                <div style="padding:2px 4px;border-bottom:1px solid #F0F0F0;display:flex;align-items:center;gap:6px;height:22px"><span style="width:13px;height:13px;border:1px solid #333;background:#fff;display:inline-block"></span><span style="font-size:11px;font-weight:600;color:#333">.mp4</span><span style="font-size:10px;color:#888">31 files</span><span style="font-size:10px;color:#CCC">·</span><span style="font-size:10px;color:#1565C0;font-weight:600">2.1 GB</span></div>
+                <div style="padding:2px 4px;border-bottom:1px solid #F0F0F0;display:flex;align-items:center;gap:6px;height:22px"><span style="width:13px;height:13px;border:1px solid #333;background:#fff;display:inline-block"></span><span style="font-size:11px;font-weight:600;color:#333">.srt</span><span style="font-size:10px;color:#888">28 files</span><span style="font-size:10px;color:#CCC">·</span><span style="font-size:10px;color:#1565C0;font-weight:600">1.4 MB</span></div>
+              </div>
+              <div style="display:flex;align-items:center;gap:4px"><button style="flex:1;background:#DDDDDD;border:1px solid #707070;padding:6px 10px;font:600 11px 'Segoe UI',system-ui;color:#C62828">&#x1F4E6; Move Files to Root</button><button style="background:#DDDDDD;border:1px solid #707070;padding:3px 6px;font:700 13px 'Segoe UI',system-ui;color:#388E3C">&#x21B6;</button><span style="width:16px;height:16px;border-radius:8px;background:#E3F2FD;border:1px solid #90CAF9;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#1565C0;box-sizing:border-box;margin-left:2px">?</span></div>
+            </div>
+            <div style="background:#fff;border:1px solid #E0E0E0;border-radius:4px;padding:10px;margin-bottom:8px">
+              <div style="font-size:12px;font-weight:600;color:#333;margin-bottom:6px">Results</div>
+              <div style="font-size:24px;font-weight:700;color:#1565C0;margin-bottom:4px">6</div>
+              <div style="font-size:11px;color:#888;margin-bottom:4px">folders found</div>
+              <div style="font-size:10px;color:#666">Found 6 folders matching 2 patterns.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- Column 2: File Preview -->
+      <sc-if value="{{ showPreview }}" hint-placeholder-val="{{ false }}">
+      <div data-screen-label="File Preview panel" style="width:380px;flex:none;background:#FAFAFA;border:1px solid #E0E0E0;border-radius:6px;padding:12px;margin:4px;box-sizing:border-box;display:flex;flex-direction:column">
+        <div style="display:flex;align-items:center;margin-bottom:8px"><span style="font-size:16px;font-weight:700;color:#1A237E;flex:1">File Preview</span><button onClick="{{ togglePreview }}" style="background:#DDDDDD;border:1px solid #707070;padding:4px 8px;font:11px 'Segoe UI',system-ui;color:#666;cursor:pointer">&#x2715; Close</button></div>
+        <div style="background:#fff;border:1px solid #E0E0E0;border-radius:4px;padding:8px;margin-bottom:8px"><div style="font-weight:600;font-size:12px">IMG_2041.jpg</div><div style="color:#888;font-size:11px;margin-top:2px">6.2 MB</div></div>
+        <div style="flex:1;background:#fff;border:1px solid #E0E0E0;border-radius:4px;padding:4px;display:flex;align-items:flex-start;justify-content:center"><div style="width:100%;aspect-ratio:4/3;background:linear-gradient(135deg,#cfd8dc,#90a4ae);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px">image preview</div></div>
+      </div>
+      </sc-if>
+    </div>
+
+    <!-- Global status bar -->
+    <div style="background:#ECEFF1;border-top:1px solid #CFD8DC;padding:4px 10px;display:flex;align-items:center;flex:none;font-size:11px">
+      <span style="color:#66BB6A;font-size:13px;margin-right:8px">&#x25CF;</span>
+      <span style="color:#666;margin-right:8px;max-width:420px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Add folders and click Scan to find duplicate files.</span>
+      <span style="flex:1"></span>
+      <span style="color:#1565C0;margin-right:12px">RAM: 186 MB</span><span style="color:#E65100;margin-right:12px">CPU: 0.4%</span><span style="color:#666">Threads: 31</span>
+    </div>
+  </div>
+
+  <!-- Profile name dialog -->
+  <sc-if value="{{ showDialog }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="Profile name dialog" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:20">
+    <div style="width:440px;background:#FAFAFA;border:1px solid #6b6b6b;box-shadow:0 8px 30px rgba(0,0,0,.35)">
+      <div style="height:32px;display:flex;align-items:center;padding-left:10px;gap:8px;background:#fff"><img src="assets/app-icon.png" alt="" style="width:16px;height:16px"><span>Profile</span><span onClick="{{ closeDialog }}" style="margin-left:auto;width:46px;text-align:center;font-size:13px;cursor:pointer">&#x2715;</span></div>
+      <div style="border:1px solid #CFD8DC;padding:16px 20px">
+        <div style="font-size:14px;font-weight:700;color:#263238;margin-bottom:4px">New Profile</div>
+        <div style="font-size:11.5px;color:#546E7A;margin-bottom:12px">Enter a name for the new blank profile.</div>
+        <div style="border:1px solid #B0BEC5;background:#fff;padding:6px 8px;font-size:13px">Photos cleanup</div>
+        <div style="font-size:11px;font-style:italic;color:#C62828;margin-top:6px">A profile named 'Photos cleanup' already exists.</div>
+        <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px">
+          <button onClick="{{ closeDialog }}" style="min-width:80px;background:#DDDDDD;border:1px solid #707070;padding:6px 16px;font:12px 'Segoe UI',system-ui;cursor:pointer">Cancel</button>
+          <button style="min-width:80px;background:#1565C0;border:1px solid #0D47A1;padding:6px 16px;font:600 12px 'Segoe UI',system-ui;color:#fff;opacity:.45">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;tab&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Folder&quot;,&quot;Duplication&quot;,&quot;History&quot;],&quot;default&quot;:&quot;Folder&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;View&quot;},&quot;windowWidth&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;1600x900&quot;,&quot;1280x800&quot;],&quot;default&quot;:&quot;1600x900&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;View&quot;},&quot;showAnalytics&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Duplication panels&quot;},&quot;showPreview&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Duplication panels&quot;},&quot;showHelpPopup&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Overlays&quot;},&quot;showDialog&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Overlays&quot;}}">
+class Component extends DCLogic {
+  state = { tab: null, analytics: null, preview: null, dialog: null, help: null };
+  renderVals() {
+    const p = this.props, s = this.state;
+    const tab = s.tab ?? p.tab ?? 'Folder';
+    const wide = (p.windowWidth ?? '1600x900') === '1600x900';
+    const isFolder = tab === 'Folder', isDup = tab === 'Duplication', isHistory = tab === 'History';
+    const showAnalytics = isDup && (s.analytics ?? p.showAnalytics ?? true);
+    const showPreview = isDup && (s.preview ?? p.showPreview ?? true);
+    const showDialog = s.dialog ?? p.showDialog ?? false;
+    const showHelp = isDup && (s.help ?? p.showHelpPopup ?? false);
+    const on = { bg: '#0277BD', fg: '#fff', bd: '#01579B' }, off = { bg: '#F5F5F5', fg: '#555', bd: '#CCCCCC' };
+    const pv = showPreview ? on : off, an = showAnalytics ? on : off;
+    const chk = '\u2713';
+    return {
+      winW: wide ? 1600 : 1280, winH: wide ? 900 : 800,
+      folderPanelW: wide ? 640 : 520,
+      isFolder, isDup, isHistory, showAnalytics, showPreview, showDialog, showHelp,
+      folderTabBg: isFolder ? '#fff' : '#F0F0F0', dupTabBg: isDup ? '#fff' : '#F0F0F0', histTabBg: isHistory ? '#fff' : '#FFF8DC',
+      folderTabH: isFolder ? 22 : 20, dupTabH: isDup ? 22 : 20, histTabH: isHistory ? 22 : 20,
+      prevBtnBg: pv.bg, prevBtnFg: pv.fg, prevBtnBd: pv.bd, prevBtnLabel: showPreview ? '\u2726 File Preview' : 'File Preview',
+      anaBtnBg: an.bg, anaBtnFg: an.fg, anaBtnBd: an.bd, anaBtnLabel: showAnalytics ? '\u2726 Analytics' : 'Analytics',
+      helpBtnBg: showHelp ? '#1565C0' : '#E3F2FD', helpBtnFg: showHelp ? '#fff' : '#1565C0', helpBtnBd: showHelp ? '#0D47A1' : '#90CAF9',
+      setFolder: () => this.setState({ tab: 'Folder' }), setDup: () => this.setState({ tab: 'Duplication' }), setHistory: () => this.setState({ tab: 'History' }),
+      toggleAnalytics: () => this.setState({ analytics: !showAnalytics }), togglePreview: () => this.setState({ preview: !showPreview }),
+      openDialog: () => this.setState({ dialog: true }), closeDialog: () => this.setState({ dialog: false }),
+      toggleHelp: () => this.setState({ help: !showHelp }),
+      folderRows: [
+        { chk, name: 'FamilyAlbum', size: '2.4 GB', path: 'D:\\Photos\\FamilyAlbum' },
+        { chk, name: 'Trip-2019', size: '1.1 GB', path: 'D:\\Photos\\Trip-2019' },
+        { chk, name: 'Scans', size: '388 MB', path: 'D:\\Photos\\Scans' },
+        { chk: '', name: 'Wallpapers', size: '212 MB', path: 'D:\\Backup\\Photos\\Wallpapers' },
+        { chk: '', name: 'Phone-export', size: '5.7 GB', path: 'D:\\Backup\\Photos\\Phone-export' },
+        { chk: '', name: 'Raw', size: '14.2 GB', path: 'D:\\Backup\\Photos\\Raw' },
+      ],
+      exts: [{ ext: '.jpg', count: '(4)' }, { ext: '.mp4', count: '(2)' }, { ext: '.pdf', count: '(1)' }],
+      groups: [
+        { count: 3, size: '6.2 MB', wasted: '12.4 MB', deleteLabel: '\uD83D\uDDD1 Delete All (3)', icon: '\uD83D\uDDBC\uFE0F', first: 'IMG_2041.jpg', ext: '.jpg', files: [
+          { chk: '', path: 'D:\\Photos\\FamilyAlbum\\IMG_2041.jpg', size: '6.2 MB' },
+          { chk, path: 'D:\\Backup\\Photos\\Phone-export\\IMG_2041.jpg', size: '6.2 MB' },
+          { chk, path: 'D:\\Backup\\Photos\\Phone-export\\Originals\\IMG_2041 (1).jpg', size: '6.2 MB' } ] },
+        { count: 2, size: '15.1 MB', wasted: '15.1 MB', deleteLabel: '\uD83D\uDDD1 Delete Both', icon: '\uD83C\uDFAC', first: 'beach-clip.mp4', ext: '.mp4', files: [
+          { chk: '', path: 'D:\\Photos\\Trip-2019\\beach-clip.mp4', size: '15.1 MB' },
+          { chk, path: 'D:\\Backup\\Photos\\Phone-export\\VID_0091.mp4', size: '15.1 MB' } ] },
+        { count: 2, size: '1.3 MB', wasted: '1.3 MB', deleteLabel: '\uD83D\uDDD1 Delete Both', icon: '\uD83D\uDCD5', first: 'passport-scan.pdf', ext: '.pdf', files: [
+          { chk: '', path: 'D:\\Photos\\Scans\\passport-scan.pdf', size: '1.3 MB' },
+          { chk, path: 'D:\\Backup\\Photos\\Scans\\passport-scan.pdf', size: '1.3 MB' } ] },
+      ],
+      history: [
+        { time: '2026-09-04 10:12:41', kind: 'RecycleFiles', items: 4, summary: 'Recycled 4 duplicate files (24.8 MB) from D:\\Backup\\Photos' },
+        { time: '2026-09-04 09:58:03', kind: 'MoveFiles', items: 12, summary: 'Flattened 12 files to D:\\Photos\\Trip-2019' },
+        { time: '2026-09-03 18:22:17', kind: 'RecycleDirectories', items: 14, summary: 'Recycled 14 × node_modules across 14 folders' },
+        { time: '2026-09-03 18:05:49', kind: 'RecycleFiles', items: 5, summary: 'Recycled 5 files of type .log, .tmp' },
+      ],
+      subfolders: [
+        { chk, name: 'node_modules', count: 14, size: '1.6 GB' }, { chk: '', name: '.vs', count: 6, size: '88 MB' },
+        { chk, name: 'bin', count: 9, size: '112 MB' }, { chk: '', name: 'obj', count: 9, size: '41 MB' } ],
+      filetypes: [
+        { chk, name: '.log', count: 237, size: '388 MB' }, { chk: '', name: '.tmp', count: 41, size: '12 MB' }, { chk: '', name: '.bak', count: 8, size: '12 MB' } ],
+    };
+  }
+}
+</script>
+</body>
+</html>
