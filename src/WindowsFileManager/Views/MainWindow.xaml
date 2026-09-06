@@ -13,59 +13,6 @@
         <vm:MainViewModel />
     </Window.DataContext>
 
-    <Window.Resources>
-        <helpers:BoolToVisibilityConverter x:Key="BoolToVisibility" />
-        <helpers:InverseBoolConverter x:Key="InverseBool" />
-        <helpers:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibility" />
-        <helpers:MiniPreviewConverter x:Key="MiniPreview" />
-        <helpers:FileTypeIconConverter x:Key="FileTypeIcon" />
-
-        <!-- Help Button Style: small ? circle that shows a popup on click -->
-        <Style x:Key="HelpButtonStyle" TargetType="ToggleButton">
-            <Setter Property="Width" Value="16" />
-            <Setter Property="Height" Value="16" />
-            <Setter Property="FontSize" Value="10" />
-            <Setter Property="FontWeight" Value="Bold" />
-            <Setter Property="Foreground" Value="{DynamicResource Legacy.Brush.Action.Primary}" />
-            <Setter Property="Cursor" Value="Hand" />
-            <Setter Property="VerticalAlignment" Value="Center" />
-            <Setter Property="Margin" Value="4,0,0,0" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="ToggleButton">
-                        <Grid>
-                            <Border x:Name="Circle" Width="16" Height="16" CornerRadius="8"
-                                    Background="{DynamicResource Legacy.Brush.Surface.InfoTint}" BorderBrush="{DynamicResource Legacy.Brush.Action.FocusLight}" BorderThickness="1">
-                                <TextBlock Text="?" HorizontalAlignment="Center" VerticalAlignment="Center"
-                                           FontSize="10" FontWeight="Bold" Foreground="{DynamicResource Legacy.Brush.Action.Primary}" Margin="0,-1,0,0" />
-                            </Border>
-                            <Popup x:Name="HelpPopup" IsOpen="{Binding IsChecked, RelativeSource={RelativeSource TemplatedParent}}"
-                                   StaysOpen="False" Placement="Bottom" AllowsTransparency="True" PopupAnimation="Fade">
-                                <Border Background="{DynamicResource Legacy.Brush.Help.Bg}" BorderBrush="{DynamicResource Legacy.Brush.Help.Border}" BorderThickness="1"
-                                        CornerRadius="6" Padding="12,10" MaxWidth="380">
-                                    <Border.Effect>
-                                        <DropShadowEffect Color="{DynamicResource Legacy.Color.Shadow}" Opacity="0.15" BlurRadius="8" ShadowDepth="2" />
-                                    </Border.Effect>
-                                    <TextBlock TextWrapping="Wrap" FontSize="11.5" FontWeight="Normal"
-                                               Foreground="{DynamicResource Legacy.Brush.Fg.Strong}" LineHeight="18"
-                                               helpers:FormattedTextBehavior.FormattedText="{TemplateBinding Tag}" />
-                                </Border>
-                            </Popup>
-                        </Grid>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Circle" Property="Background" Value="{DynamicResource Legacy.Brush.Action.HoverTint}" />
-                            </Trigger>
-                            <Trigger Property="IsChecked" Value="True">
-                                <Setter TargetName="Circle" Property="Background" Value="{DynamicResource Legacy.Brush.Action.Primary}" />
-                                <Setter TargetName="Circle" Property="BorderBrush" Value="{DynamicResource Legacy.Brush.Action.PrimaryDark}" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-    </Window.Resources>
 
     <DockPanel Margin="4">
         <!-- Profile Bar (docked to top, full width) -->
