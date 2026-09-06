@@ -1,0 +1,83 @@
+<UserControl x:Class="WindowsFileManager.Views.Chrome.AppStatusBar"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Global status bar (always visible): icon → status → progress + count → spacer → RAM/CPU/Threads -->
+    <Border Background="{DynamicResource Legacy.Brush.Surface.Chrome}" BorderBrush="{DynamicResource Legacy.Brush.Border.Chrome}"
+            BorderThickness="0,1,0,0" Padding="10,4">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Status indicator dot: green (idle) / blue (busy) -->
+            <TextBlock Grid.Column="0" FontSize="13" VerticalAlignment="Center" Margin="0,0,8,0">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Text" Value="●" />
+                        <Setter Property="Foreground" Value="{DynamicResource Legacy.Brush.Success.Light}" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsBusy}" Value="True">
+                                <Setter Property="Text" Value="⏳" />
+                                <Setter Property="Foreground" Value="{DynamicResource Legacy.Brush.Action.Primary}" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+
+            <!-- Status text: BusyStatus when busy, otherwise general StatusMessage -->
+            <TextBlock Grid.Column="1" FontSize="11" VerticalAlignment="Center"
+                       MaxWidth="420" TextTrimming="CharacterEllipsis" Margin="0,0,8,0">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Text" Value="{Binding StatusMessage}" />
+                        <Setter Property="Foreground" Value="{DynamicResource Legacy.Brush.Fg.Secondary}" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsBusy}" Value="True">
+                                <Setter Property="Text" Value="{Binding BusyStatus}" />
+                                <Setter Property="Foreground" Value="{DynamicResource Legacy.Brush.Action.Primary}" />
+                                <Setter Property="FontWeight" Value="SemiBold" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+
+            <!-- Progress bar: determinate when BusyTotal>0, indeterminate otherwise. Visible only while busy. -->
+            <ProgressBar Grid.Column="2" Height="8" Width="160"
+                         Minimum="0"
+                         Maximum="{Binding BusyTotal, Mode=OneWay}"
+                         Value="{Binding BusyCurrent, Mode=OneWay}"
+                         IsIndeterminate="{Binding BusyIsIndeterminate, Mode=OneWay}"
+                         Foreground="{DynamicResource Legacy.Brush.Action.Primary}" Background="{DynamicResource Legacy.Brush.Border.Chrome}" BorderThickness="0"
+                         VerticalAlignment="Center" Margin="0,0,8,0"
+                         Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibility}}" />
+
+            <!-- Count text: "500 / 1,000 subfolders" -->
+            <TextBlock Grid.Column="3" Text="{Binding BusyCountText}"
+                       Foreground="{DynamicResource Legacy.Brush.Action.Primary}" FontSize="11" FontWeight="SemiBold"
+                       VerticalAlignment="Center" Margin="0,0,8,0" />
+
+            <!-- ETA text: "~3m 15s left" (empty when not computable) -->
+            <TextBlock Grid.Column="4" Text="{Binding BusyEta}"
+                       Foreground="{DynamicResource Legacy.Brush.Fg.Secondary}" FontSize="11" FontStyle="Italic"
+                       VerticalAlignment="Center" Margin="0,0,12,0" />
+
+            <!-- Live resource readouts (RAM / CPU / Threads) on far right -->
+            <StackPanel Grid.Column="6" Orientation="Horizontal">
+                <TextBlock Text="{Binding ResourceMemory}" Foreground="{DynamicResource Legacy.Brush.Action.Primary}" FontSize="11"
+                           Margin="0,0,12,0" VerticalAlignment="Center" />
+                <TextBlock Text="{Binding ResourceCpu}" Foreground="{DynamicResource Legacy.Brush.Warn.Fg}" FontSize="11"
+                           Margin="0,0,12,0" VerticalAlignment="Center" />
+                <TextBlock Text="{Binding ResourceThreads}" Foreground="{DynamicResource Legacy.Brush.Fg.Secondary}" FontSize="11"
+                           VerticalAlignment="Center" />
+            </StackPanel>
+        </Grid>
+    </Border>
+</UserControl>

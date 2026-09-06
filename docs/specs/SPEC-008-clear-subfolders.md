@@ -53,7 +53,7 @@ The inventory step exists so the user chooses from **what is actually there**, r
 | Subfolder / file-type filter boxes | `SubfolderFilter` / `FileTypeFilter` → `FilteredSubfolders` / `FilteredFileTypes` | `OrdinalIgnoreCase` substring over the item `Name` |
 | **Select all** in a list | `SelectAllSubfoldersCommand` / `SelectAllFileTypesCommand` | operate on the **filtered** view |
 | **Clear selection** in a list | `ClearSubfolderSelectionCommand` / `ClearFileTypeSelectionCommand` | operate on the **whole** collection |
-| **‹ Prev / Next ›** inside an expanded item | `MainWindow.SubfolderPrevPage_Click` / `SubfolderNextPage_Click` → `SubfolderItem.PrevPage()` / `NextPage()` | code-behind, because the buttons bind to the item, not the VM |
+| **‹ Prev / Next ›** inside an expanded item | `FolderActionPanel.SubfolderPrevPage_Click` / `SubfolderNextPage_Click` → `SubfolderItem.PrevPage()` / `NextPage()` | code-behind, because the buttons bind to the item, not the VM |
 | **🗑 Clear Selected Subfolders** (`ClearSelectedSubfoldersCommand`) | `MainViewModel.ClearSelectedSubfolders()` | `async void`; `CanExecute` = `DiscoveredSubfolders.Any(s => s.IsSelected)` |
 | **🗑 Clear Selected Files** (`ClearSelectedFileTypesCommand`) | `MainViewModel.ClearSelectedFileTypes()` | `async void`; `CanExecute` = `DiscoveredFileTypes.Any(t => t.IsSelected)` |
 | Recycle primitives | `RecycleDirectory(path)` / `RecycleFile(path)` | `Microsoft.VisualBasic.FileIO.FileSystem.DeleteDirectory` / `DeleteFile` with `UIOption.OnlyErrorDialogs` + `RecycleOption.SendToRecycleBin` |

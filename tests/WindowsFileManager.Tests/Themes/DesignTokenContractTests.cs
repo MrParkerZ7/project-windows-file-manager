@@ -60,11 +60,22 @@ public class DesignTokenContractTests
     private static IEnumerable<string> ShellXamlFiles()
     {
         var shell = Path.Combine(RepositoryRoot, "src", "WindowsFileManager");
+
+        // Only the three DECLARING dictionaries are exempt — they are the source of keys, so
+        // scanning them for references would just assert they define what they define. Every
+        // other file under Themes/ is a CONSUMER and must be scanned like any view: T-002 moved
+        // HelpButtonStyle there, and its 9 brush references had been checked by nothing at all
+        // while the exemption covered the whole folder.
+        var declaring = DictionaryFiles
+            .Select(d => "Themes/" + d)
+            .Append("Themes/Legacy.Shell.xaml")
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
         return Directory.GetFiles(shell, "*.xaml", SearchOption.AllDirectories)
             .Where(f =>
             {
                 var rel = Path.GetRelativePath(shell, f).Replace('\\', '/');
-                return !rel.StartsWith("Themes/", StringComparison.Ordinal)
+                return !declaring.Contains(rel)
                        && !rel.StartsWith("bin/", StringComparison.Ordinal)
                        && !rel.StartsWith("obj/", StringComparison.Ordinal);
             });

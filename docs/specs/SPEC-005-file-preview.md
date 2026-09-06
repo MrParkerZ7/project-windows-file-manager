@@ -45,7 +45,7 @@ The mini thumbnail exists for the same reason at a lower cost: scanning a list o
 
 ## Current behavior & invariants
 
-Preview state lives in `src/WindowsFileManager/ViewModels/MainViewModel.cs`; the thumbnail converter is `src/WindowsFileManager/Helpers/MiniPreviewConverter.cs`; the emoji fallback is `src/WindowsFileManager/Helpers/FileTypeIconConverter.cs`; transport controls are in `src/WindowsFileManager/Views/MainWindow.xaml.cs`. All four types are marked `[ExcludeFromCodeCoverage]`, so **no automated test covers this feature**; the only covered dependency is `ScannedFile.FormatFileSize`.
+Preview state lives in `src/WindowsFileManager/ViewModels/MainViewModel.cs`; the thumbnail converter is `src/WindowsFileManager/Helpers/MiniPreviewConverter.cs`; the emoji fallback is `src/WindowsFileManager/Helpers/FileTypeIconConverter.cs`; transport controls are in `src/WindowsFileManager/Views/Panels/PreviewPanel.xaml(.cs)` (T-002 moved them out of `MainWindow.xaml.cs`; `MainWindow` now only relays DuplicatesScreen's stop request to `PreviewPanel.StopMedia()`). All four types are marked `[ExcludeFromCodeCoverage]`, so **no automated test covers this feature**; the only covered dependency is `ScannedFile.FormatFileSize`.
 
 **Entry points**
 
@@ -114,7 +114,7 @@ Preview state lives in `src/WindowsFileManager/ViewModels/MainViewModel.cs`; the
 
 **Invariants**
 
-- `PreviewType` is always one of exactly seven string literals: `none` (the field's initial value), `image`, `video`, `audio`, `infocard`, `text`, `unsupported`. Adding a renderer means adding both the classification branch **and** a matching `DataTrigger` in `MainWindow.xaml`.
+- `PreviewType` is always one of exactly seven string literals: `none` (the field's initial value), `image`, `video`, `audio`, `infocard`, `text`, `unsupported`. Adding a renderer means adding both the classification branch **and** a matching `DataTrigger` in `Views/Panels/PreviewPanel.xaml`.
 - Exactly one renderer is visible at a time: every renderer defaults to `Collapsed` and only its own `PreviewType` `DataTrigger` reveals it.
 - A file is classified by extension alone, except for the final text branch, which is the only content-sniffing path.
 - Every image the preview or the thumbnail produces is `Freeze()`d before it leaves its factory, so it is safe to hand to the UI thread from any thread.

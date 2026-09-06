@@ -123,7 +123,7 @@ Defaults and the summary format are pinned by `FilterRuleTests.Constructor_Shoul
 
 **Not implemented**
 
-- **The help popup contradicts the code, in two ways.** The Custom Rules `?` popup (`MainWindow.xaml`, the `HelpButtonStyle` `Tag` on the Custom Rules label) still names the actions **"Contains"** and **"Ignore"** — the drop-down shows `Include` / `Exclude` — and states *"Ignore ALWAYS overrides Contains. If a file matches both, it stays unchecked."* That is true of the `ApplyIgnoreRules` post-pass (rule 7) but **false of ▶ Apply**, which is first-match-wins by priority. The popup text is stale, not the code.
+- **The help popup contradicts the code, in two ways.** The Custom Rules `?` popup (`Views/Screens/DuplicatesScreen.xaml` since T-002, the `HelpButtonStyle` `Tag` on the Custom Rules label) still names the actions **"Contains"** and **"Ignore"** — the drop-down shows `Include` / `Exclude` — and states *"Ignore ALWAYS overrides Contains. If a file matches both, it stays unchecked."* That is true of the `ApplyIgnoreRules` post-pass (rule 7) but **false of ▶ Apply**, which is first-match-wins by priority. The popup text is stale, not the code.
 - **Dead code in `ApplyFilterRules`.** It builds `var rulesHighToLow = FilterRules.Reverse().ToList();` and never reads it — a leftover from an earlier lowest-priority-first overwrite strategy that was replaced by the first-match `break`.
 - **No preview or dry-run.** There is no "this would select N files" before committing; the only feedback is the status line afterwards.
 - **No pattern validation.** Regex syntax is never checked at add time, and a broken pattern is indistinguishable from a pattern that legitimately matches nothing.

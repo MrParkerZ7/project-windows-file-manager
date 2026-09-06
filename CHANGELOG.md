@@ -12,6 +12,23 @@ version has been tagged yet (`git tag` is empty and no GitHub release exists).
 
 ### Changed
 
+- **`MainWindow.xaml` is now a composition root, not the whole UI.** Its 2,743 lines were cut
+  into nine `UserControl`s grouped by role — `Views/Chrome/` (profile bar, status bar, scan
+  scope), `Views/Screens/` (the three tabs' content), `Views/Panels/` (analytics, folder
+  actions, preview) — leaving 91 lines that name them plus the layout they sit in. **Nothing
+  changed on screen and no binding path moved**: the cut was made mechanically and every
+  structural marker was counted before and after — 302 bindings, 72 commands, 77 styles, 19
+  data templates, 23 control templates, 81 tooltips, 21 help popups, 21 `AncestorType=Window`
+  bindings and all 368 `DynamicResource` references are conserved exactly. The only additions
+  are the two `x:Name`s the shell needs to wire one event.
+- The single coupling that could not survive the split — the duplicate list stopping the media
+  players by naming them — is now an explicit `GroupSelectionChanged` event routed through the
+  composition root to `PreviewPanel.StopMedia()`, instead of one code-behind reaching across
+  what are now sibling controls.
+- Code-behind moved to sit beside the markup it serves. `MainWindow.xaml.cs` drops from 421
+  lines to 128 (window geometry, tab state, that one event wire); the media transport, column
+  sorting, profile dialogs and subfolder paging each moved into their own control, and the
+  digit-only input filter the two integer TextBoxes shared became `Views/Support/NumericInputFilter`.
 - **Every colour in the shell now comes from a resource dictionary.** All 389 colour sites
   across `MainWindow.xaml`, `ProfileNameDialog.xaml` and two C# files were rewritten from hex
   literals to keyed `DynamicResource` references, backed by three new dictionaries under
@@ -28,6 +45,10 @@ version has been tagged yet (`git tag` is empty and no GitHub release exists).
 
 ### Added
 
+- **`XamlLoadTests`** — constructs all nine decomposed controls against the shipped `App.xaml`
+  dictionaries, so a `{StaticResource}` that stops resolving fails the suite instead of failing
+  the first time a user opens a collapsed panel. It is the suite's only test that starts a WPF
+  `Application`; the scope and reasoning are recorded in `docs/modules/ui.md` § Testing.
 - **Folder Control tab** — search folders by configurable patterns with inline editable
   rule chips, priority reordering, select-all, and an Action section in the sidebar
 - **Six folder match types** — `Include`, `Match`, `Contains`, `Exclude`, `Mismatch`,

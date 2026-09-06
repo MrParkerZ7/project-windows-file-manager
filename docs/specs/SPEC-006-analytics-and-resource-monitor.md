@@ -40,7 +40,7 @@ The resource monitor exists because the scan is I/O- and CPU-heavy: it hashes th
 
 ## Current behavior & invariants
 
-`ScanAnalytics`, `ExtensionStat` and `SizeBucket` live in `src/WindowsFileManager.Core/Models/ScanAnalytics.cs` and are **fully covered** — `ScanAnalyticsTests` pins every formula named below. The panel wiring lives in `src/WindowsFileManager/ViewModels/MainViewModel.cs` and `src/WindowsFileManager/Views/MainWindow.xaml`; the resource sampler is `MainViewModel.UpdateResourceInfo()`. `MainViewModel` is `[ExcludeFromCodeCoverage]`, so the wiring and the sampler are not covered. `PercentToWidthConverter` (`src/WindowsFileManager/Helpers/Converters.cs`) is covered by `PercentToWidthConverterTests`.
+`ScanAnalytics`, `ExtensionStat` and `SizeBucket` live in `src/WindowsFileManager.Core/Models/ScanAnalytics.cs` and are **fully covered** — `ScanAnalyticsTests` pins every formula named below. The panel wiring lives in `src/WindowsFileManager/ViewModels/MainViewModel.cs` and `src/WindowsFileManager/Views/Panels/AnalyticsPanel.xaml(.cs)` (T-002; `MainWindow.xaml` keeps only the `Border` that carries the panel's `Width` and `Visibility` binding); the resource sampler is `MainViewModel.UpdateResourceInfo()`. `MainViewModel` is `[ExcludeFromCodeCoverage]`, so the wiring and the sampler are not covered. `PercentToWidthConverter` (`src/WindowsFileManager/Helpers/Converters.cs`) is covered by `PercentToWidthConverterTests`.
 
 **Entry points**
 
@@ -49,7 +49,7 @@ The resource monitor exists because the scan is I/O- and CPU-heavy: it hashes th
 | Scan starts | `ScanAsync()` | Sets `Analytics = null` before any work |
 | Scan completes successfully | `ScanAsync()` | `Analytics = ScanAnalytics.FromResult(result)` |
 | `Analytics` toggle button | `IsAnalyticsVisible` (two-way `ToggleButton`) | Shows/hides the panel |
-| `✕ Close` in the panel header | `CloseAnalytics_Click` (code-behind) | Sets `IsAnalyticsVisible = false` |
+| `✕ Close` in the panel header | `AnalyticsPanel.CloseAnalytics_Click` (code-behind) | Sets `IsAnalyticsVisible = false` |
 | Window loaded | `MainWindow_Loaded` | Saves the current value, then forces `IsAnalyticsVisible = false` because `Folder` is the first tab |
 | Tab changed | `TabControl_SelectionChanged` | Hides on the `Folder` tab, restores the saved value otherwise |
 | Every 2 s, always | `_resourceTimer.Tick` → `UpdateResourceInfo()` | Started in the constructor, never stopped |

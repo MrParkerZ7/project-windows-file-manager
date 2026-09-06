@@ -138,8 +138,8 @@ All behavior below lives in `src/WindowsFileManager/ViewModels/MainViewModel.cs`
 
 **Not implemented**
 
-- **Move-by-age / by-name / by-path variants do not exist.** The `1.0.0` CHANGELOG entry still lists *"Granular move options: move by oldest, newest, filename, or path"*; those commands were removed in `e3fa45c` before that entry was written. The CHANGELOG line is stale — no such command is bound in `MainWindow.xaml` and no such method exists in `MainViewModel`.
-- **The `Action` help popup contradicts the code.** Its text (`MainWindow.xaml`, the `Action` section's `HelpButtonStyle` tag) says Delete *"Permanently removes checked files from disk. No Recycle Bin — cannot be undone."* Every delete path recycles and is undoable. The popup text is wrong; the behavior above is correct. See [SPEC-010](SPEC-010-contextual-help.md).
+- **Move-by-age / by-name / by-path variants do not exist.** The `1.0.0` CHANGELOG entry still lists *"Granular move options: move by oldest, newest, filename, or path"*; those commands were removed in `e3fa45c` before that entry was written. The CHANGELOG line is stale — no such command is bound in `Views/Screens/DuplicatesScreen.xaml` and no such method exists in `MainViewModel`.
+- **The `Action` help popup contradicts the code.** Its text (`Views/Screens/DuplicatesScreen.xaml` since T-002, the `Action` section's `HelpButtonStyle` tag) says Delete *"Permanently removes checked files from disk. No Recycle Bin — cannot be undone."* Every delete path recycles and is undoable. The popup text is wrong; the behavior above is correct. See [SPEC-010](SPEC-010-contextual-help.md).
 - **No dry-run, no path allow-list, no system-path guard.** Nothing prevents targeting `C:\Windows`, a drive root, or a UNC path; one confirmation can authorize an unbounded number of items. See [`../SECURITY.md`](../SECURITY.md).
 - **Failures are counted, never diagnosed.** Every bulk loop is `catch { failed++; }`. There is no log, no per-file error list, and no retry.
 

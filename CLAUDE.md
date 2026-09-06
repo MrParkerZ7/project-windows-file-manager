@@ -76,7 +76,8 @@ project-windows-file-manager/
 │       │   ├── ExtensionFilter.cs
 │       │   └── ToggleItem.cs          # Enable/disable wrapper for paths & exclusions
 │       ├── Views/
-│       │   ├── MainWindow.xaml / .xaml.cs      # 3 tabs: Folder · Duplication · 🕘 History
+│       │   ├── MainWindow.xaml / .xaml.cs      # composition root; 3 tabs: Folder · Duplication · 🕘 History
+│       │   ├── Chrome/ Screens/ Panels/        # the 9 UserControls it composes (T-002)
 │       │   └── ProfileNameDialog.xaml / .xaml.cs
 │       └── Helpers/
 │           ├── RelayCommand.cs · Converters.cs # The measured UI types (with ViewModelBase)

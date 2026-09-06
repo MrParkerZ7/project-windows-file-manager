@@ -42,7 +42,7 @@ Putting the explanation one click from the control keeps it where the question i
 
 | Trigger | Handler | Notes |
 |---------|---------|-------|
-| A `?` circle (`ToggleButton` with `Style="{StaticResource HelpButtonStyle}"`) | The style's `ControlTemplate` (`Views/MainWindow.xaml`, in `Window.Resources`) | the template's `Popup.IsOpen` is bound to the button's own `IsChecked` |
+| A `?` circle (`ToggleButton` with `Style="{StaticResource HelpButtonStyle}"`) | The style's `ControlTemplate` (`Themes/Legacy.HelpButton.xaml`, merged into `Application.Resources` through `Themes/Legacy.Shell.xaml`) | the template's `Popup.IsOpen` is bound to the button's own `IsChecked`. App-scoped since T-002: a `Popup` hosts its child in a separate visual tree, and the 21 consumers now sit in seven different files — a `Window.Resources` entry would resolve for none of them |
 | Popup body | `TextBlock` with `helpers:FormattedTextBehavior.FormattedText="{TemplateBinding Tag}"` | the **only** use of the behavior in the application |
 | Markup parse | `FormattedTextBehavior.OnFormattedTextChanged` → `ParseAndApply(TextBlock, string)` | attached `DependencyProperty`, `static`, `[ExcludeFromCodeCoverage]` |
 | Inline construction | `AddPlainText` · `AddStyledRun` · `AddHyperlink` | private statics |
@@ -72,7 +72,7 @@ Putting the explanation one click from the control keeps it where the question i
 12. **Empty segments produce no `Run`.** Splitting on `\n` emits a `Run` only for non-empty parts, but always emits the `LineBreak` between parts — so consecutive newlines render as blank lines.
 13. **Re-assignment re-parses.** `OnFormattedTextChanged` calls `TextBlock.Inlines.Clear()` first; a `null` or empty value leaves the block empty. A non-`TextBlock` target is a no-op.
 14. **Link activation.** The click handler launches the URL with `UseShellExecute = true`, so the system default handler opens it. Any exception is swallowed — a bad or unlaunchable URL does nothing visible.
-15. **The popup surface today (21 popups, all in `Views/MainWindow.xaml`):**
+15. **The popup surface today (21 popups).** Since T-002 they live in five files, not one — `Views/Chrome/ProfileBar.xaml` (1) · `Views/Chrome/ScanScopeBar.xaml` (2) · `Views/Screens/FoldersScreen.xaml` (4) · `Views/Screens/DuplicatesScreen.xaml` (9) · `Views/Panels/FolderActionPanel.xaml` (5). The grouping below is by on-screen area, which still maps one-to-one onto those files:
 
     | Area | Popups |
     |------|--------|
@@ -114,7 +114,7 @@ Putting the explanation one click from the control keeps it where the question i
   - `TAKE ACTION on selected files` claimed *"Permanently removes checked files from disk. `<w>`No Recycle Bin — cannot be undone.`</w>`"*. Every delete path recycles (`RecycleFile` → `VbRecycleOption.SendToRecycleBin`, `MainViewModel.cs:4101`) and pushes an `ActionHistoryKind.RecycleFiles` entry (`:4711`) that Undo replays via `RestoreFromRecycleBin` (`:4179`). Now reads: sends to the Recycle Bin, undoable from History unless the bin has been emptied ([SPEC-004](SPEC-004-selection-and-file-actions.md)).
   - `FOLDER SEARCH` claimed *"Matching: Case-insensitive contains match"*, describing the feature before match types existed. Now states that matching follows each pattern's match type, and documents the optional depth limit it had never mentioned ([SPEC-007](SPEC-007-folder-search.md)).
   - `MATCH TYPES` documented five of the six — `NotContain` was implemented and selectable but undocumented. Now documents all six.
-  - `CUSTOM FILTER RULES` used the retired `Contains`/`Ignore` vocabulary for what the code calls `FilterAction.Include`/`Exclude` (`FilterRule.cs:9,12`), named a button *"Apply Rules"* whose label is `▶ Apply` (`MainWindow.xaml:1242`), and asserted *"Ignore ALWAYS overrides Contains"* — a precedence model the code does not implement. `ApplyFilterRules` breaks on the first enabled matching rule in list order (`MainViewModel.cs:3018-3031`, `break; // highest priority match wins`), so precedence is positional, not action-based. Now states first-match-wins and that reordering changes precedence ([SPEC-003](SPEC-003-custom-filter-rules.md)).
+  - `CUSTOM FILTER RULES` used the retired `Contains`/`Ignore` vocabulary for what the code calls `FilterAction.Include`/`Exclude` (`FilterRule.cs:9,12`), named a button *"Apply Rules"* whose label is `▶ Apply` (`Views/Screens/DuplicatesScreen.xaml:536` since T-002), and asserted *"Ignore ALWAYS overrides Contains"* — a precedence model the code does not implement. `ApplyFilterRules` breaks on the first enabled matching rule in list order (`MainViewModel.cs:3018-3031`, `break; // highest priority match wins`), so precedence is positional, not action-based. Now states first-match-wins and that reordering changes precedence ([SPEC-003](SPEC-003-custom-filter-rules.md)).
 - **No tests.** The grammar's behavior — including the degradation rules above — is pinned by nothing.
 - **No tag-set validation.** Invariant 17's closed tag set is enforced by nobody: not the XAML parser (an unknown tag is well-formed text), not the build, not CI. The 2026-09-04 sweep found one violation across 21 payloads; a future one would ship silently and render as visible markup to the user.
 - **No nesting, and no way to escape a literal `<` inside help text at runtime.** A `<` that is not a recognized tag is emitted verbatim, which happens to work, but there is no escape syntax.
@@ -128,4 +128,4 @@ Putting the explanation one click from the control keeps it where the question i
 - Module docs: [WindowsFileManager (WPF UI)](../modules/ui.md)
 - Related specs: [SPEC-007 — Folder search](SPEC-007-folder-search.md) · [SPEC-008 — Clear subfolders](SPEC-008-clear-subfolders.md) · [SPEC-003 — Custom filter rules](SPEC-003-custom-filter-rules.md) · [SPEC-004 — Selection and file actions](SPEC-004-selection-and-file-actions.md)
 - Background: [`../CONTEXT.md`](../CONTEXT.md) · [`../SECURITY.md`](../SECURITY.md)
-- Tests: none — `WindowsFileManager.Helpers.FormattedTextBehavior` and `Views/MainWindow.xaml` are outside the coverage boundary
+- Tests: no coverage — `WindowsFileManager.Helpers.FormattedTextBehavior` and the whole `Views` namespace are outside the coverage boundary. Since T-002 there is a regression net that is not a coverage contributor: `XamlLoadTests` constructs every control that hosts a `?` popup against the shipped `App.xaml` dictionaries, so a `HelpButtonStyle` that stops resolving fails the suite instead of failing the first time a user opens the panel

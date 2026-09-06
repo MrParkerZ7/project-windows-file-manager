@@ -175,7 +175,7 @@ and aborts the entire scan on the first hit in `GroupByNameRegex`. Neither is a 
 
 `MinFileSizeText` + `SelectedSizeUnit` are parsed in `ApplyFilters`; `FolderSearchMaxDepthText`
 is parsed by `ParseFolderSearchMaxDepth` (blank, non-numeric, or `< 1` → `null` = unlimited).
-`Views/MainWindow.xaml.cs` adds digit-only `PreviewTextInput` handlers.
+`Views/Support/NumericInputFilter` adds the digit-only `PreviewTextInput` filter, forwarded from `FoldersScreen` and `FolderActionPanel`.
 
 > **Rule 7 — `PreviewTextInput` is a convenience, not validation.** The same fields load from
 > `settings.json` with no keystroke filtering. `SettingsService`'s `ReadLong`/`ReadDouble`
@@ -382,7 +382,7 @@ the user sees.
 
 ### Known documentation drift — fix the string, not the code
 
-The Action help popup in `src/WindowsFileManager/Views/MainWindow.xaml` (around line 1484)
+The Action help popup in `src/WindowsFileManager/Views/Screens/DuplicatesScreen.xaml`
 claims Delete *"Permanently removes checked files from disk. No Recycle Bin — cannot be undone."*
 **The code recycles and pushes history — the operation IS undoable.** The help text understates
 the safety, which is the harmless direction, but it is still wrong.

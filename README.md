@@ -179,7 +179,8 @@ project-windows-file-manager/
 │       │   ├── ExtensionFilter.cs         # File type filter toggle
 │       │   └── ToggleItem.cs              # Enable/disable wrapper for paths & exclusions
 │       ├── Views/
-│       │   ├── MainWindow.xaml(.cs)       # Three-tab UI layout + window code-behind
+│       │   ├── MainWindow.xaml(.cs)       # composition root: names the 9 controls + window code-behind
+│       │   ├── Chrome/ Screens/ Panels/  # the 9 UserControls the shell composes (T-002)
 │       │   └── ProfileNameDialog.xaml(.cs) # Profile name entry dialog
 │       └── Helpers/
 │           ├── RelayCommand.cs            # ICommand implementation

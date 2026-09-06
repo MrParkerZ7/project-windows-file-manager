@@ -32,10 +32,27 @@ WindowsFileManager/
     Legacy.Palette.xaml     277   the 76 colours actually in use today, verbatim, each with its
                                   use count and the Broadsheet key it is destined for
     Legacy.Metrics.xaml      31   the 7 radii, 4 thicknesses, 16 font sizes and 2 families in use
+    Converters.xaml          14   the 5 converter instances, app-scoped by T-002
+    Legacy.HelpButton.xaml   60   HelpButtonStyle - the ? circle and its Popup, app-scoped by T-002
+    Legacy.Shell.xaml        18   aggregator: the one App.xaml merge entry T-002 is allowed
   Views/                          WindowsFileManager.Views
-    MainWindow.xaml       2796    the whole UI
-    MainWindow.xaml.cs     421    code-behind for what bindings cannot do
+    MainWindow.xaml          91    composition root - names the nine controls and the layout they sit in
+    MainWindow.xaml.cs      128    window geometry, tab state, and one event wire
     ProfileNameDialog.xaml/.cs    modal name-entry dialog with live validation
+    Chrome/                       WindowsFileManager.Views.Chrome        (T-002)
+      ProfileBar.xaml         49    profile selector + new/clone/rename/delete
+      AppStatusBar.xaml       83    busy dot, status, progress, count, ETA, RAM/CPU/threads
+      ScanScopeBar.xaml      192    target folders + exclude folder names, 50/50
+    Screens/                      WindowsFileManager.Views.Screens       (T-002)
+      FoldersScreen.xaml     307    folder-search controls + sortable results
+      DuplicatesScreen.xaml 1006    filters, custom rules, group list, action bar
+      HistoryScreen.xaml     124    the global operation log
+    Panels/                       WindowsFileManager.Views.Panels        (T-002)
+      AnalyticsPanel.xaml    162    the analytics dashboard
+      FolderActionPanel.xaml 561    subfolder paging, file-type filters, flatten
+      PreviewPanel.xaml      219    image/video/audio preview + transport
+    Support/                      WindowsFileManager.Views.Support       (T-002)
+      NumericInputFilter.cs        digits-only filter shared by the two integer TextBoxes
   Assets/                         app-icon.ico + 3 MSIX PNG logos
   Package.appxmanifest            MSIX identity (see ADR-008)
 ```
@@ -61,7 +78,9 @@ internal MainViewModel(DuplicateScannerService scannerService,
 
 `CreateDefaultScanner()` builds `new DuplicateScannerService(fs, new FileHashService(fs))` over one shared `FileSystemService`; `CreateDefaultSettings()` builds `new SettingsService(new FileSystemService(), %APPDATA%\WindowsFileManager\settings.json)`.
 
-**Code-behind exists only where a binding cannot reach.** `MainWindow.xaml.cs` handles window geometry restore, `MediaElement` transport (WPF exposes no bindable Play/Pause), `TabControl.SelectionChanged` panel state, `GridViewColumnHeader` click-sorting, the three modal profile dialogs, digit-only `PreviewTextInput`, and `SubfolderItem` paging clicks. Everything else is a command binding.
+**Code-behind exists only where a binding cannot reach**, and since T-002 it lives beside the markup it serves rather than in one file. `MainWindow.xaml.cs` keeps only what the composition root owns: window geometry restore, `TabControl.SelectionChanged` panel state, and one event wire. The rest moved with its region — `MediaElement` transport (WPF exposes no bindable Play/Pause) to `PreviewPanel`, `GridViewColumnHeader` click-sorting to `FoldersScreen`, the three modal profile dialogs to `ProfileBar`, `SubfolderItem` paging clicks to `FolderActionPanel`, and digit-only `PreviewTextInput` to `Views/Support/NumericInputFilter`, which `FoldersScreen` and `FolderActionPanel` both forward to. Everything else is a command binding.
+
+**One coupling could not be expressed in markup.** The Duplication list's `SelectionChanged` used to stop the preview players by naming `VideoPlayer`/`AudioPlayer` directly. Those are sibling controls now, so `DuplicatesScreen` raises `GroupSelectionChanged` and `MainWindow` — the only place that legitimately knows about both — calls `PreviewPanel.StopMedia()`. The trigger is deliberately a `SelectionChanged` and not a property change.
 
 **Coverage split.** Only three files in this module are inside the coverage boundary: `Converters.cs`, `RelayCommand.cs`, `ViewModelBase.cs`. Everything else in `Helpers/` and `ViewModels/` is marked `[ExcludeFromCodeCoverage]`, and the entire `Views` namespace is pattern-excluded. See [Testing](#testing).
 
@@ -81,7 +100,11 @@ internal MainViewModel(DuplicateScannerService scannerService,
 | `FormattedTextBehavior` | `Helpers/FormattedTextBehavior.cs` | Attached `FormattedText` property that parses the help-popup markup into `TextBlock` inlines. |
 | `TextBoxEnterKeyBehavior` | `Helpers/TextBoxEnterKeyBehavior.cs` | Attached `Command` property that updates the binding then executes on Enter. |
 | `ShortcutHelper` | `Helpers/ShortcutHelper.cs` | `internal static` — creates a `.lnk` via late-bound `WScript.Shell`. |
-| `MainWindow` | `Views/MainWindow.xaml(.cs)` | The single window. All 2796 XAML lines. |
+| `MainWindow` | `Views/MainWindow.xaml(.cs)` | The single window, and since T-002 a **composition root only**: 91 XAML lines that name the nine controls below, plus the layout they sit in (the `DockPanel`, the 3-column `Grid`, the `TabControl` and its three `TabItem`s, and the three side-panel `Border`s with their `Width`/`Visibility` bindings). |
+| `ProfileBar`, `AppStatusBar`, `ScanScopeBar` | `Views/Chrome/*.xaml(.cs)` | Window chrome: the profile strip, the global status bar, and the target/exclude folder scope row. |
+| `FoldersScreen`, `DuplicatesScreen`, `HistoryScreen` | `Views/Screens/*.xaml(.cs)` | The content of the three tabs. Named for their 3a identity, not for today's tab headers — those header *strings* are load-bearing (see rule 18). |
+| `AnalyticsPanel`, `FolderActionPanel`, `PreviewPanel` | `Views/Panels/*.xaml(.cs)` | The content of the three side panels. `PreviewPanel` exposes `StopMedia()` for the composition root. |
+| `NumericInputFilter` | `Views/Support/NumericInputFilter.cs` | `static` digit-only `PreviewTextInput` filter, shared by the two integer TextBoxes that no longer live in the same file. |
 | `ProfileNameDialog` | `Views/ProfileNameDialog.xaml(.cs)` | Modal name entry with live duplicate validation and an OK button disabled while invalid. |
 
 ## Public API
@@ -369,8 +392,21 @@ Four test classes under `tests/WindowsFileManager.Tests/Helpers/` cover this mod
 | `PercentToWidthConverterTests` | `PercentToWidthConverter` — normal case, both clamps, too-few values, wrong types, zero container width, `ProvideValue`, `ConvertBack` |
 | `RelayCommandTests` | `Execute`, `CanExecute` with and without a predicate, the `ArgumentNullException` on a null `execute`, `RaiseCanExecuteChanged`, and `CanExecuteChanged` add/remove |
 | `ViewModelBaseTests` | `SetProperty` changed vs unchanged, the returned bool, and `[CallerMemberName]` propagation |
+| `XamlLoadTests` | That all nine decomposed `UserControl`s parse against the shipped `App.xaml` dictionaries, and that the shell composes exactly those nine (so a tenth cannot be added untested). Does not add coverage — the `Views` namespace is pattern-excluded — it is a regression net, not a coverage contributor. |
 
-**Nothing is mocked** in these tests — the covered types have no dependencies. Note that the test project sets `<UseWPF>true</UseWPF>` because these types derive from WPF interfaces (`IValueConverter`, `ICommand`, `MarkupExtension`); the tests instantiate the types directly and never start an `Application` or open a window.
+**Nothing is mocked** in these tests — the covered types have no dependencies. The test project sets `<UseWPF>true</UseWPF>` because these types derive from WPF interfaces (`IValueConverter`, `ICommand`, `MarkupExtension`); they are instantiated directly.
+
+**Starting an `Application` — the one permitted exception.** This document previously stated flatly that the tests *never start an `Application` or open a window*. Since T-002 that is true of every test but one, and the exception is deliberate rather than an erosion.
+
+Decomposing `MainWindow.xaml` into nine `UserControl`s created a failure mode that did not exist while everything lived in one file: a `{StaticResource}` that used to resolve against the Window's own `Resources` block must now resolve against `Application.Resources`. When it doesn't, the `XamlParseException` is raised **while that control is parsed** — so for a panel that ships `Collapsed`, it surfaces the first time a user opens the panel and never in a build, a lint, or any other test. Seven of the nine controls carry such references (21 × `HelpButtonStyle` plus the five converters), so this is the module's largest untested surface, not a corner case.
+
+`XamlLoadTests` therefore constructs all nine controls against the real `App` — `new App(); app.InitializeComponent();`, so the test resolves against exactly the dictionaries `App.xaml` merges, in `App.xaml`'s order, and cannot drift from what ships. The bounds that keep this from becoming "the tests open windows":
+
+- **No window is shown and no message loop runs.** Controls are constructed and dropped; `Application.Run()` is never called.
+- **One private STA thread**, owned by the fixture, so the controls are built on the same thread that owns the `Application` whose resources they resolve against.
+- **Scoped to parse-time resolution.** `{DynamicResource}` is deferred and cannot throw here; those keys are checked textually by `DesignTokenContractTests` instead.
+
+Anything beyond that — showing a window, pumping a dispatcher, driving input — still does not belong in this suite.
 
 **What is not tested, and why**
 

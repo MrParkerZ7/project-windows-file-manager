@@ -72,6 +72,10 @@ Core additionally grants `InternalsVisibleTo` to `WindowsFileManager.Application
 | `WindowsFileManager.ViewModels` | `src/WindowsFileManager/ViewModels/` |
 | `WindowsFileManager.Helpers` | `src/WindowsFileManager/Helpers/` |
 | `WindowsFileManager.Views` | `src/WindowsFileManager/Views/` |
+| `WindowsFileManager.Views.Chrome` | `src/WindowsFileManager/Views/Chrome/` |
+| `WindowsFileManager.Views.Screens` | `src/WindowsFileManager/Views/Screens/` |
+| `WindowsFileManager.Views.Panels` | `src/WindowsFileManager/Views/Panels/` |
+| `WindowsFileManager.Views.Support` | `src/WindowsFileManager/Views/Support/` |
 
 ---
 
@@ -121,8 +125,9 @@ broken today, but the grant is inert.
 There is **no DI container and no service locator**. Wiring is manual, in one place.
 
 `src/WindowsFileManager/App.xaml` sets `StartupUri="Views/MainWindow.xaml"`, and
-`src/WindowsFileManager/App.xaml.cs` is an empty partial class. `Views/MainWindow.xaml` declares
-its own view model:
+`src/WindowsFileManager/App.xaml.cs` is an empty partial class. `Views/MainWindow.xaml` is a
+composition root: it names the nine `UserControl`s that hold the markup and declares
+its own view model, which every one of them inherits through the logical tree:
 
 ```xml
 <Window.DataContext>
@@ -357,7 +362,7 @@ the observed rate and is suppressed below 500 ms elapsed.
   `ScanAsync` and `SearchFoldersAsync` have broad catch blocks — an unobserved exception in the
   others crashes the process. Treat that as a known hazard when adding a new bulk operation.
 - `_resourceTimer` is a 2-second `DispatcherTimer` feeding the CPU/RAM/thread readout.
-- `Views/MainWindow.xaml.cs` defers the media first-frame pause to
+- `Views/Panels/PreviewPanel.xaml.cs` defers the media first-frame pause to
   `Dispatcher.BeginInvoke(DispatcherPriority.Loaded, …)` so a thumbnail renders before pausing.
 
 ### 7.4 Settings persistence
@@ -420,7 +425,7 @@ Recorded so a future reader does not have to rediscover them.
 | Coverage `Exclude` entry `[WindowsFileManager]*Helpers.Win32Api*` | No `Win32Api` type exists in the tree. Dead exclusion, in `tests/WindowsFileManager.Tests/coverlet.runsettings`. |
 | `ScanOptions.MinimumFileSize` and `ScanOptions.FileExtensions` | Fully implemented and fully tested in `DuplicateScannerService`, but `MainViewModel.ScanAsync` never sets either. `MinimumFileSize` is persisted per profile yet never fed into a scan; `FileExtensions` is never set from the UI at all. Both filters are unreachable from the running app. Post-scan filtering by size and extension does exist, in `MainViewModel.ApplyFilters`/`FilterDuplicateGroup` — a different mechanism. |
 | `BuildRegexKey` comment in `DuplicateScannerService` | The comment says capture groups are joined with SOH (0x01) so `("ab","c")` and `("a","bc")` stay distinct; the code is `string.Join("", parts)`, an empty separator, so those tuples collide. No test covers it. |
-| Delete help popup in `Views/MainWindow.xaml` | Says Delete is permanent with "No Recycle Bin — cannot be undone." The code recycles via `Microsoft.VisualBasic.FileIO.FileSystem.DeleteFile(..., SendToRecycleBin)` and pushes an undo entry. |
+| Delete help popup in `Views/Screens/DuplicatesScreen.xaml` | Says Delete is permanent with "No Recycle Bin — cannot be undone." The code recycles via `Microsoft.VisualBasic.FileIO.FileSystem.DeleteFile(..., SendToRecycleBin)` and pushes an undo entry. |
 | `RemoveEmptyDirectoriesRecursive` | The one destructive path that is **not** recycled and **not** recorded in `ActionHistory` — `Directory.Delete` is permanent and unundoable. |
 | History tab activation | `TabControl_SelectionChanged` matches on a string tab header, but the History tab's header is a `TextBlock`, so `IsHistoryActive` is effectively never true. |
 | Folder search location | Implemented in the UI layer (`MainViewModel.SearchFoldersAsync` `:3213`, `SearchFoldersRecursive` `:3299`), **not** in Core or Application, and `FolderContainsItem` calls `System.IO.Directory`/`File` directly rather than going through `IFileSystemService`. It is the one place the port is bypassed. |
@@ -440,12 +445,12 @@ Recorded so a future reader does not have to rediscover them.
 | Add or change a sort option | `MainViewModel.ApplySorting` (`:2547`) plus the `SortOptions` list; spec [SPEC-002](docs/specs/SPEC-002-filtering-and-sorting.md) |
 | Change custom filter-rule matching | `src/WindowsFileManager.Core/Models/FilterRule.cs` + `MainViewModel.ApplyFilterRules` (`:2999`) / `MatchesFilter` (`:3041`); spec [SPEC-003](docs/specs/SPEC-003-custom-filter-rules.md) |
 | Add a selection or file action (move, delete, open) | `MainViewModel` command block in the constructor (`:617` onward) + the matching private method; spec [SPEC-004](docs/specs/SPEC-004-selection-and-file-actions.md) |
-| Add a preview type | `MainViewModel.PreviewFile` (`:2636`) and the extension `HashSet`s at the top of `MainViewModel.cs`, then the `PreviewType` `DataTrigger`s in `src/WindowsFileManager/Views/MainWindow.xaml`; thumbnails in `Helpers/MiniPreviewConverter.cs`; spec [SPEC-005](docs/specs/SPEC-005-file-preview.md) |
+| Add a preview type | `MainViewModel.PreviewFile` (`:2636`) and the extension `HashSet`s at the top of `MainViewModel.cs`, then the `PreviewType` `DataTrigger`s in `src/WindowsFileManager/Views/Panels/PreviewPanel.xaml`; thumbnails in `Helpers/MiniPreviewConverter.cs`; spec [SPEC-005](docs/specs/SPEC-005-file-preview.md) |
 | Change the analytics dashboard or resource monitor | `src/WindowsFileManager.Core/Models/ScanAnalytics.cs` (`FromResult`) and `Helpers/Converters.cs` (`PercentToWidthConverter`); monitor in `MainViewModel.UpdateResourceInfo`; spec [SPEC-006](docs/specs/SPEC-006-analytics-and-resource-monitor.md) |
 | Change folder-search match semantics | `MainViewModel.SearchFoldersRecursive` (`:3299`) + `src/WindowsFileManager.Core/Models/FolderSearchPattern.cs`; spec [SPEC-007](docs/specs/SPEC-007-folder-search.md) |
 | Change the clear-subfolders flow | `src/WindowsFileManager.Core/Models/SubfolderItem.cs` + `MainViewModel.ScanSubfolders` / `ClearSelectedSubfolders`; spec [SPEC-008](docs/specs/SPEC-008-clear-subfolders.md) |
 | Add a persisted setting | `src/WindowsFileManager.Core/Models/ProfileSettings.cs` (per profile) or `AppSettings.cs` (global), then `SnapshotLiveStateInto` / `ApplyProfileToLiveState` in `MainViewModel`; migration in `src/WindowsFileManager.Application/Services/SettingsService.cs`; spec [SPEC-009](docs/specs/SPEC-009-settings-and-window-state-persistence.md) |
-| Add a help popup or change its markup | `src/WindowsFileManager/Views/MainWindow.xaml` (`HelpButtonStyle`, the control's `Tag`) + `src/WindowsFileManager/Helpers/FormattedTextBehavior.cs`; spec [SPEC-010](docs/specs/SPEC-010-contextual-help.md) |
+| Add a help popup or change its markup | the owning control under `src/WindowsFileManager/Views/` (the `Tag` on a `HelpButtonStyle` `ToggleButton`; the style itself lives in `Themes/Legacy.HelpButton.xaml`) + `src/WindowsFileManager/Helpers/FormattedTextBehavior.cs`; spec [SPEC-010](docs/specs/SPEC-010-contextual-help.md) |
 | Add a new file-system operation | Add the member to `src/WindowsFileManager.Core/Services/IFileSystemService.cs`, implement it in `src/WindowsFileManager.Infrastructure/Services/FileSystemService.cs`, then mock it in the affected tests |
 | Add a value converter or attached behavior | `src/WindowsFileManager/Helpers/` — and remember `Helpers` is inside the coverage `Include` list, so it needs full test coverage |
 | Change build gates, analyzers, or style rules | `Directory.Build.props`, `.editorconfig`, `stylecop.json`; decision [ADR-009](docs/adr/ADR-009-treat-warnings-as-errors.md) |

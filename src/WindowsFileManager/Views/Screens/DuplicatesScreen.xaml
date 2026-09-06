@@ -1,0 +1,1006 @@
+<UserControl x:Class="WindowsFileManager.Views.Screens.DuplicatesScreen"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:helpers="clr-namespace:WindowsFileManager.Helpers">
+    <Grid Margin="8">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" MinWidth="400" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Left Column: Controls + Results -->
+        <Grid Grid.Column="0" Margin="0,0,8,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!-- Row 0: Action Buttons + Progress -->
+            <StackPanel Grid.Row="0" Margin="0,0,0,8">
+                <StackPanel Orientation="Horizontal">
+                    <Button Content="Scan for Duplicates"
+                            Command="{Binding ScanCommand}"
+                            Padding="16,6" FontWeight="SemiBold"
+                            Margin="0,0,8,0" />
+
+                    <Button Content="Cancel"
+                            Command="{Binding CancelCommand}"
+                            Padding="16,6"
+                            Visibility="{Binding IsScanning, Converter={StaticResource BoolToVisibility}}" />
+
+                    <TextBlock Text="{Binding FilesScanned, StringFormat='Files scanned: {0}'}"
+                               VerticalAlignment="Center" Margin="16,0,0,0"
+                               Visibility="{Binding IsScanning, Converter={StaticResource BoolToVisibility}}" />
+
+                    <ToggleButton Style="{StaticResource HelpButtonStyle}" Margin="16,0,0,0"
+                                  Tag="&lt;h&gt;SCAN &amp; DISPLAY OPTIONS&lt;/h&gt;&#x0a;&#x0a;&lt;b&gt;Mini Preview&lt;/b&gt; = show small thumbnails inline in the list&#x0a;&lt;b&gt;File Preview&lt;/b&gt; = show full preview panel when clicking a file&#x0a;&lt;b&gt;Auto Play&lt;/b&gt; = auto-play video/audio in preview&#x0a;&#x0a;After scanning, use &lt;b&gt;Filters&lt;/b&gt; to narrow results and &lt;b&gt;Actions&lt;/b&gt; to select files for deletion or moving." />
+
+                    <ToggleButton IsChecked="{Binding IsMiniPreview}"
+                                  VerticalAlignment="Center" FontSize="11" Padding="8,3" Margin="16,0,0,0" Cursor="Hand"
+                                  ToolTip="Show inline thumbnail in the duplicate list">
+                        <ToggleButton.Style>
+                            <Style TargetType="ToggleButton">
+                                <Setter Property="Content" Value="Mini Preview" />
+                                <Setter Property="Foreground" Value="{DynamicResource Legacy.Brush.Fg.Body}" />
+                                <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Surface.Raised}" />
+                                <Setter Property="BorderBrush" Value="{DynamicResource Legacy.Brush.Border.Light}" />
+                                <Setter Property="BorderThickness" Value="1" />
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="ToggleButton">
+                                            <Border Background="{TemplateBinding Background}"
+                                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                                    CornerRadius="3" Padding="{TemplateBinding Padding}">
+                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                                <Style.Triggers>
+                                    <Trigger Property="IsChecked" Value="True">
+                                        <Setter Property="Content" Value="✦ Mini Preview" />
+                                        <Setter Property="Foreground" Value="White" />
+                                        <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Action.Info}" />
+                                        <Setter Property="BorderBrush" Value="{DynamicResource Legacy.Brush.Action.InfoDark}" />
+                                        <Setter Property="FontWeight" Value="SemiBold" />
+                                    </Trigger>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Surface.InfoTintAlt}" />
+                                    </Trigger>
+                                    <MultiTrigger>
+                                        <MultiTrigger.Conditions>
+                                            <Condition Property="IsChecked" Value="True" />
+                                            <Condition Property="IsMouseOver" Value="True" />
+                                        </MultiTrigger.Conditions>
+                                        <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Action.InfoMid}" />
+                                    </MultiTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ToggleButton.Style>
+                    </ToggleButton>
+
+                    <ToggleButton IsChecked="{Binding IsAutoPreview}"
+                                  VerticalAlignment="Center" FontSize="11" Padding="8,3" Margin="4,0,0,0" Cursor="Hand"
+                                  ToolTip="Show full file preview panel when clicking a group">
+                        <ToggleButton.Style>
+                            <Style TargetType="ToggleButton">
+                                <Setter Property="Content" Value="File Preview" />
+                                <Setter Property="Foreground" Value="{DynamicResource Legacy.Brush.Fg.Body}" />
+                                <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Surface.Raised}" />
+                                <Setter Property="BorderBrush" Value="{DynamicResource Legacy.Brush.Border.Light}" />
+                                <Setter Property="BorderThickness" Value="1" />
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="ToggleButton">
+                                            <Border Background="{TemplateBinding Background}"
+                                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                                    CornerRadius="3" Padding="{TemplateBinding Padding}">
+                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                                <Style.Triggers>
+                                    <Trigger Property="IsChecked" Value="True">
+                                        <Setter Property="Content" Value="✦ File Preview" />
+                                        <Setter Property="Foreground" Value="White" />
+                                        <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Action.Info}" />
+                                        <Setter Property="BorderBrush" Value="{DynamicResource Legacy.Brush.Action.InfoDark}" />
+                                        <Setter Property="FontWeight" Value="SemiBold" />
+                                    </Trigger>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Surface.InfoTintAlt}" />
+                                    </Trigger>
+                                    <MultiTrigger>
+                                        <MultiTrigger.Conditions>
+                                            <Condition Property="IsChecked" Value="True" />
+                                            <Condition Property="IsMouseOver" Value="True" />
+                                        </MultiTrigger.Conditions>
+                                        <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Action.InfoMid}" />
+                                    </MultiTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ToggleButton.Style>
+                    </ToggleButton>
+
+                    <ToggleButton IsChecked="{Binding IsAnalyticsVisible}"
+                                  VerticalAlignment="Center" FontSize="11" Padding="8,3" Margin="4,0,0,0" Cursor="Hand"
+                                  ToolTip="Show or hide the analytics dashboard panel">
+                        <ToggleButton.Style>
+                            <Style TargetType="ToggleButton">
+                                <Setter Property="Content" Value="Analytics" />
+                                <Setter Property="Foreground" Value="{DynamicResource Legacy.Brush.Fg.Body}" />
+                                <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Surface.Raised}" />
+                                <Setter Property="BorderBrush" Value="{DynamicResource Legacy.Brush.Border.Light}" />
+                                <Setter Property="BorderThickness" Value="1" />
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="ToggleButton">
+                                            <Border Background="{TemplateBinding Background}"
+                                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                                    CornerRadius="3" Padding="{TemplateBinding Padding}">
+                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                                <Style.Triggers>
+                                    <Trigger Property="IsChecked" Value="True">
+                                        <Setter Property="Content" Value="✦ Analytics" />
+                                        <Setter Property="Foreground" Value="White" />
+                                        <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Action.Info}" />
+                                        <Setter Property="BorderBrush" Value="{DynamicResource Legacy.Brush.Action.InfoDark}" />
+                                        <Setter Property="FontWeight" Value="SemiBold" />
+                                    </Trigger>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Surface.InfoTintAlt}" />
+                                    </Trigger>
+                                    <MultiTrigger>
+                                        <MultiTrigger.Conditions>
+                                            <Condition Property="IsChecked" Value="True" />
+                                            <Condition Property="IsMouseOver" Value="True" />
+                                        </MultiTrigger.Conditions>
+                                        <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Action.InfoMid}" />
+                                    </MultiTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ToggleButton.Style>
+                    </ToggleButton>
+
+                    <ToggleButton IsChecked="{Binding IsAutoPlay}"
+                                  VerticalAlignment="Center" FontSize="11" Padding="8,3" Margin="4,0,0,0" Cursor="Hand"
+                                  ToolTip="Auto-play video/audio. When off, video shows first frame.">
+                        <ToggleButton.Style>
+                            <Style TargetType="ToggleButton">
+                                <Setter Property="Content" Value="Auto Play" />
+                                <Setter Property="Foreground" Value="{DynamicResource Legacy.Brush.Fg.Body}" />
+                                <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Surface.Raised}" />
+                                <Setter Property="BorderBrush" Value="{DynamicResource Legacy.Brush.Border.Light}" />
+                                <Setter Property="BorderThickness" Value="1" />
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="ToggleButton">
+                                            <Border Background="{TemplateBinding Background}"
+                                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                                    CornerRadius="3" Padding="{TemplateBinding Padding}">
+                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                                <Style.Triggers>
+                                    <Trigger Property="IsChecked" Value="True">
+                                        <Setter Property="Content" Value="✦ Auto Play" />
+                                        <Setter Property="Foreground" Value="White" />
+                                        <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Action.Info}" />
+                                        <Setter Property="BorderBrush" Value="{DynamicResource Legacy.Brush.Action.InfoDark}" />
+                                        <Setter Property="FontWeight" Value="SemiBold" />
+                                    </Trigger>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Surface.InfoTintAlt}" />
+                                    </Trigger>
+                                    <MultiTrigger>
+                                        <MultiTrigger.Conditions>
+                                            <Condition Property="IsChecked" Value="True" />
+                                            <Condition Property="IsMouseOver" Value="True" />
+                                        </MultiTrigger.Conditions>
+                                        <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Action.InfoMid}" />
+                                    </MultiTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ToggleButton.Style>
+                    </ToggleButton>
+                </StackPanel>
+
+                <ProgressBar Height="6" Margin="0,6,0,0"
+                             IsIndeterminate="{Binding IsScanning}"
+                             Visibility="{Binding IsScanning, Converter={StaticResource BoolToVisibility}}" />
+            </StackPanel>
+
+            <!-- Row 1: Workflow Panels + Duplicate Groups List -->
+            <Grid Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <!-- Row 0: Base Filters (inline — sort + file type controls + size/dup filters) -->
+                <Border Grid.Row="0" Background="{DynamicResource Legacy.Brush.Surface.InfoWash}" CornerRadius="4" Padding="8,2" Margin="0,0,0,4"
+                        BorderBrush="{DynamicResource Legacy.Brush.Border.Accent}" BorderThickness="1"
+                        Visibility="{Binding DuplicateMatchByRegex, Converter={StaticResource InverseBoolToVisibility}}">
+                    <WrapPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <!-- Title -->
+                        <StackPanel Orientation="Horizontal" Margin="0,2,8,2" VerticalAlignment="Center">
+                            <Button Content="🔄 Use Regex"
+                                    Command="{Binding ToggleDuplicateMatchModeCommand}"
+                                    Padding="6,2" Margin="0,0,8,0" FontSize="10" Cursor="Hand"
+                                    Foreground="{DynamicResource Legacy.Brush.Warn.Fg}" BorderBrush="{DynamicResource Legacy.Brush.Warn.Border}" Background="{DynamicResource Legacy.Brush.Warn.Wash}"
+                                    ToolTip="Switch to Match by Name Regex mode (group files by regex captures from their name — files don't need to be identical)" />
+                            <TextBlock Text="Base Filters" FontWeight="Bold" FontSize="11"
+                                       Foreground="{DynamicResource Legacy.Brush.Action.Primary}" VerticalAlignment="Center" Margin="0,0,4,0" />
+                            <ToggleButton Style="{StaticResource HelpButtonStyle}"
+                                          Tag="&lt;h&gt;BASE FILTERS&lt;/h&gt;&#x0a;Quick filters to narrow down duplicate results.&#x0a;&#x0a;&lt;b&gt;Sort&lt;/b&gt; — order groups by size, count, type, or name&#x0a;&lt;b&gt;Types&lt;/b&gt; — show/hide groups by file extension&#x0a;&lt;b&gt;Min size&lt;/b&gt; — hide files smaller than threshold&#x0a;&lt;b&gt;Min dups&lt;/b&gt; — hide groups with fewer than N copies&#x0a;&#x0a;&lt;h&gt;Tip:&lt;/h&gt; These filters work instantly on the current scan results. Use &lt;b&gt;Custom Rules&lt;/b&gt; below for pattern-based selection." />
+                            <Border Width="1" Background="{DynamicResource Legacy.Brush.Border.Accent}" Margin="8,2" />
+                        </StackPanel>
+
+                        <!-- Sort + Group count -->
+                        <StackPanel Orientation="Horizontal" Margin="0,2,8,2" VerticalAlignment="Center">
+                            <TextBlock Text="Sort:" FontWeight="SemiBold" FontSize="11"
+                                       Foreground="{DynamicResource Legacy.Brush.Fg.Secondary}" VerticalAlignment="Center" Margin="0,0,4,0" />
+                            <ComboBox ItemsSource="{Binding SortOptions}"
+                                      SelectedItem="{Binding SelectedSortOption}"
+                                      Width="155" FontSize="11" VerticalContentAlignment="Center" />
+                            <Border Width="1" Background="{DynamicResource Legacy.Brush.Border.Panel}" Margin="8,2" />
+                            <TextBlock VerticalAlignment="Center" FontSize="11" Foreground="{DynamicResource Legacy.Brush.Fg.Muted}">
+                                <TextBlock.Text>
+                                    <MultiBinding StringFormat="Showing {0} of {1} groups">
+                                        <Binding Path="FilteredGroupCount" />
+                                        <Binding Path="TotalGroupCount" />
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                        </StackPanel>
+
+                        <!-- File Types -->
+                        <StackPanel Orientation="Horizontal" Margin="0,2,8,2" VerticalAlignment="Center">
+                            <Border Width="1" Background="{DynamicResource Legacy.Brush.Border.Panel}" Margin="0,2,8,2" />
+                            <TextBlock Text="Types:" FontWeight="SemiBold" FontSize="11"
+                                       Foreground="{DynamicResource Legacy.Brush.Action.Primary}" VerticalAlignment="Center" Margin="0,0,2,0" />
+                            <ToggleButton Style="{StaticResource HelpButtonStyle}"
+                                          Tag="&lt;h&gt;FILTER BY FILE TYPE&lt;/h&gt;&#x0a;Show or hide duplicate groups by their file extension.&#x0a;&#x0a;&lt;b&gt;Checked&lt;/b&gt; = shown in results&#x0a;&lt;b&gt;Unchecked&lt;/b&gt; = hidden from results&#x0a;&#x0a;&lt;h&gt;Tip:&lt;/h&gt; Use this to focus on one type at a time (e.g. only images, only documents)." />
+                            <Button Content="All"
+                                    Command="{Binding ShowAllTypesCommand}"
+                                    Padding="4,2" Margin="4,0,2,0" FontSize="10" Cursor="Hand" />
+                            <Button Content="None"
+                                    Command="{Binding ClearAllTypesCommand}"
+                                    Padding="4,2" FontSize="10" Cursor="Hand" />
+                        </StackPanel>
+
+                        <!-- Min size + Min dups + Apply -->
+                        <StackPanel Orientation="Horizontal" Margin="0,2,0,2" VerticalAlignment="Center">
+                            <Border Width="1" Background="{DynamicResource Legacy.Brush.Border.Panel}" Margin="0,2,8,2" />
+                            <TextBlock Text="Min size:" FontWeight="SemiBold" FontSize="11"
+                                       Foreground="{DynamicResource Legacy.Brush.Fg.Strong}" VerticalAlignment="Center" Margin="0,0,4,0" />
+                            <ToggleButton Style="{StaticResource HelpButtonStyle}" Margin="0,0,4,0"
+                                          Tag="&lt;h&gt;FILTER BY SIZE &amp; COUNT&lt;/h&gt;&#x0a;&#x0a;&lt;b&gt;Min file size&lt;/b&gt;&#x0a;Hide files below this threshold. Useful to skip tiny duplicates and focus on large files wasting disk space.&#x0a;&#x0a;&lt;b&gt;Min duplicates&lt;/b&gt;&#x0a;Hide groups with fewer than N copies. Default = 2. Increase to find files with many copies (e.g. 5+ scattered across folders)." />
+                            <TextBox Text="{Binding MinFileSizeText, UpdateSourceTrigger=PropertyChanged}"
+                                     Width="50" Padding="4,3" FontSize="11" VerticalContentAlignment="Center" />
+                            <ComboBox ItemsSource="{Binding SizeUnits}"
+                                      SelectedItem="{Binding SelectedSizeUnit}"
+                                      Width="50" Margin="4,0,0,0" FontSize="11"
+                                      VerticalContentAlignment="Center" />
+                            <Border Width="1" Background="{DynamicResource Legacy.Brush.Border.Panel}" Margin="8,2" />
+                            <TextBlock Text="Min dups:" FontWeight="SemiBold" FontSize="11"
+                                       Foreground="{DynamicResource Legacy.Brush.Fg.Strong}" VerticalAlignment="Center" Margin="0,0,4,0" />
+                            <TextBox Text="{Binding MinDuplicateCount, UpdateSourceTrigger=PropertyChanged}"
+                                     Width="35" Padding="4,3" FontSize="11" VerticalContentAlignment="Center" />
+                            <Button Content="Apply" Command="{Binding ApplyFileSizeFilterCommand}"
+                                    Padding="6,3" Margin="8,0,0,0" FontSize="11" Cursor="Hand" />
+                        </StackPanel>
+                    </WrapPanel>
+                </Border>
+
+                <!-- Row 0 alt: Match by Name Regex (mutually exclusive with Base Filters) -->
+                <Border Grid.Row="0" Background="{DynamicResource Legacy.Brush.Warn.Tint}" CornerRadius="4" Padding="8,2" Margin="0,0,0,4"
+                        BorderBrush="{DynamicResource Legacy.Brush.Warn.Border}" BorderThickness="1"
+                        Visibility="{Binding DuplicateMatchByRegex, Converter={StaticResource BoolToVisibility}}">
+                    <WrapPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <!-- Title -->
+                        <StackPanel Orientation="Horizontal" Margin="0,2,8,2" VerticalAlignment="Center">
+                            <Button Content="🔄 Use Base Filters"
+                                    Command="{Binding ToggleDuplicateMatchModeCommand}"
+                                    Padding="6,2" Margin="0,0,8,0" FontSize="10" Cursor="Hand"
+                                    Foreground="{DynamicResource Legacy.Brush.Action.Primary}" BorderBrush="{DynamicResource Legacy.Brush.Border.Accent}" Background="{DynamicResource Legacy.Brush.Surface.InfoWash}"
+                                    ToolTip="Switch back to Base Filters mode (size + content hash matching)" />
+                            <TextBlock Text="Match by Name Regex" FontWeight="Bold" FontSize="11"
+                                       Foreground="{DynamicResource Legacy.Brush.Warn.Fg}" VerticalAlignment="Center" Margin="0,0,4,0" />
+                            <ToggleButton Style="{StaticResource HelpButtonStyle}"
+                                          Tag="&lt;h&gt;MATCH BY NAME REGEX&lt;/h&gt;&#x0a;Group files by regex captures from their name instead of by content hash. Files do NOT need to be the same size.&#x0a;&#x0a;&lt;b&gt;How it works&lt;/b&gt;&#x0a;Each file name is matched against the regex. Files whose captured groups (or full match if no groups) are equal land in the same duplicate group.&#x0a;&#x0a;&lt;b&gt;Example&lt;/b&gt;&#x0a;Pattern: &lt;b&gt;(?i)(abc).*?(\d{7,8})&lt;/b&gt;&#x0a;Captures (abc, 12345678) from both &lt;b&gt;abc-12345678.jpg&lt;/b&gt; and &lt;b&gt;bla bla abc 12345678.png&lt;/b&gt; → grouped together.&#x0a;&#x0a;&lt;b&gt;Notes&lt;/b&gt;&#x0a;• Files not matching the pattern are skipped&#x0a;• Use &lt;b&gt;(?i)&lt;/b&gt; for case-insensitive matching&#x0a;• Switch back to Base Filters to restore size+hash matching" />
+                            <Border Width="1" Background="{DynamicResource Legacy.Brush.Warn.Border}" Margin="8,2" />
+                        </StackPanel>
+
+                        <!-- Pattern -->
+                        <StackPanel Orientation="Horizontal" Margin="0,2,0,2" VerticalAlignment="Center">
+                            <TextBlock Text="Pattern:" FontWeight="SemiBold" FontSize="11"
+                                       Foreground="{DynamicResource Legacy.Brush.Warn.Fg}" VerticalAlignment="Center" Margin="0,0,4,0" />
+                            <TextBox Text="{Binding DuplicateMatchRegex, UpdateSourceTrigger=PropertyChanged}"
+                                     Width="380" Padding="4,3" FontSize="11" VerticalContentAlignment="Center"
+                                     FontFamily="Consolas"
+                                     ToolTip="Regex applied to each file name. Use capture groups to define the match key — files with equal captures form a group. Inline flags supported (e.g. (?i) for case-insensitive)." />
+                        </StackPanel>
+                    </WrapPanel>
+                </Border>
+
+                <!-- Row 1: Extension checkboxes (visible when filters exist) -->
+                <Border Grid.Row="1" Background="{DynamicResource Legacy.Brush.Surface.InfoWashAlt}" CornerRadius="4" Padding="8,4" Margin="0,0,0,4"
+                        BorderBrush="{DynamicResource Legacy.Brush.Border.Faint}" BorderThickness="1">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Setter Property="Visibility" Value="Visible" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ExtensionFilters.Count}" Value="0">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+                    <ItemsControl ItemsSource="{Binding ExtensionFilters}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <CheckBox IsChecked="{Binding IsChecked}" Margin="0,1,12,1" Cursor="Hand">
+                                    <CheckBox.Content>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="{Binding Extension}" FontWeight="SemiBold"
+                                                       FontSize="11" Foreground="{DynamicResource Legacy.Brush.Action.Primary}" />
+                                            <TextBlock Text="{Binding FileCount, StringFormat=' ({0})'}"
+                                                       FontSize="10" Foreground="{DynamicResource Legacy.Brush.Fg.Muted}" />
+                                        </StackPanel>
+                                    </CheckBox.Content>
+                                </CheckBox>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Border>
+
+                <!-- Row 2: Custom Rule Filter (inline — rule builder + apply/clear) -->
+                <Border Grid.Row="2" Background="{DynamicResource Legacy.Brush.Help.RuleBg}" CornerRadius="4" Padding="8,2" Margin="0,0,0,4"
+                        BorderBrush="{DynamicResource Legacy.Brush.Help.RuleBorder}" BorderThickness="1">
+                    <StackPanel>
+                        <!-- Rule builder row -->
+                        <WrapPanel Orientation="Horizontal">
+                            <!-- Label -->
+                            <StackPanel Orientation="Horizontal" Margin="0,2,0,2" VerticalAlignment="Center">
+                                <TextBlock Text="Custom Rules" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource Legacy.Brush.Warn.Fg}"
+                                           VerticalAlignment="Center" Margin="0,0,4,0" />
+                                <ToggleButton Style="{StaticResource HelpButtonStyle}"
+                                              Tag="&lt;h&gt;CUSTOM FILTER RULES&lt;/h&gt;&#x0a;Build rules to find or ignore files by pattern.&#x0a;&#x0a;&lt;b&gt;Action:&lt;/b&gt; Include (check matching files) or Exclude (uncheck matching files)&#x0a;&lt;b&gt;Target:&lt;/b&gt; Filename only or full Filepath&#x0a;&lt;b&gt;Pattern:&lt;/b&gt; Text to match against&#x0a;&lt;b&gt;Regex:&lt;/b&gt; Use regular expressions&#x0a;&lt;b&gt;Ignore Case:&lt;/b&gt; Case-insensitive matching&#x0a;&#x0a;&lt;h&gt;How it works:&lt;/h&gt;&#x0a;1. Set action, target, pattern, and options&#x0a;2. Click &lt;b&gt;+ Add&lt;/b&gt; to add the rule to the list&#x0a;3. Repeat to add more rules&#x0a;4. Click &lt;b&gt;&#x25b6; Apply&lt;/b&gt; to run the rules&#x0a;&#x0a;&lt;w&gt;First match wins.&lt;/w&gt; Rules are tried top-down; the first enabled rule that matches decides the file and later rules are not applied to it. Reorder rules to change precedence." />
+                                <Border Width="1" Background="{DynamicResource Legacy.Brush.Help.Divider}" Margin="8,2" />
+                            </StackPanel>
+
+                            <!-- Rule input controls -->
+                            <StackPanel Orientation="Horizontal" Margin="0,2,0,2" VerticalAlignment="Center">
+                                <ComboBox ItemsSource="{Binding FilterActions}"
+                                          SelectedItem="{Binding RuleAction}"
+                                          Width="70" FontSize="11" VerticalContentAlignment="Center"
+                                          Margin="0,0,4,0" />
+                                <TextBlock Text="on" FontSize="10" Foreground="{DynamicResource Legacy.Brush.Fg.MutedLight}"
+                                           VerticalAlignment="Center" Margin="0,0,4,0" />
+                                <ComboBox ItemsSource="{Binding FilterTargets}"
+                                          SelectedItem="{Binding RuleTarget}"
+                                          Width="80" FontSize="11" VerticalContentAlignment="Center"
+                                          Margin="0,0,4,0" />
+                                <TextBlock Text="matching" FontSize="10" Foreground="{DynamicResource Legacy.Brush.Fg.MutedLight}"
+                                           VerticalAlignment="Center" Margin="0,0,4,0" />
+                                <TextBox Text="{Binding RulePatternText, UpdateSourceTrigger=PropertyChanged}"
+                                         Width="180" Padding="4,3" FontSize="11" VerticalContentAlignment="Center"
+                                         Margin="0,0,4,0"
+                                         helpers:TextBoxEnterKeyBehavior.Command="{Binding AddFilterRuleCommand}">
+                                    <TextBox.Style>
+                                        <Style TargetType="TextBox">
+                                            <Setter Property="BorderBrush" Value="{DynamicResource Legacy.Brush.Fg.Disabled}" />
+                                            <Setter Property="Background" Value="White" />
+                                            <Setter Property="FontFamily" Value="Segoe UI" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding RuleIsRegex}" Value="True">
+                                                    <Setter Property="BorderBrush" Value="{DynamicResource Legacy.Brush.Action.Focus}" />
+                                                    <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Surface.InfoTintAlt}" />
+                                                    <Setter Property="FontFamily" Value="Consolas" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBox.Style>
+                                </TextBox>
+                                <ToggleButton IsChecked="{Binding RuleIsRegex}"
+                                              VerticalAlignment="Center" FontSize="10" Padding="6,2" Cursor="Hand"
+                                              ToolTip="Use regular expression matching">
+                                    <ToggleButton.Style>
+                                        <Style TargetType="ToggleButton">
+                                            <Setter Property="Content" Value=".* Regex" />
+                                            <Setter Property="Foreground" Value="{DynamicResource Legacy.Brush.Fg.Body}" />
+                                            <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Surface.Raised}" />
+                                            <Setter Property="BorderBrush" Value="{DynamicResource Legacy.Brush.Border.Light}" />
+                                            <Setter Property="BorderThickness" Value="1" />
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="ToggleButton">
+                                                        <Border Background="{TemplateBinding Background}"
+                                                                BorderBrush="{TemplateBinding BorderBrush}"
+                                                                BorderThickness="{TemplateBinding BorderThickness}"
+                                                                CornerRadius="3" Padding="{TemplateBinding Padding}">
+                                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                        </Border>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                            <Style.Triggers>
+                                                <Trigger Property="IsChecked" Value="True">
+                                                    <Setter Property="Content" Value="✦ .* Regex" />
+                                                    <Setter Property="Foreground" Value="White" />
+                                                    <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Action.Primary}" />
+                                                    <Setter Property="BorderBrush" Value="{DynamicResource Legacy.Brush.Action.PrimaryDark}" />
+                                                    <Setter Property="FontWeight" Value="SemiBold" />
+                                                </Trigger>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Surface.InfoTint}" />
+                                                </Trigger>
+                                                <MultiTrigger>
+                                                    <MultiTrigger.Conditions>
+                                                        <Condition Property="IsChecked" Value="True" />
+                                                        <Condition Property="IsMouseOver" Value="True" />
+                                                    </MultiTrigger.Conditions>
+                                                    <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Action.PrimaryMid}" />
+                                                </MultiTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ToggleButton.Style>
+                                </ToggleButton>
+                                <ToggleButton Style="{StaticResource HelpButtonStyle}" Margin="2,0,0,0"
+                                              Tag="&lt;h&gt;REGEX (Regular Expression)&lt;/h&gt;&#x0a;Advanced pattern matching using special symbols.&#x0a;&#x0a;&lt;b&gt;OFF&lt;/b&gt; = plain text search (matches exact text)&#x0a;&lt;b&gt;ON&lt;/b&gt; = regex mode (matches patterns)&#x0a;&#x0a;&lt;h&gt;Common patterns:&lt;/h&gt;&#x0a;&lt;b&gt;.&lt;/b&gt; = any single character&#x0a;&lt;b&gt;*&lt;/b&gt; = repeat previous (zero or more)&#x0a;&lt;b&gt;.*&lt;/b&gt; = match anything&#x0a;&lt;b&gt;^&lt;/b&gt; = start of text&#x0a;&lt;b&gt;$&lt;/b&gt; = end of text&#x0a;&lt;b&gt;[abc]&lt;/b&gt; = any of a, b, or c&#x0a;&lt;b&gt;\d&lt;/b&gt; = any digit (0-9)&#x0a;&#x0a;&lt;h&gt;Examples:&lt;/h&gt;&#x0a;&lt;b&gt;IMG_\d+&lt;/b&gt; matches IMG_001, IMG_9999&#x0a;&lt;b&gt;^backup&lt;/b&gt; matches files starting with &quot;backup&quot;&#x0a;&lt;b&gt;\.(jpg|png)$&lt;/b&gt; matches .jpg or .png endings&#x0a;&#x0a;&lt;w&gt;Leave OFF if unsure — plain text works for most cases.&lt;/w&gt;&#x0a;&#x0a;📖 &lt;link=https://regex101.com&gt;regex101.com — test &amp; learn regex interactively&lt;/link&gt;" />
+                                <ToggleButton IsChecked="{Binding RuleIgnoreCase}"
+                                              VerticalAlignment="Center" FontSize="10" Padding="6,2" Margin="4,0,0,0" Cursor="Hand"
+                                              ToolTip="Ignore case when matching">
+                                    <ToggleButton.Style>
+                                        <Style TargetType="ToggleButton">
+                                            <Setter Property="Content" Value="Aa" />
+                                            <Setter Property="Foreground" Value="{DynamicResource Legacy.Brush.Fg.Body}" />
+                                            <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Surface.Raised}" />
+                                            <Setter Property="BorderBrush" Value="{DynamicResource Legacy.Brush.Border.Light}" />
+                                            <Setter Property="BorderThickness" Value="1" />
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="ToggleButton">
+                                                        <Border Background="{TemplateBinding Background}"
+                                                                BorderBrush="{TemplateBinding BorderBrush}"
+                                                                BorderThickness="{TemplateBinding BorderThickness}"
+                                                                CornerRadius="3" Padding="{TemplateBinding Padding}">
+                                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                        </Border>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                            <Style.Triggers>
+                                                <Trigger Property="IsChecked" Value="True">
+                                                    <Setter Property="Content" Value="✦ Aa" />
+                                                    <Setter Property="Foreground" Value="White" />
+                                                    <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Warn.Fg}" />
+                                                    <Setter Property="BorderBrush" Value="{DynamicResource Legacy.Brush.Danger.Dark}" />
+                                                    <Setter Property="FontWeight" Value="SemiBold" />
+                                                </Trigger>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Warn.Tint}" />
+                                                </Trigger>
+                                                <MultiTrigger>
+                                                    <MultiTrigger.Conditions>
+                                                        <Condition Property="IsChecked" Value="True" />
+                                                        <Condition Property="IsMouseOver" Value="True" />
+                                                    </MultiTrigger.Conditions>
+                                                    <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Danger.Strong}" />
+                                                </MultiTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ToggleButton.Style>
+                                </ToggleButton>
+                                <ToggleButton Style="{StaticResource HelpButtonStyle}" Margin="2,0,0,0"
+                                              Tag="&lt;h&gt;IGNORE CASE&lt;/h&gt;&#x0a;Controls whether uppercase and lowercase letters are treated the same.&#x0a;&#x0a;&lt;b&gt;ON (default)&lt;/b&gt; = &quot;Photo&quot; matches &quot;photo&quot;, &quot;PHOTO&quot;, &quot;Photo&quot;&#x0a;&lt;b&gt;OFF&lt;/b&gt; = &quot;Photo&quot; only matches exactly &quot;Photo&quot;&#x0a;&#x0a;&lt;h&gt;When to turn OFF:&lt;/h&gt;&#x0a;When you need to distinguish between files like:&#x0a;  &lt;b&gt;README.md&lt;/b&gt; vs &lt;b&gt;readme.md&lt;/b&gt;&#x0a;  &lt;b&gt;Config.xml&lt;/b&gt; vs &lt;b&gt;config.xml&lt;/b&gt;&#x0a;&#x0a;&lt;h&gt;Tip:&lt;/h&gt; Leave ON for most cases — Windows filenames are case-insensitive anyway." />
+
+                                <Button Content="+ Add" Command="{Binding AddFilterRuleCommand}"
+                                        Padding="8,3" Margin="4,0,0,0" FontSize="11" Cursor="Hand"
+                                        FontWeight="SemiBold" Foreground="{DynamicResource Legacy.Brush.Success.FgDark}"
+                                        ToolTip="Add this rule to the list" />
+                                <Border Width="1" Background="{DynamicResource Legacy.Brush.Help.Divider}" Margin="8,2" />
+                            </StackPanel>
+
+                            <!-- All / None | Apply -->
+                            <StackPanel Orientation="Horizontal" Margin="0,2,0,2" VerticalAlignment="Center">
+                                <Button Content="✓ All" Command="{Binding EnableAllRulesCommand}"
+                                        Padding="6,3" FontSize="11" Cursor="Hand"
+                                        Foreground="{DynamicResource Legacy.Brush.Success.FgDark}"
+                                        ToolTip="Enable all rules" />
+                                <Button Content="✕ None" Command="{Binding DisableAllRulesCommand}"
+                                        Padding="6,3" Margin="4,0,0,0" FontSize="11" Cursor="Hand"
+                                        Foreground="{DynamicResource Legacy.Brush.Fg.Muted}"
+                                        ToolTip="Disable all rules" />
+                                <Border Width="1" Background="{DynamicResource Legacy.Brush.Help.Divider}" Margin="8,2" />
+                                <Button Content="▶ Apply" Command="{Binding ApplyFilterRulesCommand}"
+                                        Padding="6,3" FontSize="11" Cursor="Hand"
+                                        FontWeight="SemiBold" Foreground="{DynamicResource Legacy.Brush.Action.Primary}"
+                                        ToolTip="Apply all enabled rules" />
+                            </StackPanel>
+                        </WrapPanel>
+
+                        <!-- Rules list (horizontal chips) — only visible when rules exist -->
+                        <ItemsControl ItemsSource="{Binding FilterRules}" Margin="0,4,0,0">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel Orientation="Horizontal" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Margin="0,0,6,4" Padding="6,3" CornerRadius="4">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Surface.InfoTint}" />
+                                                <Setter Property="BorderBrush" Value="{DynamicResource Legacy.Brush.Action.Focus}" />
+                                                <Setter Property="BorderThickness" Value="1" />
+                                                <Setter Property="Opacity" Value="1" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Action}" Value="Exclude">
+                                                        <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Surface.InfoTintAlt}" />
+                                                        <Setter Property="BorderBrush" Value="{DynamicResource Legacy.Brush.Action.InfoLight}" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding IsEnabled}" Value="False">
+                                                        <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Surface.Sunken}" />
+                                                        <Setter Property="BorderBrush" Value="{DynamicResource Legacy.Brush.Border.Panel}" />
+                                                        <Setter Property="Opacity" Value="0.6" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                        <StackPanel Orientation="Horizontal">
+                                            <!-- Enable/disable checkbox -->
+                                            <CheckBox IsChecked="{Binding IsEnabled}" VerticalAlignment="Center"
+                                                      Margin="0,0,4,0" Cursor="Hand"
+                                                      ToolTip="Enable or disable this rule temporarily" />
+                                            <!-- Priority number -->
+                                            <Border CornerRadius="3" Padding="5,1" Margin="0,0,4,0"
+                                                    VerticalAlignment="Center" Width="20">
+                                                <Border.Style>
+                                                    <Style TargetType="Border">
+                                                        <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Fg.StrongAlt}" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsEnabled}" Value="False">
+                                                                <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Border.MidAlt}" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Border.Style>
+                                                <TextBlock Text="{Binding Priority}" FontSize="9" FontWeight="Bold"
+                                                           Foreground="{DynamicResource Legacy.Brush.Surface.White}" HorizontalAlignment="Center" />
+                                            </Border>
+                                            <!-- Move up/down -->
+                                            <StackPanel Orientation="Horizontal" Margin="0,0,4,0" VerticalAlignment="Center">
+                                                <Button Command="{Binding DataContext.MoveFilterRuleUpCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                        CommandParameter="{Binding}" Cursor="Hand" ToolTip="Move up (higher priority)">
+                                                    <Button.Template>
+                                                        <ControlTemplate TargetType="Button">
+                                                            <Border x:Name="UpBorder" Background="{DynamicResource Legacy.Brush.Border.Default}" CornerRadius="2,0,0,2"
+                                                                    Padding="3,1" BorderThickness="0">
+                                                                <TextBlock Text="▲" FontSize="8" Foreground="{DynamicResource Legacy.Brush.Fg.Body}"
+                                                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                            </Border>
+                                                            <ControlTemplate.Triggers>
+                                                                <Trigger Property="IsMouseOver" Value="True">
+                                                                    <Setter TargetName="UpBorder" Property="Background" Value="{DynamicResource Legacy.Brush.Action.Primary}" />
+                                                                </Trigger>
+                                                            </ControlTemplate.Triggers>
+                                                        </ControlTemplate>
+                                                    </Button.Template>
+                                                </Button>
+                                                <Button Command="{Binding DataContext.MoveFilterRuleDownCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                        CommandParameter="{Binding}" Cursor="Hand" ToolTip="Move down (lower priority)">
+                                                    <Button.Template>
+                                                        <ControlTemplate TargetType="Button">
+                                                            <Border x:Name="DownBorder" Background="{DynamicResource Legacy.Brush.Border.Default}" CornerRadius="0,2,2,0"
+                                                                    Padding="3,1" BorderThickness="0">
+                                                                <TextBlock Text="▼" FontSize="8" Foreground="{DynamicResource Legacy.Brush.Fg.Body}"
+                                                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                            </Border>
+                                                            <ControlTemplate.Triggers>
+                                                                <Trigger Property="IsMouseOver" Value="True">
+                                                                    <Setter TargetName="DownBorder" Property="Background" Value="{DynamicResource Legacy.Brush.Action.Primary}" />
+                                                                </Trigger>
+                                                            </ControlTemplate.Triggers>
+                                                        </ControlTemplate>
+                                                    </Button.Template>
+                                                </Button>
+                                            </StackPanel>
+                                            <!-- Action dropdown -->
+                                            <ComboBox ItemsSource="{Binding DataContext.FilterActions, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                      SelectedItem="{Binding Action}"
+                                                      FontSize="9" Width="70" VerticalContentAlignment="Center"
+                                                      Margin="0,0,4,0" />
+                                            <!-- Target dropdown -->
+                                            <ComboBox ItemsSource="{Binding DataContext.FilterTargets, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                      SelectedItem="{Binding Target}"
+                                                      FontSize="9" Width="72" VerticalContentAlignment="Center"
+                                                      Margin="0,0,4,0" />
+                                            <!-- Editable pattern text -->
+                                            <TextBox Text="{Binding Pattern, UpdateSourceTrigger=LostFocus}"
+                                                     MinWidth="80" MaxWidth="200" Padding="4,2" FontSize="11"
+                                                     FontWeight="SemiBold" VerticalContentAlignment="Center"
+                                                     BorderThickness="0,0,0,1.5" BorderBrush="{DynamicResource Legacy.Brush.Action.Focus}"
+                                                     Background="Transparent" Margin="0,0,2,0"
+                                                     ToolTip="Click to edit pattern" />
+                                            <!-- Regex toggle button (same style as toolbar) -->
+                                            <ToggleButton IsChecked="{Binding IsRegex}"
+                                                          VerticalAlignment="Center" FontSize="9" Padding="4,1" Margin="4,0,0,0" Cursor="Hand"
+                                                          ToolTip="Toggle regex matching">
+                                                <ToggleButton.Style>
+                                                    <Style TargetType="ToggleButton">
+                                                        <Setter Property="Content" Value=".*" />
+                                                        <Setter Property="Foreground" Value="{DynamicResource Legacy.Brush.Fg.MutedLight}" />
+                                                        <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Border.Hairline}" />
+                                                        <Setter Property="BorderBrush" Value="{DynamicResource Legacy.Brush.Border.Panel}" />
+                                                        <Setter Property="BorderThickness" Value="1" />
+                                                        <Setter Property="FontFamily" Value="Consolas" />
+                                                        <Setter Property="Template">
+                                                            <Setter.Value>
+                                                                <ControlTemplate TargetType="ToggleButton">
+                                                                    <Border Background="{TemplateBinding Background}"
+                                                                            BorderBrush="{TemplateBinding BorderBrush}"
+                                                                            BorderThickness="{TemplateBinding BorderThickness}"
+                                                                            CornerRadius="3" Padding="{TemplateBinding Padding}">
+                                                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                                    </Border>
+                                                                </ControlTemplate>
+                                                            </Setter.Value>
+                                                        </Setter>
+                                                        <Style.Triggers>
+                                                            <Trigger Property="IsChecked" Value="True">
+                                                                <Setter Property="Content" Value="✦ .*" />
+                                                                <Setter Property="Foreground" Value="White" />
+                                                                <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Action.Primary}" />
+                                                                <Setter Property="BorderBrush" Value="{DynamicResource Legacy.Brush.Action.PrimaryDark}" />
+                                                                <Setter Property="FontWeight" Value="SemiBold" />
+                                                            </Trigger>
+                                                            <Trigger Property="IsMouseOver" Value="True">
+                                                                <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Surface.InfoTint}" />
+                                                            </Trigger>
+                                                            <MultiTrigger>
+                                                                <MultiTrigger.Conditions>
+                                                                    <Condition Property="IsChecked" Value="True" />
+                                                                    <Condition Property="IsMouseOver" Value="True" />
+                                                                </MultiTrigger.Conditions>
+                                                                <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Action.PrimaryMid}" />
+                                                            </MultiTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </ToggleButton.Style>
+                                            </ToggleButton>
+                                            <!-- IgnoreCase toggle button (same style as toolbar) -->
+                                            <ToggleButton IsChecked="{Binding IgnoreCase}"
+                                                          VerticalAlignment="Center" FontSize="9" Padding="4,1" Margin="2,0,4,0" Cursor="Hand"
+                                                          ToolTip="Toggle case-insensitive matching">
+                                                <ToggleButton.Style>
+                                                    <Style TargetType="ToggleButton">
+                                                        <Setter Property="Content" Value="Aa" />
+                                                        <Setter Property="Foreground" Value="{DynamicResource Legacy.Brush.Fg.MutedLight}" />
+                                                        <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Border.Hairline}" />
+                                                        <Setter Property="BorderBrush" Value="{DynamicResource Legacy.Brush.Border.Panel}" />
+                                                        <Setter Property="BorderThickness" Value="1" />
+                                                        <Setter Property="FontFamily" Value="Consolas" />
+                                                        <Setter Property="Template">
+                                                            <Setter.Value>
+                                                                <ControlTemplate TargetType="ToggleButton">
+                                                                    <Border Background="{TemplateBinding Background}"
+                                                                            BorderBrush="{TemplateBinding BorderBrush}"
+                                                                            BorderThickness="{TemplateBinding BorderThickness}"
+                                                                            CornerRadius="3" Padding="{TemplateBinding Padding}">
+                                                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                                    </Border>
+                                                                </ControlTemplate>
+                                                            </Setter.Value>
+                                                        </Setter>
+                                                        <Style.Triggers>
+                                                            <Trigger Property="IsChecked" Value="True">
+                                                                <Setter Property="Content" Value="✦ Aa" />
+                                                                <Setter Property="Foreground" Value="White" />
+                                                                <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Warn.Fg}" />
+                                                                <Setter Property="BorderBrush" Value="{DynamicResource Legacy.Brush.Danger.Dark}" />
+                                                                <Setter Property="FontWeight" Value="SemiBold" />
+                                                            </Trigger>
+                                                            <Trigger Property="IsMouseOver" Value="True">
+                                                                <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Warn.Tint}" />
+                                                            </Trigger>
+                                                            <MultiTrigger>
+                                                                <MultiTrigger.Conditions>
+                                                                    <Condition Property="IsChecked" Value="True" />
+                                                                    <Condition Property="IsMouseOver" Value="True" />
+                                                                </MultiTrigger.Conditions>
+                                                                <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Danger.Strong}" />
+                                                            </MultiTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </ToggleButton.Style>
+                                            </ToggleButton>
+                                            <!-- Remove button -->
+                                            <Button Command="{Binding DataContext.RemoveFilterRuleCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    CommandParameter="{Binding}"
+                                                    Cursor="Hand" VerticalAlignment="Center" Margin="2,0,0,0"
+                                                    ToolTip="Remove this rule">
+                                                <Button.Template>
+                                                    <ControlTemplate TargetType="Button">
+                                                        <Border x:Name="RemoveBorder" Width="16" Height="16" CornerRadius="8"
+                                                                Background="{DynamicResource Legacy.Brush.Border.Default}" BorderThickness="0">
+                                                            <TextBlock x:Name="RemoveText" Text="✕" FontSize="9" FontWeight="Bold"
+                                                                       Foreground="{DynamicResource Legacy.Brush.Fg.SecondaryAlt}"
+                                                                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                                       Margin="0,-1,0,0" />
+                                                        </Border>
+                                                        <ControlTemplate.Triggers>
+                                                            <Trigger Property="IsMouseOver" Value="True">
+                                                                <Setter TargetName="RemoveBorder" Property="Background" Value="{DynamicResource Legacy.Brush.Danger.Mid}" />
+                                                                <Setter TargetName="RemoveText" Property="Foreground" Value="White" />
+                                                            </Trigger>
+                                                        </ControlTemplate.Triggers>
+                                                    </ControlTemplate>
+                                                </Button.Template>
+                                            </Button>
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+
+                <!-- Action Section (inline) -->
+                <Border Grid.Row="3" Background="{DynamicResource Legacy.Brush.Warn.Tint}" CornerRadius="4" Padding="8,2" Margin="0,0,0,4">
+                    <WrapPanel Orientation="Horizontal">
+                        <!-- Label + count -->
+                        <StackPanel Orientation="Horizontal" Margin="0,2,0,2" VerticalAlignment="Center">
+                            <TextBlock Text="Action" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource Legacy.Brush.Warn.Fg}"
+                                       VerticalAlignment="Center" Margin="0,0,4,0" />
+                            <ToggleButton Style="{StaticResource HelpButtonStyle}"
+                                          Tag="&lt;h&gt;TAKE ACTION on selected files&lt;/h&gt;&#x0a;&#x0a;&lt;b&gt;Delete&lt;/b&gt;&#x0a;Sends checked files to the Recycle Bin.&#x0a;Undo from the History tab restores them, unless the Recycle Bin has been emptied.&#x0a;&#x0a;&lt;b&gt;Move&lt;/b&gt;&#x0a;Relocates checked files to the target folder.&#x0a;Filenames are preserved. Original files are removed.&#x0a;&#x0a;&lt;w&gt;Both actions affect ALL checked files across ALL groups.&lt;/w&gt; Double-check your selection before proceeding." />
+                            <TextBlock FontSize="10" Foreground="{DynamicResource Legacy.Brush.Fg.Body}" Margin="8,0,0,0"
+                                       VerticalAlignment="Center">
+                                <TextBlock.Text>
+                                    <Binding Path="SelectedFileCount" StringFormat="{}{0} files selected" />
+                                </TextBlock.Text>
+                            </TextBlock>
+                            <Border Width="1" Background="{DynamicResource Legacy.Brush.Help.Divider}" Margin="8,2" />
+                        </StackPanel>
+
+                        <!-- Quick Select buttons -->
+                        <StackPanel Orientation="Horizontal" Margin="0,2,0,2" VerticalAlignment="Center">
+                            <Button Content="✓ All" Command="{Binding SelectAllFilesCommand}"
+                                    Padding="6,3" Margin="0,0,4,0" FontSize="11" Cursor="Hand"
+                                    ToolTip="Select all files in all groups" />
+                            <Button Content="✓ Newer" Command="{Binding SelectNewerFilesCommand}"
+                                    Padding="6,3" Margin="0,0,4,0" FontSize="11" Cursor="Hand"
+                                    ToolTip="Select newer duplicates (keep oldest unselected)" />
+                            <Button Content="✓ Older" Command="{Binding SelectOlderFilesCommand}"
+                                    Padding="6,3" Margin="0,0,4,0" FontSize="11" Cursor="Hand"
+                                    ToolTip="Select older duplicates (keep newest unselected)" />
+                            <Button Content="✕ Clear" Command="{Binding ClearFileSelectionCommand}"
+                                    Padding="6,3" FontSize="11" Cursor="Hand"
+                                    Foreground="{DynamicResource Legacy.Brush.Fg.Muted}"
+                                    ToolTip="Clear all file selections" />
+                            <Border Width="1" Background="{DynamicResource Legacy.Brush.Help.Divider}" Margin="8,2" />
+                        </StackPanel>
+
+                        <!-- Delete / Move -->
+                        <StackPanel Orientation="Horizontal" Margin="0,2,0,2" VerticalAlignment="Center">
+                            <Button Content="🗑 Delete" Command="{Binding DeleteSelectedFilesCommand}"
+                                    Padding="6,3" Margin="0,0,0,0" FontSize="11" Cursor="Hand"
+                                    Foreground="{DynamicResource Legacy.Brush.Danger.Fg}"
+                                    ToolTip="Send selected files to Recycle Bin" />
+                            <Button Content="↶" Command="{Binding UndoLastActionCommand}"
+                                    ToolTip="{Binding UndoTooltip}"
+                                    Padding="6,3" Margin="4,0,0,0" FontSize="13" Cursor="Hand"
+                                    FontWeight="Bold" Foreground="{DynamicResource Legacy.Brush.Success.Fg}" />
+                            <Border Width="1" Background="{DynamicResource Legacy.Brush.Help.Divider}" Margin="8,2" />
+                            <TextBlock Text="Move to:" FontSize="11" FontWeight="SemiBold"
+                                       VerticalAlignment="Center" Foreground="{DynamicResource Legacy.Brush.Warn.Fg}" Margin="0,0,4,0" />
+                            <TextBox Text="{Binding MoveTargetPath, UpdateSourceTrigger=PropertyChanged}"
+                                     Width="200" Padding="4,3" FontSize="11" VerticalContentAlignment="Center" />
+                            <Button Content="..." Command="{Binding BrowseMoveTargetCommand}"
+                                    Padding="6,3" Margin="4,0,4,0" FontSize="11" Cursor="Hand"
+                                    ToolTip="Browse for target folder" />
+                            <Button Content="📁 Move" Command="{Binding MoveSelectedFilesCommand}"
+                                    Padding="6,3" FontSize="11" Cursor="Hand"
+                                    Foreground="{DynamicResource Legacy.Brush.Action.Primary}"
+                                    ToolTip="Move all selected files to the target folder" />
+                            <Button Content="↶" Command="{Binding UndoLastActionCommand}"
+                                    ToolTip="{Binding UndoTooltip}"
+                                    Padding="6,3" Margin="4,0,0,0" FontSize="13" Cursor="Hand"
+                                    FontWeight="Bold" Foreground="{DynamicResource Legacy.Brush.Success.Fg}" />
+                        </StackPanel>
+                    </WrapPanel>
+                </Border>
+
+                <GroupBox Grid.Row="4" Header="Duplicate Groups" Padding="4">
+                <ListView x:Name="DuplicateGroupsList"
+                          ItemsSource="{Binding FilteredDuplicateGroups}"
+                          SelectedItem="{Binding SelectedDuplicateGroup}"
+                          SelectionMode="Extended"
+                          SelectionChanged="DuplicateGroups_SelectionChanged"
+                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                          VirtualizingPanel.IsVirtualizing="True"
+                          VirtualizingPanel.VirtualizationMode="Recycling"
+                          VirtualizingPanel.ScrollUnit="Pixel"
+                          ScrollViewer.CanContentScroll="True">
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Border BorderBrush="{DynamicResource Legacy.Brush.Border.Subtle}" BorderThickness="0,0,0,1"
+                                    Padding="4,8" Margin="0,0,0,4">
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                        <TextBlock FontWeight="SemiBold"
+                                                   Text="{Binding Count, StringFormat='{}{0} files'}" />
+                                        <TextBlock Text=" — " Foreground="{DynamicResource Legacy.Brush.Fg.Gray}" />
+                                        <TextBlock Text="{Binding FormattedFileSize}" Foreground="{DynamicResource Legacy.Brush.Action.Primary}" />
+                                        <TextBlock Text=" each — " Foreground="{DynamicResource Legacy.Brush.Fg.Gray}" />
+                                        <TextBlock Text="{Binding FormattedWastedSize, StringFormat='wasted: {0}'}"
+                                                   Foreground="{DynamicResource Legacy.Brush.Danger.Fg}" FontWeight="SemiBold" />
+                                        <Button Content="✓ Select All"
+                                                Command="{Binding DataContext.SelectAllInGroupCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                CommandParameter="{Binding}"
+                                                Padding="6,2" Margin="12,0,4,0"
+                                                FontSize="11" Cursor="Hand"
+                                                Foreground="{DynamicResource Legacy.Brush.Success.FgDark}" />
+                                        <Button Content="✕ Clear"
+                                                Command="{Binding DataContext.ClearSelectionInGroupCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                CommandParameter="{Binding}"
+                                                Padding="6,2" Margin="0,0,4,0"
+                                                FontSize="11" Cursor="Hand"
+                                                Foreground="{DynamicResource Legacy.Brush.Fg.Muted}" />
+                                        <Button Content="{Binding DeleteAllLabel}"
+                                                Command="{Binding DataContext.DeleteAllInGroupCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                CommandParameter="{Binding}"
+                                                Padding="6,2" Margin="4,0,0,0"
+                                                FontSize="11" Cursor="Hand"
+                                                Foreground="{DynamicResource Legacy.Brush.Danger.Fg}" FontWeight="SemiBold" />
+                                    </StackPanel>
+
+                                    <!-- Mini Inline Preview -->
+                                    <Border Margin="16,2,0,6" Padding="6" CornerRadius="4"
+                                            Background="{DynamicResource Legacy.Brush.Surface.Cool}" BorderBrush="{DynamicResource Legacy.Brush.Border.Faint}" BorderThickness="1"
+                                            HorizontalAlignment="Left"
+                                            Visibility="{Binding DataContext.IsMiniPreview, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisibility}}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <!-- Image thumbnail -->
+                                            <Image x:Name="ThumbImg"
+                                                   Source="{Binding FirstFilePath, Converter={StaticResource MiniPreview}}"
+                                                   Width="60" Height="60" Stretch="Uniform"
+                                                   RenderOptions.BitmapScalingMode="LowQuality"
+                                                   Margin="0,0,8,0">
+                                                <Image.Style>
+                                                    <Style TargetType="Image">
+                                                        <Setter Property="Visibility" Value="Visible" />
+                                                        <Style.Triggers>
+                                                            <Trigger Property="Source" Value="{x:Null}">
+                                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                            </Trigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Image.Style>
+                                            </Image>
+                                            <!-- File type icon (only when no thumbnail) -->
+                                            <TextBlock Text="{Binding FirstFilePath, Converter={StaticResource FileTypeIcon}}"
+                                                       FontSize="32" VerticalAlignment="Center" Margin="0,0,8,0">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding Source, ElementName=ThumbImg}" Value="{x:Null}">
+                                                                <Setter Property="Visibility" Value="Visible" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                            <StackPanel VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding FirstFileName}" FontSize="11" FontWeight="SemiBold"
+                                                           TextTrimming="CharacterEllipsis" MaxWidth="300" />
+                                                <TextBlock Text="{Binding FileExtension}" FontSize="10" Foreground="{DynamicResource Legacy.Brush.Action.Primary}" />
+                                                <TextBlock Text="{Binding FormattedFileSize}" FontSize="10" Foreground="{DynamicResource Legacy.Brush.Fg.Muted}" />
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <ItemsControl ItemsSource="{Binding Files}" Margin="16,0,0,0">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid Margin="0,2">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                                        <CheckBox IsChecked="{Binding IsFileSelected}"
+                                                                  VerticalAlignment="Center" Margin="0,0,4,0" />
+                                                        <Button Content="📂 Open"
+                                                                Command="{Binding DataContext.OpenFileLocationCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                                CommandParameter="{Binding FilePath}"
+                                                                Padding="6,2" Margin="0,0,4,0"
+                                                                FontSize="11" Cursor="Hand"
+                                                                ToolTip="Open this file's folder in Explorer" />
+                                                        <Button Content="👁 Preview"
+                                                                Command="{Binding DataContext.PreviewFileCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                                CommandParameter="{Binding FilePath}"
+                                                                Padding="6,2" Margin="0,0,4,0"
+                                                                FontSize="11" Cursor="Hand"
+                                                                Foreground="{DynamicResource Legacy.Brush.Action.Primary}"
+                                                                ToolTip="Show this file in the File Preview panel" />
+                                                        <Button Content="🗑 Delete"
+                                                                Command="{Binding DataContext.DeleteFileCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                                CommandParameter="{Binding}"
+                                                                Padding="6,2" Margin="0,0,8,0"
+                                                                FontSize="11" Cursor="Hand"
+                                                                Foreground="{DynamicResource Legacy.Brush.Danger.Fg}"
+                                                                ToolTip="Move this file to the Recycle Bin" />
+                                                    </StackPanel>
+                                                    <TextBlock Grid.Column="1" Text="{Binding FilePath}"
+                                                               Foreground="{DynamicResource Legacy.Brush.Fg.Strong}" FontSize="12"
+                                                               VerticalAlignment="Center"
+                                                               TextTrimming="CharacterEllipsis"
+                                                               ToolTip="{Binding FilePath}" />
+                                                    <TextBlock Grid.Column="2" Text="{Binding FormattedSize}"
+                                                               Foreground="{DynamicResource Legacy.Brush.Action.Primary}" FontSize="11" FontWeight="SemiBold"
+                                                               VerticalAlignment="Center"
+                                                               Margin="12,0,4,0"
+                                                               MinWidth="60" TextAlignment="Right"
+                                                               ToolTip="File size on disk" />
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </GroupBox>
+            </Grid>
+
+            <!-- Row 2: Status Bar + Resource Monitor -->
+            <Border Grid.Row="2" Background="{DynamicResource Legacy.Brush.Surface.Raised}" Padding="8,4" Margin="0,8,0,0"
+                    CornerRadius="4">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{Binding StatusMessage}" Foreground="{DynamicResource Legacy.Brush.Fg.Secondary}" VerticalAlignment="Center" />
+                    <StackPanel Grid.Column="1" Orientation="Horizontal">
+                        <TextBlock Text="{Binding ResourceMemory}" Foreground="{DynamicResource Legacy.Brush.Action.Primary}" FontSize="11" Margin="0,0,12,0" VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding ResourceCpu}" Foreground="{DynamicResource Legacy.Brush.Warn.Fg}" FontSize="11" Margin="0,0,12,0" VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding ResourceThreads}" Foreground="{DynamicResource Legacy.Brush.Fg.Secondary}" FontSize="11" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+
+    </Grid>
+</UserControl>
