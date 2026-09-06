@@ -1,0 +1,18 @@
+<!--
+    T-002 aggregator - the single App.xaml merge entry this task is allowed.
+
+    T-001 publishes the rule: a task may author as many FAMILY files as it likes, but it appends
+    EXACTLY ONE entry to App.xaml, an aggregator that merges its own families. T-002 authors two
+    families (the converter instances and HelpButtonStyle, both lifted out of MainWindow.xaml when
+    Window.Resources was retired), so they are merged here rather than spliced separately into
+    App.xaml.
+
+    Order within an aggregator does not matter here - neither family references the other.
+-->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="Converters.xaml" />
+        <ResourceDictionary Source="Legacy.HelpButton.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+</ResourceDictionary>

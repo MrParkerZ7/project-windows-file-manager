@@ -210,10 +210,14 @@ public class DesignTokenContractTests
             .Where(s => s is not null)
             .ToList();
 
+        // Grows by exactly ONE entry per task: T-001 published the token layer's three, T-002
+        // appended a single aggregator for the two families it lifted out of Window.Resources.
+        // A task splicing several entries in here is the deviation this assertion exists to catch.
         sources.Should().Equal(
             "Themes/Broadsheet.Tokens.xaml",
             "Themes/Legacy.Palette.xaml",
-            "Themes/Legacy.Metrics.xaml");
+            "Themes/Legacy.Metrics.xaml",
+            "Themes/Legacy.Shell.xaml");
     }
 
     /// <summary>8. The legacy layer is transitional and its retirement is owned. Once no view

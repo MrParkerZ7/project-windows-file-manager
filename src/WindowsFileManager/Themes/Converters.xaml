@@ -1,20 +1,20 @@
-<!--
-    Converter instances, lifted out of MainWindow.xaml by T-002.
-
-    They MUST live at Application scope, not on the Window. StaticResource resolves at PARSE
-    time by walking the element tree being parsed, then Application.Resources. A UserControl is
-    parsed as its own root and is not yet attached to the Window, so the moment a
-    {StaticResource BoolToVisibility} leaves MainWindow.xaml it throws
-    XamlParseException: Cannot find resource named ... . Application scope is a precondition of
-    the decomposition compiling at all, not a preference.
--->
-<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:helpers="clr-namespace:WindowsFileManager.Helpers">
-        <helpers:BoolToVisibilityConverter x:Key="BoolToVisibility" />
-        <helpers:InverseBoolConverter x:Key="InverseBool" />
-        <helpers:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibility" />
-        <helpers:MiniPreviewConverter x:Key="MiniPreview" />
-        <helpers:FileTypeIconConverter x:Key="FileTypeIcon" />
-
-</ResourceDictionary>
+<!--
+    Converter instances, lifted out of MainWindow.xaml by T-002.
+
+    They MUST live at Application scope, not on the Window. StaticResource resolves at PARSE
+    time by walking the element tree being parsed, then Application.Resources. A UserControl is
+    parsed as its own root and is not yet attached to the Window, so the moment a
+    {StaticResource BoolToVisibility} leaves MainWindow.xaml it throws
+    XamlParseException: Cannot find resource named ... . Application scope is a precondition of
+    the decomposition compiling at all, not a preference.
+-->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:helpers="clr-namespace:WindowsFileManager.Helpers">
+        <helpers:BoolToVisibilityConverter x:Key="BoolToVisibility" />
+        <helpers:InverseBoolConverter x:Key="InverseBool" />
+        <helpers:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibility" />
+        <helpers:MiniPreviewConverter x:Key="MiniPreview" />
+        <helpers:FileTypeIconConverter x:Key="FileTypeIcon" />
+
+</ResourceDictionary>

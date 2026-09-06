@@ -30,12 +30,11 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Themes/Broadsheet.Tokens.xaml" />
                 <ResourceDictionary Source="Themes/Legacy.Palette.xaml" />
-                <ResourceDictionary Source="Themes/Legacy.Metrics.xaml" />
-                <!-- T-002: lifted out of MainWindow.xaml. StaticResource resolves at PARSE time
-                     and a UserControl is parsed as its own root, so these must be app-scoped or
-                     the decomposed controls cannot find them. -->
-                <ResourceDictionary Source="Themes/Converters.xaml" />
-                <ResourceDictionary Source="Themes/Legacy.HelpButton.xaml" />
+                <ResourceDictionary Source="Themes/Legacy.Metrics.xaml" />
+                <!-- T-002: lifted out of MainWindow.xaml. StaticResource resolves at PARSE time
+                     and a UserControl is parsed as its own root, so these must be app-scoped or
+                     the decomposed controls cannot find them. -->
+                <ResourceDictionary Source="Themes/Legacy.Shell.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>
