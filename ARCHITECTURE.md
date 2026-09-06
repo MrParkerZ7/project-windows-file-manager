@@ -55,7 +55,7 @@ composition root (see [§4](#4-request-flow--a-duplicate-scan-from-click-to-resu
 | `WindowsFileManager.Core` | `src/WindowsFileManager.Core/` | Plain models (`ScannedFile`, `DuplicateGroup`, `ScanOptions`, `ScanResult`, `ScanAnalytics`, `FilterRule`, `FolderSearchPattern`, `FolderSearchResult`, `SubfolderItem`, `ActionHistoryEntry`, `ProfileSettings`, `AppSettings`) plus the single I/O port `IFileSystemService` | nothing — `WindowsFileManager.Core.csproj` declares zero `ProjectReference` and zero `PackageReference`, so Core takes no runtime dependency; `Directory.Build.props` still injects the build-time `StyleCop.Analyzers` analyzer into it, as into every project | every other project, and any concrete I/O type (`File`, `Directory`, `FileInfo`) |
 | `WindowsFileManager.Application` | `src/WindowsFileManager.Application/` | Business services: `DuplicateScannerService`, `FileHashService`, `SettingsService` | `Core` only | `Infrastructure`, the UI project, WPF types |
 | `WindowsFileManager.Infrastructure` | `src/WindowsFileManager.Infrastructure/` | The one real-disk adapter, `FileSystemService : IFileSystemService` | `Core` only | `Application`, the UI project |
-| `WindowsFileManager` | `src/WindowsFileManager/` | WPF shell — `App`, `Views/`, `ViewModels/`, `Helpers/`; also the composition root | `Core`, `Application`, `Infrastructure` | nothing (it is the top of the graph) |
+| `WindowsFileManager` | `src/WindowsFileManager/` | WPF shell — `App`, `Views/`, `ViewModels/`, `Helpers/`, `Themes/`; also the composition root | `Core`, `Application`, `Infrastructure` | nothing (it is the top of the graph) |
 | `WindowsFileManager.Tests` | `tests/WindowsFileManager.Tests/` | xUnit suite — 217 tests, 0 failed, 0 skipped | `Core`, `Application`, `WindowsFileManager` | `Infrastructure` — it is deliberately not referenced, because Infrastructure is replaced by Moq doubles |
 
 Core additionally grants `InternalsVisibleTo` to `WindowsFileManager.Application` and
@@ -432,6 +432,7 @@ Recorded so a future reader does not have to rediscover them.
 
 | Task | Open |
 |---|---|
+| Change a colour, radius or type token | `src/WindowsFileManager/Themes/` — `Broadsheet.Tokens.xaml` for the design system, `Legacy.Palette.xaml` / `Legacy.Metrics.xaml` for what ships today; merged in `App.xaml`. Guarded by `tests/WindowsFileManager.Tests/Themes/DesignTokenContractTests.cs`, which fails `dotnet test` on a dangling key, an unsanctioned prefix, or a value that drifts from the vendored design system |
 | Change how duplicates are detected or grouped | `src/WindowsFileManager.Application/Services/DuplicateScannerService.cs`; spec [SPEC-001](docs/specs/SPEC-001-duplicate-detection.md); tests `tests/WindowsFileManager.Tests/Services/DuplicateScannerServiceTests.cs` |
 | Change hashing (algorithm, chunking, size cap) | `src/WindowsFileManager.Application/Services/FileHashService.cs`; tests `tests/.../Services/FileHashServiceTests.cs`; decision [ADR-003](docs/adr/ADR-003-three-stage-duplicate-detection.md) |
 | Add a scan-time filter (size, extension, path shape) | `src/WindowsFileManager.Core/Models/ScanOptions.cs` + `DuplicateScannerService.Scan` step 1, **and** `MainViewModel.ScanAsync` (`:2260`) — the view model is where the existing filters are currently not wired |

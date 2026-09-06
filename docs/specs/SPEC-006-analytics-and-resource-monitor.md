@@ -97,7 +97,7 @@ The resource monitor exists because the scan is I/O- and CPU-heavy: it hashes th
     - **CPU** — `elapsed = (now − _lastCheckTime).TotalMilliseconds`; when `elapsed > 0`, `cpuPercent = (TotalProcessorTime − _lastCpuTime).TotalMilliseconds / (Environment.ProcessorCount × elapsed) × 100`, formatted `"CPU: {F1}%"`. The value is normalised by core count, so a fully saturated 8-core machine reads `100.0%`, not `800%`. `_lastCpuTime` and `_lastCheckTime` are then advanced **unconditionally**.
     - **Threads** — `"Threads: {Threads.Count}"`.
 21. The whole body is wrapped in `try { … } catch { }` with the comment *"Process may have been disposed"* — a sampling failure leaves the previous readout on screen and is never surfaced.
-22. All three strings render in two places: the global status bar (`ResourceMemory` in `#1565C0`, `ResourceCpu` in `#E65100`, `ResourceThreads` in `#666666`) and the Duplication tab's own row-2 status bar, with the same colours. They are plain one-way `TextBlock` bindings.
+22. All three strings render in two places: the global status bar (`ResourceMemory` in `Legacy.Brush.Action.Primary` (`#1565C0`), `ResourceCpu` in `Legacy.Brush.Warn.Fg` (`#E65100`), `ResourceThreads` in `Legacy.Brush.Fg.Secondary` (`#666666`) — keyed since `dd46d2c`) and the Duplication tab's own row-2 status bar, with the same colours. They are plain one-way `TextBlock` bindings.
 
 **Invariants**
 

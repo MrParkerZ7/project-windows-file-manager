@@ -50,15 +50,15 @@ Putting the explanation one click from the control keeps it where the question i
 
 **Rules**
 
-1. **The button.** 16 × 16, `CornerRadius = 8`, background `#E3F2FD` with border `#90CAF9`, a bold `?` glyph in `#1565C0`, hand cursor, `VerticalAlignment = Center`. Hover repaints the circle `#BBDEFB`; the checked state repaints it `#1565C0` with border `#0D47A1`. It is a `ToggleButton`, so a second click closes the popup.
-2. **The popup.** `Placement = Bottom`, `StaysOpen = False` (an outside click dismisses it), `AllowsTransparency = True`, `PopupAnimation = Fade`. The body is a `Border` — background `#FFFDE7`, border `#FFD54F`, `CornerRadius = 6`, `Padding = 12,10`, `MaxWidth = 380`, drop shadow (`Opacity 0.15`, `BlurRadius 8`, `ShadowDepth 2`) — wrapping a `TextBlock` at `FontSize = 11.5`, `LineHeight = 18`, `Foreground = #333333`, `TextWrapping = Wrap`.
+1. **The button.** 16 × 16, `CornerRadius = 8`, background `Legacy.Brush.Surface.InfoTint` (`#E3F2FD`) with border `Legacy.Brush.Action.FocusLight` (`#90CAF9`), a bold `?` glyph in `Legacy.Brush.Action.Primary` (`#1565C0`), hand cursor, `VerticalAlignment = Center`. Hover repaints the circle `Legacy.Brush.Action.HoverTint` (`#BBDEFB`); the checked state repaints it `Legacy.Brush.Action.Primary` (`#1565C0`) with border `Legacy.Brush.Action.PrimaryDark` (`#0D47A1`). It is a `ToggleButton`, so a second click closes the popup.
+2. **The popup.** `Placement = Bottom`, `StaysOpen = False` (an outside click dismisses it), `AllowsTransparency = True`, `PopupAnimation = Fade`. The body is a `Border` — background `Legacy.Brush.Help.Bg` (`#FFFDE7`), border `Legacy.Brush.Help.Border` (`#FFD54F`), `CornerRadius = 6`, `Padding = 12,10`, `MaxWidth = 380`, drop shadow (`Opacity 0.15`, `BlurRadius 8`, `ShadowDepth 2`) — wrapping a `TextBlock` at `FontSize = 11.5`, `LineHeight = 18`, `Foreground = Legacy.Brush.Fg.Strong` (`#333333`), `TextWrapping = Wrap`.
 3. **Content is data on the control.** Each popup's text is the `ToggleButton`'s `Tag`. Adding a popup means adding a styled `ToggleButton` with a `Tag`; no code changes and no registration.
 4. **The grammar.** Four tags, all parsed by `FormattedTextBehavior`:
 
     | Markup | Renders as |
     |--------|-----------|
     | `<b>text</b>` | `FontWeight = Bold` |
-    | `<h>text</h>` | `FontWeight = SemiBold`, `Foreground = #0D47A1` — used for the popup's leading title line and for sub-headings |
+    | `<h>text</h>` | `FontWeight = SemiBold`, `Foreground = `Legacy.Brush.Action.PrimaryDark`` (`#0D47A1`) — used for the popup's leading title line and for sub-headings |
     | `<w>text</w>` | `FontWeight = SemiBold`, `Foreground = #C62828` on background `#FFEBEE` — the warning style |
     | `<link=URL>text</link>` | `Hyperlink`, `Foreground = #1565C0`, underlined, hand cursor |
 
@@ -91,7 +91,7 @@ Putting the explanation one click from the control keeps it where the question i
 - The parser never throws: it only slices strings and constructs inlines, and every `IndexOf` result is bounds-checked before use. Malformed markup degrades to literal text rather than failing.
 - Every popup is independent — each `?` owns its own `Popup` instance through the template, and opening one does not close another; `StaysOpen = False` closes on an outside click.
 - Because `Popup.IsOpen` is bound to `IsChecked`, the button's visual state and the popup's visibility can never disagree.
-- The four styling colors are fixed in code (`#0D47A1` highlight, `#C62828` on `#FFEBEE` warning, `#1565C0` link) and are not themeable.
+- ~~The four styling colors are fixed in code and are not themeable.~~ **No longer true since `dd46d2c` (T-001).** The four are now `Legacy.Brush.*` keys in `src/WindowsFileManager/Themes/Legacy.Palette.xaml`, resolved at render time by `FormattedTextBehavior` via `TryFindResource` on the target `TextBlock` — `Action.PrimaryDark` highlight, `Danger.Fg` on `Help.WarnBg` warning, `Action.Primary` link. Each keeps its original literal as a `??` fallback, so a missing dictionary degrades to the shipped colour rather than to black. They **are** themeable now: swapping the merged dictionary changes them.
 - `FormattedTextBehavior` is `[ExcludeFromCodeCoverage]`, so none of the grammar is exercised by the 100 % coverage gate ([ADR-011](../adr/ADR-011-coverage-via-collector-and-script.md)).
 
 **Edge cases**

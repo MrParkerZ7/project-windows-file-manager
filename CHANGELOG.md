@@ -10,6 +10,22 @@ and this project adheres to [Semantic Versioning](https://semver.org).
 18 commits have landed since 1.0.0 without a release. Grouped from the git log; no
 version has been tagged yet (`git tag` is empty and no GitHub release exists).
 
+### Changed
+
+- **Every colour in the shell now comes from a resource dictionary.** All 389 colour sites
+  across `MainWindow.xaml`, `ProfileNameDialog.xaml` and two C# files were rewritten from hex
+  literals to keyed `DynamicResource` references, backed by three new dictionaries under
+  `src/WindowsFileManager/Themes/` merged at `Application.Resources`. **No colour changed** —
+  verified by before/after screenshot comparison of all three tabs, in which every differing
+  pixel fell inside the status bar's live RAM/CPU/thread counters and the client area was
+  otherwise pixel-identical. The app looks exactly as it did; what changed is that its palette
+  is now 76 lines in one file instead of 389 decisions typed at their point of use.
+- The help-markup colours in `FormattedTextBehavior` and the profile dialog's validation border
+  moved from hard-coded brushes to resource lookups with the original literals as fallbacks, so
+  a missing dictionary degrades to the shipped colour rather than to black.
+- `Themes/Broadsheet.Tokens.xaml` additionally carries the design system the shell redesign is
+  drawn in (see `docs/design/DESIGN-001`), defined but consumed by nothing yet.
+
 ### Added
 
 - **Folder Control tab** — search folders by configurable patterns with inline editable

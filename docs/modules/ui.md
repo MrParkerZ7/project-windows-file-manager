@@ -26,6 +26,12 @@ WindowsFileManager/
     FormattedTextBehavior.cs 213  the help-popup markup grammar
     TextBoxEnterKeyBehavior.cs 67 attached Enter-key command
     ShortcutHelper.cs       34    .lnk creation via WScript.Shell
+  Themes/                         resource dictionaries, merged in App.xaml (added by T-001)
+    Broadsheet.Tokens.xaml  123   the design system 3a is drawn in - 35 Colors + 35 brushes,
+                                  12 frame metrics, type scale, radii, space; consumed by nothing yet
+    Legacy.Palette.xaml     277   the 76 colours actually in use today, verbatim, each with its
+                                  use count and the Broadsheet key it is destined for
+    Legacy.Metrics.xaml      31   the 7 radii, 4 thicknesses, 16 font sizes and 2 families in use
   Views/                          WindowsFileManager.Views
     MainWindow.xaml       2796    the whole UI
     MainWindow.xaml.cs     421    code-behind for what bindings cannot do
@@ -294,8 +300,8 @@ Cache is a `static ConcurrentDictionary<string, ImageSource?>`; a `null` entry m
 | Markup | Renders as |
 |--------|-----------|
 | `<b>…</b>` | Bold |
-| `<h>…</h>` | SemiBold, foreground `#0D47A1` |
-| `<w>…</w>` | SemiBold, foreground `#C62828` on background `#FFEBEE` |
+| `<h>…</h>` | SemiBold, foreground `Legacy.Brush.Action.PrimaryDark` (`#0D47A1`) |
+| `<w>…</w>` | SemiBold, foreground `Legacy.Brush.Danger.Fg` (`#C62828`) on background `Legacy.Brush.Help.WarnBg` (`#FFEBEE`) |
 | `<link=URL>text</link>` | `Hyperlink`; click runs `Process.Start(new ProcessStartInfo { FileName = url, UseShellExecute = true })`, failures swallowed |
 | `\n` | `LineBreak` |
 
