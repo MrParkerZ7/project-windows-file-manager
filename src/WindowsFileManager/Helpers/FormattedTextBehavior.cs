@@ -15,10 +15,19 @@ namespace WindowsFileManager.Helpers;
 [ExcludeFromCodeCoverage]
 public static class FormattedTextBehavior
 {
-    private static readonly SolidColorBrush HighlightForeground = new(Color.FromRgb(0x0D, 0x47, 0xA1));
-    private static readonly SolidColorBrush WarningForeground = new(Color.FromRgb(0xC6, 0x28, 0x28));
-    private static readonly SolidColorBrush WarningBackground = new(Color.FromRgb(0xFF, 0xEB, 0xEE));
-    private static readonly SolidColorBrush LinkForeground = new(Color.FromRgb(0x15, 0x65, 0xC0));
+    // The four help-markup brushes now live in Themes/Legacy.Palette.xaml and are resolved
+    // per target element rather than held as statics. TryFindResource walks the LOGICAL tree
+    // from the element upward and terminates at Application.Resources — which is precisely why
+    // the dictionaries are anchored there: these TextBlocks live inside HelpButtonStyle's
+    // Popup, and a Popup hosts its child in a separate visual tree on its own HwndSource.
+    //
+    // Each keeps its original literal as a fallback, so a missing dictionary degrades to the
+    // shipped colour rather than to WPF's default (which for Foreground is black, and would
+    // silently erase the distinction between a heading, a warning and a link).
+    private const string HighlightKey = "Legacy.Brush.Action.PrimaryDark";   // #0D47A1
+    private const string WarningFgKey = "Legacy.Brush.Danger.Fg";            // #C62828
+    private const string WarningBgKey = "Legacy.Brush.Help.WarnBg";          // #FFEBEE
+    private const string LinkKey = "Legacy.Brush.Action.Primary";            // #1565C0
 
     /// <summary>
     /// Identifies the FormattedText attached property.
@@ -132,6 +141,16 @@ public static class FormattedTextBehavior
         }
     }
 
+    /// <summary>Resolve a palette brush from the target element, falling back to the shipped literal.</summary>
+    /// <param name="target">The element to resolve from - resource lookup walks up from here.</param>
+    /// <param name="key">The <c>Legacy.Brush.*</c> key to look up.</param>
+    /// <param name="r">Red channel of the fallback literal.</param>
+    /// <param name="g">Green channel of the fallback literal.</param>
+    /// <param name="b">Blue channel of the fallback literal.</param>
+    /// <returns>The dictionary brush, or a brush built from the literal when the key is absent.</returns>
+    private static Brush Resolve(FrameworkElement target, string key, byte r, byte g, byte b)
+        => target.TryFindResource(key) as Brush ?? new SolidColorBrush(Color.FromRgb(r, g, b));
+
     private static void AddPlainText(TextBlock textBlock, string text)
     {
         var parts = text.Split('\n');
@@ -153,7 +172,7 @@ public static class FormattedTextBehavior
     {
         var hyperlink = new Hyperlink(new Run(displayText))
         {
-            Foreground = LinkForeground,
+            Foreground = Resolve(textBlock, LinkKey, 0x15, 0x65, 0xC0),
             TextDecorations = TextDecorations.Underline,
             Cursor = System.Windows.Input.Cursors.Hand,
         };
@@ -192,12 +211,12 @@ public static class FormattedTextBehavior
                         break;
                     case "h":
                         run.FontWeight = FontWeights.SemiBold;
-                        run.Foreground = HighlightForeground;
+                        run.Foreground = Resolve(textBlock, HighlightKey, 0x0D, 0x47, 0xA1);
                         break;
                     case "w":
                         run.FontWeight = FontWeights.SemiBold;
-                        run.Foreground = WarningForeground;
-                        run.Background = WarningBackground;
+                        run.Foreground = Resolve(textBlock, WarningFgKey, 0xC6, 0x28, 0x28);
+                        run.Background = Resolve(textBlock, WarningBgKey, 0xFF, 0xEB, 0xEE);
                         break;
                 }
 

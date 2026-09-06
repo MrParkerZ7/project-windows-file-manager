@@ -9,26 +9,26 @@
         WindowStyle="SingleBorderWindow"
         ResizeMode="NoResize"
         ShowInTaskbar="False"
-        Background="#FAFAFA">
+        Background="{DynamicResource Legacy.Brush.Surface.Card}">
 
-    <Border BorderBrush="#CFD8DC" BorderThickness="1" Padding="20,16">
+    <Border BorderBrush="{DynamicResource Legacy.Brush.Border.Chrome}" BorderThickness="1" Padding="20,16">
         <StackPanel>
             <TextBlock x:Name="HeadlineText" Text="Profile Name"
-                       FontSize="14" FontWeight="Bold" Foreground="#263238" Margin="0,0,0,4" />
+                       FontSize="14" FontWeight="Bold" Foreground="{DynamicResource Legacy.Brush.Fg.SlateDark}" Margin="0,0,0,4" />
 
             <TextBlock x:Name="PromptText" Text="Enter a name for this profile."
-                       FontSize="11.5" Foreground="#546E7A" Margin="0,0,0,12"
+                       FontSize="11.5" Foreground="{DynamicResource Legacy.Brush.Fg.SlateLight}" Margin="0,0,0,12"
                        TextWrapping="Wrap" />
 
             <TextBox x:Name="NameInput"
                      FontSize="13" Padding="8,6"
-                     BorderBrush="#B0BEC5" BorderThickness="1"
+                     BorderBrush="{DynamicResource Legacy.Brush.Border.Slate}" BorderThickness="1"
                      TextChanged="NameInput_TextChanged"
                      KeyDown="NameInput_KeyDown" />
 
             <TextBlock x:Name="ValidationText"
                        FontSize="11" FontStyle="Italic"
-                       Foreground="#C62828" Margin="0,6,0,0"
+                       Foreground="{DynamicResource Legacy.Brush.Danger.Fg}" Margin="0,6,0,0"
                        TextWrapping="Wrap"
                        Visibility="Collapsed" />
 
@@ -40,8 +40,8 @@
                 <Button x:Name="OkButton" Content="OK"
                         Padding="16,6" Margin="8,0,0,0" MinWidth="80" FontSize="12"
                         Cursor="Hand" FontWeight="SemiBold"
-                        Background="#1565C0" Foreground="White"
-                        BorderBrush="#0D47A1" BorderThickness="1"
+                        Background="{DynamicResource Legacy.Brush.Action.Primary}" Foreground="{DynamicResource Legacy.Brush.Surface.White}"
+                        BorderBrush="{DynamicResource Legacy.Brush.Action.PrimaryDark}" BorderThickness="1"
                         IsDefault="True"
                         Click="Ok_Click" />
             </StackPanel>

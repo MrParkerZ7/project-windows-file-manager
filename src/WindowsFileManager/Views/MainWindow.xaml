@@ -26,7 +26,7 @@
             <Setter Property="Height" Value="16" />
             <Setter Property="FontSize" Value="10" />
             <Setter Property="FontWeight" Value="Bold" />
-            <Setter Property="Foreground" Value="#1565C0" />
+            <Setter Property="Foreground" Value="{DynamicResource Legacy.Brush.Action.Primary}" />
             <Setter Property="Cursor" Value="Hand" />
             <Setter Property="VerticalAlignment" Value="Center" />
             <Setter Property="Margin" Value="4,0,0,0" />
@@ -35,30 +35,30 @@
                     <ControlTemplate TargetType="ToggleButton">
                         <Grid>
                             <Border x:Name="Circle" Width="16" Height="16" CornerRadius="8"
-                                    Background="#E3F2FD" BorderBrush="#90CAF9" BorderThickness="1">
+                                    Background="{DynamicResource Legacy.Brush.Surface.InfoTint}" BorderBrush="{DynamicResource Legacy.Brush.Action.FocusLight}" BorderThickness="1">
                                 <TextBlock Text="?" HorizontalAlignment="Center" VerticalAlignment="Center"
-                                           FontSize="10" FontWeight="Bold" Foreground="#1565C0" Margin="0,-1,0,0" />
+                                           FontSize="10" FontWeight="Bold" Foreground="{DynamicResource Legacy.Brush.Action.Primary}" Margin="0,-1,0,0" />
                             </Border>
                             <Popup x:Name="HelpPopup" IsOpen="{Binding IsChecked, RelativeSource={RelativeSource TemplatedParent}}"
                                    StaysOpen="False" Placement="Bottom" AllowsTransparency="True" PopupAnimation="Fade">
-                                <Border Background="#FFFDE7" BorderBrush="#FFD54F" BorderThickness="1"
+                                <Border Background="{DynamicResource Legacy.Brush.Help.Bg}" BorderBrush="{DynamicResource Legacy.Brush.Help.Border}" BorderThickness="1"
                                         CornerRadius="6" Padding="12,10" MaxWidth="380">
                                     <Border.Effect>
-                                        <DropShadowEffect Color="#000000" Opacity="0.15" BlurRadius="8" ShadowDepth="2" />
+                                        <DropShadowEffect Color="{DynamicResource Legacy.Color.Shadow}" Opacity="0.15" BlurRadius="8" ShadowDepth="2" />
                                     </Border.Effect>
                                     <TextBlock TextWrapping="Wrap" FontSize="11.5" FontWeight="Normal"
-                                               Foreground="#333333" LineHeight="18"
+                                               Foreground="{DynamicResource Legacy.Brush.Fg.Strong}" LineHeight="18"
                                                helpers:FormattedTextBehavior.FormattedText="{TemplateBinding Tag}" />
                                 </Border>
                             </Popup>
                         </Grid>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Circle" Property="Background" Value="#BBDEFB" />
+                                <Setter TargetName="Circle" Property="Background" Value="{DynamicResource Legacy.Brush.Action.HoverTint}" />
                             </Trigger>
                             <Trigger Property="IsChecked" Value="True">
-                                <Setter TargetName="Circle" Property="Background" Value="#1565C0" />
-                                <Setter TargetName="Circle" Property="BorderBrush" Value="#0D47A1" />
+                                <Setter TargetName="Circle" Property="Background" Value="{DynamicResource Legacy.Brush.Action.Primary}" />
+                                <Setter TargetName="Circle" Property="BorderBrush" Value="{DynamicResource Legacy.Brush.Action.PrimaryDark}" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -69,7 +69,7 @@
 
     <DockPanel Margin="4">
         <!-- Profile Bar (docked to top, full width) -->
-        <Border DockPanel.Dock="Top" Background="#ECEFF1" BorderBrush="#CFD8DC"
+        <Border DockPanel.Dock="Top" Background="{DynamicResource Legacy.Brush.Surface.Chrome}" BorderBrush="{DynamicResource Legacy.Brush.Border.Chrome}"
                 BorderThickness="0,0,0,1" Padding="8,4" Margin="0,0,0,4">
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -83,10 +83,10 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0" Text="{Binding ProfileOperationStatus}"
-                           FontSize="10.5" FontStyle="Italic" Foreground="#558B2F"
+                           FontSize="10.5" FontStyle="Italic" Foreground="{DynamicResource Legacy.Brush.Success.Olive}"
                            VerticalAlignment="Center" Margin="0,0,12,0" TextTrimming="CharacterEllipsis" />
                 <TextBlock Grid.Column="1" Text="Profile:" FontWeight="Bold" FontSize="11"
-                           VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#37474F" />
+                           VerticalAlignment="Center" Margin="0,0,6,0" Foreground="{DynamicResource Legacy.Brush.Fg.Slate}" />
                 <ComboBox Grid.Column="2" x:Name="ProfileCombo"
                           ItemsSource="{Binding ProfileNames}"
                           SelectedItem="{Binding ActiveProfileName, Mode=TwoWay}"
@@ -94,19 +94,19 @@
                           VerticalAlignment="Center"
                           ToolTip="Switch active profile" />
                 <Button Grid.Column="3" Content="+ New" Padding="8,3" Margin="8,0,0,0"
-                        FontSize="11" Cursor="Hand" Foreground="#1565C0" FontWeight="SemiBold"
+                        FontSize="11" Cursor="Hand" Foreground="{DynamicResource Legacy.Brush.Action.Primary}" FontWeight="SemiBold"
                         Click="NewProfile_Click"
                         ToolTip="Create a blank new profile (no target folders, no filters)" />
                 <Button Grid.Column="4" Content="⎘ Clone" Padding="8,3" Margin="4,0,0,0"
-                        FontSize="11" Cursor="Hand" Foreground="#2E7D32" FontWeight="SemiBold"
+                        FontSize="11" Cursor="Hand" Foreground="{DynamicResource Legacy.Brush.Success.FgDark}" FontWeight="SemiBold"
                         Click="CloneProfile_Click"
                         ToolTip="Clone the active profile (copies current state under a new name)" />
                 <Button Grid.Column="5" Content="✎ Rename" Padding="8,3" Margin="4,0,0,0"
-                        FontSize="11" Cursor="Hand" Foreground="#455A64"
+                        FontSize="11" Cursor="Hand" Foreground="{DynamicResource Legacy.Brush.Fg.SlateMid}"
                         Click="RenameProfile_Click"
                         ToolTip="Rename the active profile" />
                 <Button Grid.Column="6" Content="🗑 Delete" Padding="8,3" Margin="4,0,0,0"
-                        FontSize="11" Cursor="Hand" Foreground="#C62828"
+                        FontSize="11" Cursor="Hand" Foreground="{DynamicResource Legacy.Brush.Danger.Fg}"
                         Click="DeleteProfile_Click"
                         ToolTip="Delete the active profile (at least one must remain)" />
                 <ToggleButton Grid.Column="7" Style="{StaticResource HelpButtonStyle}" Margin="8,0,0,0"
@@ -115,7 +115,7 @@
         </Border>
 
         <!-- Global status bar (always visible): icon → status → progress + count → spacer → RAM/CPU/Threads -->
-        <Border DockPanel.Dock="Bottom" Background="#ECEFF1" BorderBrush="#CFD8DC"
+        <Border DockPanel.Dock="Bottom" Background="{DynamicResource Legacy.Brush.Surface.Chrome}" BorderBrush="{DynamicResource Legacy.Brush.Border.Chrome}"
                 BorderThickness="0,1,0,0" Padding="10,4">
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -133,11 +133,11 @@
                     <TextBlock.Style>
                         <Style TargetType="TextBlock">
                             <Setter Property="Text" Value="●" />
-                            <Setter Property="Foreground" Value="#66BB6A" />
+                            <Setter Property="Foreground" Value="{DynamicResource Legacy.Brush.Success.Light}" />
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding IsBusy}" Value="True">
                                     <Setter Property="Text" Value="⏳" />
-                                    <Setter Property="Foreground" Value="#1565C0" />
+                                    <Setter Property="Foreground" Value="{DynamicResource Legacy.Brush.Action.Primary}" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
@@ -150,11 +150,11 @@
                     <TextBlock.Style>
                         <Style TargetType="TextBlock">
                             <Setter Property="Text" Value="{Binding StatusMessage}" />
-                            <Setter Property="Foreground" Value="#666666" />
+                            <Setter Property="Foreground" Value="{DynamicResource Legacy.Brush.Fg.Secondary}" />
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding IsBusy}" Value="True">
                                     <Setter Property="Text" Value="{Binding BusyStatus}" />
-                                    <Setter Property="Foreground" Value="#1565C0" />
+                                    <Setter Property="Foreground" Value="{DynamicResource Legacy.Brush.Action.Primary}" />
                                     <Setter Property="FontWeight" Value="SemiBold" />
                                 </DataTrigger>
                             </Style.Triggers>
@@ -168,27 +168,27 @@
                              Maximum="{Binding BusyTotal, Mode=OneWay}"
                              Value="{Binding BusyCurrent, Mode=OneWay}"
                              IsIndeterminate="{Binding BusyIsIndeterminate, Mode=OneWay}"
-                             Foreground="#1565C0" Background="#CFD8DC" BorderThickness="0"
+                             Foreground="{DynamicResource Legacy.Brush.Action.Primary}" Background="{DynamicResource Legacy.Brush.Border.Chrome}" BorderThickness="0"
                              VerticalAlignment="Center" Margin="0,0,8,0"
                              Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibility}}" />
 
                 <!-- Count text: "500 / 1,000 subfolders" -->
                 <TextBlock Grid.Column="3" Text="{Binding BusyCountText}"
-                           Foreground="#1565C0" FontSize="11" FontWeight="SemiBold"
+                           Foreground="{DynamicResource Legacy.Brush.Action.Primary}" FontSize="11" FontWeight="SemiBold"
                            VerticalAlignment="Center" Margin="0,0,8,0" />
 
                 <!-- ETA text: "~3m 15s left" (empty when not computable) -->
                 <TextBlock Grid.Column="4" Text="{Binding BusyEta}"
-                           Foreground="#666666" FontSize="11" FontStyle="Italic"
+                           Foreground="{DynamicResource Legacy.Brush.Fg.Secondary}" FontSize="11" FontStyle="Italic"
                            VerticalAlignment="Center" Margin="0,0,12,0" />
 
                 <!-- Live resource readouts (RAM / CPU / Threads) on far right -->
                 <StackPanel Grid.Column="6" Orientation="Horizontal">
-                    <TextBlock Text="{Binding ResourceMemory}" Foreground="#1565C0" FontSize="11"
+                    <TextBlock Text="{Binding ResourceMemory}" Foreground="{DynamicResource Legacy.Brush.Action.Primary}" FontSize="11"
                                Margin="0,0,12,0" VerticalAlignment="Center" />
-                    <TextBlock Text="{Binding ResourceCpu}" Foreground="#E65100" FontSize="11"
+                    <TextBlock Text="{Binding ResourceCpu}" Foreground="{DynamicResource Legacy.Brush.Warn.Fg}" FontSize="11"
                                Margin="0,0,12,0" VerticalAlignment="Center" />
-                    <TextBlock Text="{Binding ResourceThreads}" Foreground="#666666" FontSize="11"
+                    <TextBlock Text="{Binding ResourceThreads}" Foreground="{DynamicResource Legacy.Brush.Fg.Secondary}" FontSize="11"
                                VerticalAlignment="Center" />
                 </StackPanel>
             </Grid>
@@ -217,7 +217,7 @@
             </Grid.ColumnDefinitions>
 
             <!-- Left: Target Folders -->
-            <Border Grid.Column="0" BorderBrush="#C0C0C0" BorderThickness="1" CornerRadius="4" Padding="8" Margin="0,0,2,0">
+            <Border Grid.Column="0" BorderBrush="{DynamicResource Legacy.Brush.Border.Mid}" BorderThickness="1" CornerRadius="4" Padding="8" Margin="0,0,2,0">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -242,7 +242,7 @@
                                     ToolTip="Enable all target folders" />
                             <Button Content="✕ Clear" Command="{Binding ClearAllTargetsCommand}"
                                     Padding="6,2" FontSize="10" Cursor="Hand"
-                                    Foreground="#888888" ToolTip="Disable all target folders" />
+                                    Foreground="{DynamicResource Legacy.Brush.Fg.Muted}" ToolTip="Disable all target folders" />
                         </StackPanel>
                     </Grid>
 
@@ -282,11 +282,11 @@
                                     <Border CornerRadius="3" Padding="6,3" Margin="0,0,6,4">
                                         <Border.Style>
                                             <Style TargetType="Border">
-                                                <Setter Property="Background" Value="#E8EAF6" />
+                                                <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Surface.Accent}" />
                                                 <Setter Property="Opacity" Value="1" />
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding IsEnabled}" Value="False">
-                                                        <Setter Property="Background" Value="#EEEEEE" />
+                                                        <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Surface.Sunken}" />
                                                         <Setter Property="Opacity" Value="0.6" />
                                                     </DataTrigger>
                                                 </Style.Triggers>
@@ -297,13 +297,13 @@
                                                       Margin="0,0,4,0" Cursor="Hand"
                                                       ToolTip="Enable or disable this path temporarily" />
                                             <TextBlock Text="{Binding Value}" VerticalAlignment="Center"
-                                                       FontSize="11" Foreground="#333333"
+                                                       FontSize="11" Foreground="{DynamicResource Legacy.Brush.Fg.Strong}"
                                                        ToolTip="{Binding Value}" />
                                             <Button Content="✕"
                                                     Command="{Binding DataContext.RemoveFolderCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                     CommandParameter="{Binding}"
                                                     Padding="2,0" Margin="6,0,0,0"
-                                                    FontSize="9" Foreground="#C62828" Cursor="Hand"
+                                                    FontSize="9" Foreground="{DynamicResource Legacy.Brush.Danger.Fg}" Cursor="Hand"
                                                     Background="Transparent" BorderThickness="0"
                                                     ToolTip="Remove this folder" />
                                         </StackPanel>
@@ -315,7 +315,7 @@
             </Border>
 
             <!-- Right: Exclude Folders -->
-            <Border Grid.Column="1" BorderBrush="#C0C0C0" BorderThickness="1" CornerRadius="4" Padding="8" Margin="2,0,0,0">
+            <Border Grid.Column="1" BorderBrush="{DynamicResource Legacy.Brush.Border.Mid}" BorderThickness="1" CornerRadius="4" Padding="8" Margin="2,0,0,0">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -326,14 +326,14 @@
                     <!-- Header row -->
                     <Grid Grid.Row="0" Margin="0,0,0,6">
                         <TextBlock Text="Exclude Folders" FontWeight="Bold" FontSize="12"
-                                   Foreground="#E65100" VerticalAlignment="Center" HorizontalAlignment="Left" />
+                                   Foreground="{DynamicResource Legacy.Brush.Warn.Fg}" VerticalAlignment="Center" HorizontalAlignment="Left" />
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                             <Button Content="✓ All" Command="{Binding SelectAllExcludesCommand}"
                                     Padding="6,2" Margin="0,0,4,0" FontSize="10" Cursor="Hand"
-                                    Foreground="#E65100" ToolTip="Enable all exclude folders" />
+                                    Foreground="{DynamicResource Legacy.Brush.Warn.Fg}" ToolTip="Enable all exclude folders" />
                             <Button Content="✕ Clear" Command="{Binding ClearAllExcludesCommand}"
                                     Padding="6,2" FontSize="10" Cursor="Hand"
-                                    Foreground="#888888" ToolTip="Disable all exclude folders" />
+                                    Foreground="{DynamicResource Legacy.Brush.Fg.Muted}" ToolTip="Disable all exclude folders" />
                         </StackPanel>
                     </Grid>
 
@@ -349,7 +349,7 @@
                                  helpers:TextBoxEnterKeyBehavior.Command="{Binding AddExcludeFolderCommand}" />
                         <Button Grid.Column="1" Content="+ Add" Command="{Binding AddExcludeFolderCommand}"
                                 Padding="8,4" Margin="6,0,0,0" FontSize="11" Cursor="Hand"
-                                FontWeight="SemiBold" Foreground="#E65100" />
+                                FontWeight="SemiBold" Foreground="{DynamicResource Legacy.Brush.Warn.Fg}" />
                         <ToggleButton Grid.Column="2" Style="{StaticResource HelpButtonStyle}" Margin="6,0,0,0"
                                       Tag="&lt;h&gt;EXCLUDE FOLDER NAMES&lt;/h&gt;&#x0a;Skip folders with these names during scanning.&#x0a;&#x0a;Matching is by &lt;b&gt;folder name only&lt;/b&gt; (not full path), case-insensitive.&#x0a;Any subfolder matching the name is skipped entirely.&#x0a;&#x0a;&lt;h&gt;Common examples:&lt;/h&gt;&#x0a;&lt;b&gt;node_modules&lt;/b&gt; — JavaScript dependencies&#x0a;&lt;b&gt;.git&lt;/b&gt; — Git internals&#x0a;&lt;b&gt;bin&lt;/b&gt; / &lt;b&gt;obj&lt;/b&gt; — Build output&#x0a;&lt;b&gt;__pycache__&lt;/b&gt; — Python cache" />
                     </Grid>
@@ -366,11 +366,11 @@
                                 <Border CornerRadius="3" Padding="6,2" Margin="0,0,6,4">
                                     <Border.Style>
                                         <Style TargetType="Border">
-                                            <Setter Property="Background" Value="#FFE0B2" />
+                                            <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Warn.TintStrong}" />
                                             <Setter Property="Opacity" Value="1" />
                                             <Style.Triggers>
                                                 <DataTrigger Binding="{Binding IsEnabled}" Value="False">
-                                                    <Setter Property="Background" Value="#EEEEEE" />
+                                                    <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Surface.Sunken}" />
                                                     <Setter Property="Opacity" Value="0.6" />
                                                 </DataTrigger>
                                             </Style.Triggers>
@@ -381,12 +381,12 @@
                                                   Margin="0,0,4,0" Cursor="Hand"
                                                   ToolTip="Enable or disable this exclusion temporarily" />
                                         <TextBlock Text="{Binding Value}" VerticalAlignment="Center"
-                                                   FontSize="11" Foreground="#BF360C" FontWeight="SemiBold" />
+                                                   FontSize="11" Foreground="{DynamicResource Legacy.Brush.Danger.Dark}" FontWeight="SemiBold" />
                                         <Button Content="✕"
                                                 Command="{Binding DataContext.RemoveExcludeFolderCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                 CommandParameter="{Binding}"
                                                 Padding="2,0" Margin="6,0,0,0"
-                                                FontSize="9" Foreground="#C62828" Cursor="Hand"
+                                                FontSize="9" Foreground="{DynamicResource Legacy.Brush.Danger.Fg}" Cursor="Hand"
                                                 Background="Transparent" BorderThickness="0" />
                                     </StackPanel>
                                 </Border>
@@ -409,17 +409,17 @@
                     </Grid.RowDefinitions>
 
                     <!-- Row 0: Search patterns (configurable chip list) -->
-                    <Border Grid.Row="0" Background="#E8EAF6" CornerRadius="4" Padding="8,2" Margin="0,0,0,4"
-                            BorderBrush="#C5CAE9" BorderThickness="1">
+                    <Border Grid.Row="0" Background="{DynamicResource Legacy.Brush.Surface.Accent}" CornerRadius="4" Padding="8,2" Margin="0,0,0,4"
+                            BorderBrush="{DynamicResource Legacy.Brush.Border.Accent}" BorderThickness="1">
                         <StackPanel>
                             <WrapPanel Orientation="Horizontal">
                                 <!-- Label -->
                                 <StackPanel Orientation="Horizontal" Margin="0,2,0,2" VerticalAlignment="Center">
-                                    <TextBlock Text="Folder Search" FontSize="11" FontWeight="Bold" Foreground="#1565C0"
+                                    <TextBlock Text="Folder Search" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource Legacy.Brush.Action.Primary}"
                                                VerticalAlignment="Center" Margin="0,0,4,0" />
                                     <ToggleButton Style="{StaticResource HelpButtonStyle}"
                                                   Tag="&lt;h&gt;FOLDER SEARCH&lt;/h&gt;&#x0a;Search for folders by name across all target paths.&#x0a;&#x0a;&lt;b&gt;How it works:&lt;/b&gt;&#x0a;1. Add folder name patterns to the list&#x0a;2. Click &lt;b&gt;Search&lt;/b&gt; to find matching folders&#x0a;3. Results show every folder matching all enabled patterns&#x0a;&#x0a;&lt;b&gt;Scope:&lt;/b&gt; Uses the same Target Folders and Exclude Folders from the main tab.&#x0a;&lt;b&gt;Matching:&lt;/b&gt; Case-insensitive, and per the match type set on each pattern — see the Match Types help.&#x0a;&lt;b&gt;Depth:&lt;/b&gt; An optional layer limit bounds how deep the search descends. Blank searches every layer.&#x0a;&#x0a;&lt;h&gt;Tip:&lt;/h&gt; Enable/disable patterns to quickly compare different search sets." />
-                                    <Border Width="1" Background="#C5CAE9" Margin="8,2" />
+                                    <Border Width="1" Background="{DynamicResource Legacy.Brush.Border.Accent}" Margin="8,2" />
                                 </StackPanel>
 
                                 <!-- Input -->
@@ -432,14 +432,14 @@
                                                   Margin="0,0,4,0"
                                                   Tag="&lt;h&gt;MATCH TYPES&lt;/h&gt;&#x0a;&#x0a;&lt;b&gt;Include&lt;/b&gt; — folder name &lt;b&gt;contains&lt;/b&gt; the text (partial match)&#x0a;Example: &quot;log&quot; matches &lt;b&gt;log&lt;/b&gt;s, change&lt;b&gt;log&lt;/b&gt;, &lt;b&gt;log&lt;/b&gt;-backup&#x0a;&#x0a;&lt;b&gt;Match&lt;/b&gt; — folder name &lt;b&gt;exactly equals&lt;/b&gt; the text&#x0a;Example: &quot;bin&quot; matches only &lt;b&gt;bin&lt;/b&gt;, not binary or recycle-bin&#x0a;&#x0a;&lt;b&gt;Contains&lt;/b&gt; — folder has a &lt;b&gt;child item&lt;/b&gt; (file/subfolder) inside it&#x0a;Example: &quot;.git&quot; finds git repos, &quot;*.sln&quot; finds .NET solutions&#x0a;Supports wildcards: &quot;*.py&quot;, &quot;*.csproj&quot;, &quot;*.json&quot;&#x0a;&#x0a;&lt;b&gt;Exclude&lt;/b&gt; — folder name does &lt;b&gt;NOT contain&lt;/b&gt; the text (opposite of Include)&#x0a;Example: &quot;test&quot; skips folders with &quot;test&quot; in the name&#x0a;&#x0a;&lt;b&gt;Mismatch&lt;/b&gt; — folder name does &lt;b&gt;NOT equal&lt;/b&gt; the text (opposite of Match)&#x0a;Example: &quot;bin&quot; skips only the exact &quot;bin&quot; folder&#x0a;&#x0a;&lt;b&gt;NotContain&lt;/b&gt; — folder does &lt;b&gt;NOT&lt;/b&gt; hold a child item matching the pattern (opposite of Contains)&#x0a;Example: &quot;*.sln&quot; skips folders that hold a .NET solution&#x0a;&#x0a;&lt;h&gt;Combining:&lt;/h&gt; All enabled patterns use AND logic.&#x0a;Example: Contains &quot;.git&quot; + Exclude &quot;node_modules&quot;&#x0a;= git repos whose name doesn't include &quot;node_modules&quot;" />
                                     <TextBlock Text="name:" FontWeight="SemiBold" FontSize="11"
-                                               Foreground="#333333" VerticalAlignment="Center" Margin="0,0,4,0" />
+                                               Foreground="{DynamicResource Legacy.Brush.Fg.Strong}" VerticalAlignment="Center" Margin="0,0,4,0" />
                                     <Grid Width="180">
                                         <TextBox x:Name="FolderPatternInput"
                                                  Text="{Binding NewFolderSearchPattern, UpdateSourceTrigger=PropertyChanged}"
                                                  Padding="4,3" FontSize="11" VerticalContentAlignment="Center"
                                                  helpers:TextBoxEnterKeyBehavior.Command="{Binding AddFolderSearchPatternCommand}" />
                                         <TextBlock Text="folder name or pattern..."
-                                                   Padding="6,4" FontSize="11" Foreground="#AAAAAA"
+                                                   Padding="6,4" FontSize="11" Foreground="{DynamicResource Legacy.Brush.Fg.Disabled}"
                                                    VerticalAlignment="Center" IsHitTestVisible="False">
                                             <TextBlock.Style>
                                                 <Style TargetType="TextBlock">
@@ -456,14 +456,14 @@
                                     <Button Content="+ Add" Command="{Binding AddFolderSearchPatternCommand}"
                                             CommandParameter="{Binding Text, ElementName=FolderPatternInput}"
                                             Padding="8,3" Margin="4,0,0,0" FontSize="11" Cursor="Hand"
-                                            FontWeight="SemiBold" Foreground="#1565C0" />
-                                    <Border Width="1" Background="#C5CAE9" Margin="8,2" />
+                                            FontWeight="SemiBold" Foreground="{DynamicResource Legacy.Brush.Action.Primary}" />
+                                    <Border Width="1" Background="{DynamicResource Legacy.Brush.Border.Accent}" Margin="8,2" />
                                 </StackPanel>
 
                                 <!-- Search action + status -->
                                 <StackPanel Orientation="Horizontal" Margin="0,2,0,2" VerticalAlignment="Center">
                                     <TextBlock Text="layers:" FontWeight="SemiBold" FontSize="11"
-                                               Foreground="#333333" VerticalAlignment="Center" Margin="0,0,4,0" />
+                                               Foreground="{DynamicResource Legacy.Brush.Fg.Strong}" VerticalAlignment="Center" Margin="0,0,4,0" />
                                     <Grid Width="56" Margin="0,0,4,0">
                                         <TextBox x:Name="FolderSearchDepthInput"
                                                  Text="{Binding FolderSearchMaxDepthText, UpdateSourceTrigger=PropertyChanged}"
@@ -471,7 +471,7 @@
                                                  PreviewTextInput="IntegerTextBox_PreviewTextInput"
                                                  ToolTip="Maximum subfolder depth to search. Leave empty for no limit. 1 = only direct children of each target folder." />
                                         <TextBlock Text="∞"
-                                                   Padding="6,4" FontSize="11" Foreground="#AAAAAA"
+                                                   Padding="6,4" FontSize="11" Foreground="{DynamicResource Legacy.Brush.Fg.Disabled}"
                                                    VerticalAlignment="Center" HorizontalAlignment="Center" IsHitTestVisible="False">
                                             <TextBlock.Style>
                                                 <Style TargetType="TextBlock">
@@ -489,11 +489,11 @@
                                                   Tag="&lt;h&gt;SEARCH DEPTH&lt;/h&gt;&#x0a;Limits how deep the recursive search descends from each target folder.&#x0a;&#x0a;&lt;b&gt;Empty&lt;/b&gt; (default) — no limit, walks the full tree&#x0a;&lt;b&gt;1&lt;/b&gt; — only direct children of each target folder&#x0a;&lt;b&gt;2&lt;/b&gt; — children + grandchildren&#x0a;&lt;b&gt;N&lt;/b&gt; — descends N layers&#x0a;&#x0a;&lt;h&gt;Tip:&lt;/h&gt; Set a small depth on huge trees to keep results scoped and the search fast." />
                                     <Button Command="{Binding SearchFoldersCommand}"
                                             Padding="10,5" FontSize="12" Cursor="Hand"
-                                            FontWeight="Bold" Foreground="White"
+                                            FontWeight="Bold" Foreground="{DynamicResource Legacy.Brush.Surface.White}"
                                             BorderThickness="0">
                                         <Button.Style>
                                             <Style TargetType="Button">
-                                                <Setter Property="Background" Value="#1565C0" />
+                                                <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Action.Primary}" />
                                                 <Setter Property="Content" Value="▶ Search" />
                                                 <Setter Property="Template">
                                                     <Setter.Value>
@@ -505,10 +505,10 @@
                                                             </Border>
                                                             <ControlTemplate.Triggers>
                                                                 <Trigger Property="IsMouseOver" Value="True">
-                                                                    <Setter TargetName="SearchBorder" Property="Background" Value="#0D47A1" />
+                                                                    <Setter TargetName="SearchBorder" Property="Background" Value="{DynamicResource Legacy.Brush.Action.PrimaryDark}" />
                                                                 </Trigger>
                                                                 <Trigger Property="IsEnabled" Value="False">
-                                                                    <Setter TargetName="SearchBorder" Property="Background" Value="#B0BEC5" />
+                                                                    <Setter TargetName="SearchBorder" Property="Background" Value="{DynamicResource Legacy.Brush.Border.Slate}" />
                                                                 </Trigger>
                                                             </ControlTemplate.Triggers>
                                                         </ControlTemplate>
@@ -517,7 +517,7 @@
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding IsFolderSearching}" Value="True">
                                                         <Setter Property="Content" Value="⏳ Searching…" />
-                                                        <Setter Property="Background" Value="#90A4AE" />
+                                                        <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Fg.SlateMuted}" />
                                                     </DataTrigger>
                                                 </Style.Triggers>
                                             </Style>
@@ -527,28 +527,28 @@
                                                   Tag="&lt;h&gt;SEARCH&lt;/h&gt;&#x0a;Click &lt;b&gt;Search&lt;/b&gt; to find folders matching your patterns.&#x0a;&#x0a;&lt;b&gt;Requirements:&lt;/b&gt;&#x0a;• At least one &lt;b&gt;enabled&lt;/b&gt; target folder (shared from main tab)&#x0a;&#x0a;&lt;b&gt;No patterns?&lt;/b&gt; Returns &lt;b&gt;all folders&lt;/b&gt; (no filtering).&#x0a;&#x0a;&lt;b&gt;How it works:&lt;/b&gt;&#x0a;1. Scans all enabled target folders recursively&#x0a;2. Matches folders against enabled patterns (or returns all)&#x0a;3. Skips excluded folders (shared from main tab)&#x0a;4. Results appear in the list below&#x0a;&#x0a;&lt;h&gt;Then:&lt;/h&gt; Use the &lt;b&gt;Action&lt;/b&gt; section to select and delete/move found folders." />
                                     <Button Content="⏹ Stop" Command="{Binding StopFolderSearchCommand}"
                                             Padding="8,3" Margin="8,0,0,0" FontSize="11" Cursor="Hand"
-                                            FontWeight="SemiBold" Foreground="#C62828"
+                                            FontWeight="SemiBold" Foreground="{DynamicResource Legacy.Brush.Danger.Fg}"
                                             Visibility="{Binding IsFolderSearching, Converter={StaticResource BoolToVisibility}}"
                                             ToolTip="Cancel the running search" />
                                     <Button Content="✕ Clear" Command="{Binding ClearFolderSearchCommand}"
                                             Padding="8,3" Margin="8,0,0,0" FontSize="11" Cursor="Hand"
-                                            FontWeight="SemiBold" Foreground="#C62828"
+                                            FontWeight="SemiBold" Foreground="{DynamicResource Legacy.Brush.Danger.Fg}"
                                             ToolTip="Clear search results and discovered subfolders" />
                                     <TextBlock FontSize="10" VerticalAlignment="Center" Margin="8,0,0,0">
                                         <TextBlock.Style>
                                             <Style TargetType="TextBlock">
-                                                <Setter Property="Foreground" Value="#666666" />
+                                                <Setter Property="Foreground" Value="{DynamicResource Legacy.Brush.Fg.Secondary}" />
                                                 <Setter Property="Text" Value="{Binding FolderSearchStatus}" />
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding IsFolderSearching}" Value="True">
-                                                        <Setter Property="Foreground" Value="#1565C0" />
+                                                        <Setter Property="Foreground" Value="{DynamicResource Legacy.Brush.Action.Primary}" />
                                                         <Setter Property="FontWeight" Value="SemiBold" />
                                                     </DataTrigger>
                                                 </Style.Triggers>
                                             </Style>
                                         </TextBlock.Style>
                                     </TextBlock>
-                                    <TextBlock Text="{Binding FolderPatternAddStatus}" Foreground="#C62828"
+                                    <TextBlock Text="{Binding FolderPatternAddStatus}" Foreground="{DynamicResource Legacy.Brush.Danger.Fg}"
                                                FontSize="11" FontStyle="Italic" VerticalAlignment="Center"
                                                Margin="12,0,0,0" />
                                 </StackPanel>
@@ -566,14 +566,14 @@
                                         <Border CornerRadius="3" Padding="6,3" Margin="0,0,6,4">
                                             <Border.Style>
                                                 <Style TargetType="Border">
-                                                    <Setter Property="Background" Value="#C5CAE9" />
-                                                    <Setter Property="BorderBrush" Value="#7986CB" />
+                                                    <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Border.Accent}" />
+                                                    <Setter Property="BorderBrush" Value="{DynamicResource Legacy.Brush.Accent.Mid}" />
                                                     <Setter Property="BorderThickness" Value="1" />
                                                     <Setter Property="Opacity" Value="1" />
                                                     <Style.Triggers>
                                                         <DataTrigger Binding="{Binding IsEnabled}" Value="False">
-                                                            <Setter Property="Background" Value="#EEEEEE" />
-                                                            <Setter Property="BorderBrush" Value="#D0D0D0" />
+                                                            <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Surface.Sunken}" />
+                                                            <Setter Property="BorderBrush" Value="{DynamicResource Legacy.Brush.Border.Panel}" />
                                                             <Setter Property="Opacity" Value="0.6" />
                                                         </DataTrigger>
                                                     </Style.Triggers>
@@ -588,16 +588,16 @@
                                                         VerticalAlignment="Center" Width="20">
                                                     <Border.Style>
                                                         <Style TargetType="Border">
-                                                            <Setter Property="Background" Value="#424242" />
+                                                            <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Fg.StrongAlt}" />
                                                             <Style.Triggers>
                                                                 <DataTrigger Binding="{Binding IsEnabled}" Value="False">
-                                                                    <Setter Property="Background" Value="#BDBDBD" />
+                                                                    <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Border.MidAlt}" />
                                                                 </DataTrigger>
                                                             </Style.Triggers>
                                                         </Style>
                                                     </Border.Style>
                                                     <TextBlock Text="{Binding Priority}" FontSize="9" FontWeight="Bold"
-                                                               Foreground="White" HorizontalAlignment="Center" />
+                                                               Foreground="{DynamicResource Legacy.Brush.Surface.White}" HorizontalAlignment="Center" />
                                                 </Border>
                                                 <!-- Move up/down -->
                                                 <StackPanel Orientation="Horizontal" Margin="0,0,4,0" VerticalAlignment="Center">
@@ -605,14 +605,14 @@
                                                             CommandParameter="{Binding}" Cursor="Hand" ToolTip="Move up (higher priority)">
                                                         <Button.Template>
                                                             <ControlTemplate TargetType="Button">
-                                                                <Border x:Name="UpBorder" Background="#E0E0E0" CornerRadius="2,0,0,2"
+                                                                <Border x:Name="UpBorder" Background="{DynamicResource Legacy.Brush.Border.Default}" CornerRadius="2,0,0,2"
                                                                         Padding="3,1" BorderThickness="0">
-                                                                    <TextBlock Text="▲" FontSize="8" Foreground="#555555"
+                                                                    <TextBlock Text="▲" FontSize="8" Foreground="{DynamicResource Legacy.Brush.Fg.Body}"
                                                                                HorizontalAlignment="Center" VerticalAlignment="Center" />
                                                                 </Border>
                                                                 <ControlTemplate.Triggers>
                                                                     <Trigger Property="IsMouseOver" Value="True">
-                                                                        <Setter TargetName="UpBorder" Property="Background" Value="#1565C0" />
+                                                                        <Setter TargetName="UpBorder" Property="Background" Value="{DynamicResource Legacy.Brush.Action.Primary}" />
                                                                     </Trigger>
                                                                 </ControlTemplate.Triggers>
                                                             </ControlTemplate>
@@ -622,14 +622,14 @@
                                                             CommandParameter="{Binding}" Cursor="Hand" ToolTip="Move down (lower priority)">
                                                         <Button.Template>
                                                             <ControlTemplate TargetType="Button">
-                                                                <Border x:Name="DownBorder" Background="#E0E0E0" CornerRadius="0,2,2,0"
+                                                                <Border x:Name="DownBorder" Background="{DynamicResource Legacy.Brush.Border.Default}" CornerRadius="0,2,2,0"
                                                                         Padding="3,1" BorderThickness="0">
-                                                                    <TextBlock Text="▼" FontSize="8" Foreground="#555555"
+                                                                    <TextBlock Text="▼" FontSize="8" Foreground="{DynamicResource Legacy.Brush.Fg.Body}"
                                                                                HorizontalAlignment="Center" VerticalAlignment="Center" />
                                                                 </Border>
                                                                 <ControlTemplate.Triggers>
                                                                     <Trigger Property="IsMouseOver" Value="True">
-                                                                        <Setter TargetName="DownBorder" Property="Background" Value="#1565C0" />
+                                                                        <Setter TargetName="DownBorder" Property="Background" Value="{DynamicResource Legacy.Brush.Action.Primary}" />
                                                                     </Trigger>
                                                                 </ControlTemplate.Triggers>
                                                             </ControlTemplate>
@@ -644,16 +644,16 @@
                                                 <!-- Editable pattern text -->
                                                 <TextBox Text="{Binding Pattern, UpdateSourceTrigger=LostFocus}"
                                                          MinWidth="80" Padding="4,2" FontSize="11"
-                                                         FontWeight="SemiBold" Foreground="#283593"
+                                                         FontWeight="SemiBold" Foreground="{DynamicResource Legacy.Brush.Accent.Deep}"
                                                          VerticalContentAlignment="Center"
-                                                         BorderThickness="0,0,0,1.5" BorderBrush="#7986CB"
+                                                         BorderThickness="0,0,0,1.5" BorderBrush="{DynamicResource Legacy.Brush.Accent.Mid}"
                                                          Background="Transparent"
                                                          ToolTip="Click to edit pattern" />
                                                 <Button Content="✕"
                                                         Command="{Binding DataContext.RemoveFolderSearchPatternCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                         CommandParameter="{Binding}"
                                                         Padding="2,0" Margin="6,0,0,0"
-                                                        FontSize="9" Foreground="#C62828" Cursor="Hand"
+                                                        FontSize="9" Foreground="{DynamicResource Legacy.Brush.Danger.Fg}" Cursor="Hand"
                                                         Background="Transparent" BorderThickness="0" />
                                             </StackPanel>
                                         </Border>
@@ -666,7 +666,7 @@
                     <!-- Row 1: Results list -->
                     <ListView Grid.Row="1" ItemsSource="{Binding FolderSearchResults}"
                               ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                              BorderThickness="1" BorderBrush="#E0E0E0"
+                              BorderThickness="1" BorderBrush="{DynamicResource Legacy.Brush.Border.Default}"
                               GridViewColumnHeader.Click="FolderResults_ColumnHeaderClick">
                         <ListView.View>
                             <GridView>
@@ -693,7 +693,7 @@
                                             <TextBlock>
                                                 <Hyperlink Command="{Binding DataContext.OpenFolderLocationCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                            CommandParameter="{Binding FullPath}"
-                                                           Foreground="#1565C0">
+                                                           Foreground="{DynamicResource Legacy.Brush.Action.Primary}">
                                                     <Run Text="{Binding FullPath, Mode=OneWay}" />
                                                 </Hyperlink>
                                             </TextBlock>
@@ -747,9 +747,9 @@
                         <ToggleButton.Style>
                             <Style TargetType="ToggleButton">
                                 <Setter Property="Content" Value="Mini Preview" />
-                                <Setter Property="Foreground" Value="#555555" />
-                                <Setter Property="Background" Value="#F5F5F5" />
-                                <Setter Property="BorderBrush" Value="#CCCCCC" />
+                                <Setter Property="Foreground" Value="{DynamicResource Legacy.Brush.Fg.Body}" />
+                                <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Surface.Raised}" />
+                                <Setter Property="BorderBrush" Value="{DynamicResource Legacy.Brush.Border.Light}" />
                                 <Setter Property="BorderThickness" Value="1" />
                                 <Setter Property="Template">
                                     <Setter.Value>
@@ -767,19 +767,19 @@
                                     <Trigger Property="IsChecked" Value="True">
                                         <Setter Property="Content" Value="✦ Mini Preview" />
                                         <Setter Property="Foreground" Value="White" />
-                                        <Setter Property="Background" Value="#0277BD" />
-                                        <Setter Property="BorderBrush" Value="#01579B" />
+                                        <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Action.Info}" />
+                                        <Setter Property="BorderBrush" Value="{DynamicResource Legacy.Brush.Action.InfoDark}" />
                                         <Setter Property="FontWeight" Value="SemiBold" />
                                     </Trigger>
                                     <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter Property="Background" Value="#E1F5FE" />
+                                        <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Surface.InfoTintAlt}" />
                                     </Trigger>
                                     <MultiTrigger>
                                         <MultiTrigger.Conditions>
                                             <Condition Property="IsChecked" Value="True" />
                                             <Condition Property="IsMouseOver" Value="True" />
                                         </MultiTrigger.Conditions>
-                                        <Setter Property="Background" Value="#0288D1" />
+                                        <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Action.InfoMid}" />
                                     </MultiTrigger>
                                 </Style.Triggers>
                             </Style>
@@ -792,9 +792,9 @@
                         <ToggleButton.Style>
                             <Style TargetType="ToggleButton">
                                 <Setter Property="Content" Value="File Preview" />
-                                <Setter Property="Foreground" Value="#555555" />
-                                <Setter Property="Background" Value="#F5F5F5" />
-                                <Setter Property="BorderBrush" Value="#CCCCCC" />
+                                <Setter Property="Foreground" Value="{DynamicResource Legacy.Brush.Fg.Body}" />
+                                <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Surface.Raised}" />
+                                <Setter Property="BorderBrush" Value="{DynamicResource Legacy.Brush.Border.Light}" />
                                 <Setter Property="BorderThickness" Value="1" />
                                 <Setter Property="Template">
                                     <Setter.Value>
@@ -812,19 +812,19 @@
                                     <Trigger Property="IsChecked" Value="True">
                                         <Setter Property="Content" Value="✦ File Preview" />
                                         <Setter Property="Foreground" Value="White" />
-                                        <Setter Property="Background" Value="#0277BD" />
-                                        <Setter Property="BorderBrush" Value="#01579B" />
+                                        <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Action.Info}" />
+                                        <Setter Property="BorderBrush" Value="{DynamicResource Legacy.Brush.Action.InfoDark}" />
                                         <Setter Property="FontWeight" Value="SemiBold" />
                                     </Trigger>
                                     <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter Property="Background" Value="#E1F5FE" />
+                                        <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Surface.InfoTintAlt}" />
                                     </Trigger>
                                     <MultiTrigger>
                                         <MultiTrigger.Conditions>
                                             <Condition Property="IsChecked" Value="True" />
                                             <Condition Property="IsMouseOver" Value="True" />
                                         </MultiTrigger.Conditions>
-                                        <Setter Property="Background" Value="#0288D1" />
+                                        <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Action.InfoMid}" />
                                     </MultiTrigger>
                                 </Style.Triggers>
                             </Style>
@@ -837,9 +837,9 @@
                         <ToggleButton.Style>
                             <Style TargetType="ToggleButton">
                                 <Setter Property="Content" Value="Analytics" />
-                                <Setter Property="Foreground" Value="#555555" />
-                                <Setter Property="Background" Value="#F5F5F5" />
-                                <Setter Property="BorderBrush" Value="#CCCCCC" />
+                                <Setter Property="Foreground" Value="{DynamicResource Legacy.Brush.Fg.Body}" />
+                                <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Surface.Raised}" />
+                                <Setter Property="BorderBrush" Value="{DynamicResource Legacy.Brush.Border.Light}" />
                                 <Setter Property="BorderThickness" Value="1" />
                                 <Setter Property="Template">
                                     <Setter.Value>
@@ -857,19 +857,19 @@
                                     <Trigger Property="IsChecked" Value="True">
                                         <Setter Property="Content" Value="✦ Analytics" />
                                         <Setter Property="Foreground" Value="White" />
-                                        <Setter Property="Background" Value="#0277BD" />
-                                        <Setter Property="BorderBrush" Value="#01579B" />
+                                        <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Action.Info}" />
+                                        <Setter Property="BorderBrush" Value="{DynamicResource Legacy.Brush.Action.InfoDark}" />
                                         <Setter Property="FontWeight" Value="SemiBold" />
                                     </Trigger>
                                     <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter Property="Background" Value="#E1F5FE" />
+                                        <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Surface.InfoTintAlt}" />
                                     </Trigger>
                                     <MultiTrigger>
                                         <MultiTrigger.Conditions>
                                             <Condition Property="IsChecked" Value="True" />
                                             <Condition Property="IsMouseOver" Value="True" />
                                         </MultiTrigger.Conditions>
-                                        <Setter Property="Background" Value="#0288D1" />
+                                        <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Action.InfoMid}" />
                                     </MultiTrigger>
                                 </Style.Triggers>
                             </Style>
@@ -882,9 +882,9 @@
                         <ToggleButton.Style>
                             <Style TargetType="ToggleButton">
                                 <Setter Property="Content" Value="Auto Play" />
-                                <Setter Property="Foreground" Value="#555555" />
-                                <Setter Property="Background" Value="#F5F5F5" />
-                                <Setter Property="BorderBrush" Value="#CCCCCC" />
+                                <Setter Property="Foreground" Value="{DynamicResource Legacy.Brush.Fg.Body}" />
+                                <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Surface.Raised}" />
+                                <Setter Property="BorderBrush" Value="{DynamicResource Legacy.Brush.Border.Light}" />
                                 <Setter Property="BorderThickness" Value="1" />
                                 <Setter Property="Template">
                                     <Setter.Value>
@@ -902,19 +902,19 @@
                                     <Trigger Property="IsChecked" Value="True">
                                         <Setter Property="Content" Value="✦ Auto Play" />
                                         <Setter Property="Foreground" Value="White" />
-                                        <Setter Property="Background" Value="#0277BD" />
-                                        <Setter Property="BorderBrush" Value="#01579B" />
+                                        <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Action.Info}" />
+                                        <Setter Property="BorderBrush" Value="{DynamicResource Legacy.Brush.Action.InfoDark}" />
                                         <Setter Property="FontWeight" Value="SemiBold" />
                                     </Trigger>
                                     <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter Property="Background" Value="#E1F5FE" />
+                                        <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Surface.InfoTintAlt}" />
                                     </Trigger>
                                     <MultiTrigger>
                                         <MultiTrigger.Conditions>
                                             <Condition Property="IsChecked" Value="True" />
                                             <Condition Property="IsMouseOver" Value="True" />
                                         </MultiTrigger.Conditions>
-                                        <Setter Property="Background" Value="#0288D1" />
+                                        <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Action.InfoMid}" />
                                     </MultiTrigger>
                                 </Style.Triggers>
                             </Style>
@@ -938,8 +938,8 @@
                 </Grid.RowDefinitions>
 
                 <!-- Row 0: Base Filters (inline — sort + file type controls + size/dup filters) -->
-                <Border Grid.Row="0" Background="#F0F4FF" CornerRadius="4" Padding="8,2" Margin="0,0,0,4"
-                        BorderBrush="#C5CAE9" BorderThickness="1"
+                <Border Grid.Row="0" Background="{DynamicResource Legacy.Brush.Surface.InfoWash}" CornerRadius="4" Padding="8,2" Margin="0,0,0,4"
+                        BorderBrush="{DynamicResource Legacy.Brush.Border.Accent}" BorderThickness="1"
                         Visibility="{Binding DuplicateMatchByRegex, Converter={StaticResource InverseBoolToVisibility}}">
                     <WrapPanel Orientation="Horizontal" VerticalAlignment="Center">
                         <!-- Title -->
@@ -947,24 +947,24 @@
                             <Button Content="🔄 Use Regex"
                                     Command="{Binding ToggleDuplicateMatchModeCommand}"
                                     Padding="6,2" Margin="0,0,8,0" FontSize="10" Cursor="Hand"
-                                    Foreground="#E65100" BorderBrush="#FFB74D" Background="#FFF8E1"
+                                    Foreground="{DynamicResource Legacy.Brush.Warn.Fg}" BorderBrush="{DynamicResource Legacy.Brush.Warn.Border}" Background="{DynamicResource Legacy.Brush.Warn.Wash}"
                                     ToolTip="Switch to Match by Name Regex mode (group files by regex captures from their name — files don't need to be identical)" />
                             <TextBlock Text="Base Filters" FontWeight="Bold" FontSize="11"
-                                       Foreground="#1565C0" VerticalAlignment="Center" Margin="0,0,4,0" />
+                                       Foreground="{DynamicResource Legacy.Brush.Action.Primary}" VerticalAlignment="Center" Margin="0,0,4,0" />
                             <ToggleButton Style="{StaticResource HelpButtonStyle}"
                                           Tag="&lt;h&gt;BASE FILTERS&lt;/h&gt;&#x0a;Quick filters to narrow down duplicate results.&#x0a;&#x0a;&lt;b&gt;Sort&lt;/b&gt; — order groups by size, count, type, or name&#x0a;&lt;b&gt;Types&lt;/b&gt; — show/hide groups by file extension&#x0a;&lt;b&gt;Min size&lt;/b&gt; — hide files smaller than threshold&#x0a;&lt;b&gt;Min dups&lt;/b&gt; — hide groups with fewer than N copies&#x0a;&#x0a;&lt;h&gt;Tip:&lt;/h&gt; These filters work instantly on the current scan results. Use &lt;b&gt;Custom Rules&lt;/b&gt; below for pattern-based selection." />
-                            <Border Width="1" Background="#C5CAE9" Margin="8,2" />
+                            <Border Width="1" Background="{DynamicResource Legacy.Brush.Border.Accent}" Margin="8,2" />
                         </StackPanel>
 
                         <!-- Sort + Group count -->
                         <StackPanel Orientation="Horizontal" Margin="0,2,8,2" VerticalAlignment="Center">
                             <TextBlock Text="Sort:" FontWeight="SemiBold" FontSize="11"
-                                       Foreground="#666666" VerticalAlignment="Center" Margin="0,0,4,0" />
+                                       Foreground="{DynamicResource Legacy.Brush.Fg.Secondary}" VerticalAlignment="Center" Margin="0,0,4,0" />
                             <ComboBox ItemsSource="{Binding SortOptions}"
                                       SelectedItem="{Binding SelectedSortOption}"
                                       Width="155" FontSize="11" VerticalContentAlignment="Center" />
-                            <Border Width="1" Background="#D0D0D0" Margin="8,2" />
-                            <TextBlock VerticalAlignment="Center" FontSize="11" Foreground="#888888">
+                            <Border Width="1" Background="{DynamicResource Legacy.Brush.Border.Panel}" Margin="8,2" />
+                            <TextBlock VerticalAlignment="Center" FontSize="11" Foreground="{DynamicResource Legacy.Brush.Fg.Muted}">
                                 <TextBlock.Text>
                                     <MultiBinding StringFormat="Showing {0} of {1} groups">
                                         <Binding Path="FilteredGroupCount" />
@@ -976,9 +976,9 @@
 
                         <!-- File Types -->
                         <StackPanel Orientation="Horizontal" Margin="0,2,8,2" VerticalAlignment="Center">
-                            <Border Width="1" Background="#D0D0D0" Margin="0,2,8,2" />
+                            <Border Width="1" Background="{DynamicResource Legacy.Brush.Border.Panel}" Margin="0,2,8,2" />
                             <TextBlock Text="Types:" FontWeight="SemiBold" FontSize="11"
-                                       Foreground="#1565C0" VerticalAlignment="Center" Margin="0,0,2,0" />
+                                       Foreground="{DynamicResource Legacy.Brush.Action.Primary}" VerticalAlignment="Center" Margin="0,0,2,0" />
                             <ToggleButton Style="{StaticResource HelpButtonStyle}"
                                           Tag="&lt;h&gt;FILTER BY FILE TYPE&lt;/h&gt;&#x0a;Show or hide duplicate groups by their file extension.&#x0a;&#x0a;&lt;b&gt;Checked&lt;/b&gt; = shown in results&#x0a;&lt;b&gt;Unchecked&lt;/b&gt; = hidden from results&#x0a;&#x0a;&lt;h&gt;Tip:&lt;/h&gt; Use this to focus on one type at a time (e.g. only images, only documents)." />
                             <Button Content="All"
@@ -991,9 +991,9 @@
 
                         <!-- Min size + Min dups + Apply -->
                         <StackPanel Orientation="Horizontal" Margin="0,2,0,2" VerticalAlignment="Center">
-                            <Border Width="1" Background="#D0D0D0" Margin="0,2,8,2" />
+                            <Border Width="1" Background="{DynamicResource Legacy.Brush.Border.Panel}" Margin="0,2,8,2" />
                             <TextBlock Text="Min size:" FontWeight="SemiBold" FontSize="11"
-                                       Foreground="#333333" VerticalAlignment="Center" Margin="0,0,4,0" />
+                                       Foreground="{DynamicResource Legacy.Brush.Fg.Strong}" VerticalAlignment="Center" Margin="0,0,4,0" />
                             <ToggleButton Style="{StaticResource HelpButtonStyle}" Margin="0,0,4,0"
                                           Tag="&lt;h&gt;FILTER BY SIZE &amp; COUNT&lt;/h&gt;&#x0a;&#x0a;&lt;b&gt;Min file size&lt;/b&gt;&#x0a;Hide files below this threshold. Useful to skip tiny duplicates and focus on large files wasting disk space.&#x0a;&#x0a;&lt;b&gt;Min duplicates&lt;/b&gt;&#x0a;Hide groups with fewer than N copies. Default = 2. Increase to find files with many copies (e.g. 5+ scattered across folders)." />
                             <TextBox Text="{Binding MinFileSizeText, UpdateSourceTrigger=PropertyChanged}"
@@ -1002,9 +1002,9 @@
                                       SelectedItem="{Binding SelectedSizeUnit}"
                                       Width="50" Margin="4,0,0,0" FontSize="11"
                                       VerticalContentAlignment="Center" />
-                            <Border Width="1" Background="#D0D0D0" Margin="8,2" />
+                            <Border Width="1" Background="{DynamicResource Legacy.Brush.Border.Panel}" Margin="8,2" />
                             <TextBlock Text="Min dups:" FontWeight="SemiBold" FontSize="11"
-                                       Foreground="#333333" VerticalAlignment="Center" Margin="0,0,4,0" />
+                                       Foreground="{DynamicResource Legacy.Brush.Fg.Strong}" VerticalAlignment="Center" Margin="0,0,4,0" />
                             <TextBox Text="{Binding MinDuplicateCount, UpdateSourceTrigger=PropertyChanged}"
                                      Width="35" Padding="4,3" FontSize="11" VerticalContentAlignment="Center" />
                             <Button Content="Apply" Command="{Binding ApplyFileSizeFilterCommand}"
@@ -1014,8 +1014,8 @@
                 </Border>
 
                 <!-- Row 0 alt: Match by Name Regex (mutually exclusive with Base Filters) -->
-                <Border Grid.Row="0" Background="#FFF3E0" CornerRadius="4" Padding="8,2" Margin="0,0,0,4"
-                        BorderBrush="#FFB74D" BorderThickness="1"
+                <Border Grid.Row="0" Background="{DynamicResource Legacy.Brush.Warn.Tint}" CornerRadius="4" Padding="8,2" Margin="0,0,0,4"
+                        BorderBrush="{DynamicResource Legacy.Brush.Warn.Border}" BorderThickness="1"
                         Visibility="{Binding DuplicateMatchByRegex, Converter={StaticResource BoolToVisibility}}">
                     <WrapPanel Orientation="Horizontal" VerticalAlignment="Center">
                         <!-- Title -->
@@ -1023,19 +1023,19 @@
                             <Button Content="🔄 Use Base Filters"
                                     Command="{Binding ToggleDuplicateMatchModeCommand}"
                                     Padding="6,2" Margin="0,0,8,0" FontSize="10" Cursor="Hand"
-                                    Foreground="#1565C0" BorderBrush="#C5CAE9" Background="#F0F4FF"
+                                    Foreground="{DynamicResource Legacy.Brush.Action.Primary}" BorderBrush="{DynamicResource Legacy.Brush.Border.Accent}" Background="{DynamicResource Legacy.Brush.Surface.InfoWash}"
                                     ToolTip="Switch back to Base Filters mode (size + content hash matching)" />
                             <TextBlock Text="Match by Name Regex" FontWeight="Bold" FontSize="11"
-                                       Foreground="#E65100" VerticalAlignment="Center" Margin="0,0,4,0" />
+                                       Foreground="{DynamicResource Legacy.Brush.Warn.Fg}" VerticalAlignment="Center" Margin="0,0,4,0" />
                             <ToggleButton Style="{StaticResource HelpButtonStyle}"
                                           Tag="&lt;h&gt;MATCH BY NAME REGEX&lt;/h&gt;&#x0a;Group files by regex captures from their name instead of by content hash. Files do NOT need to be the same size.&#x0a;&#x0a;&lt;b&gt;How it works&lt;/b&gt;&#x0a;Each file name is matched against the regex. Files whose captured groups (or full match if no groups) are equal land in the same duplicate group.&#x0a;&#x0a;&lt;b&gt;Example&lt;/b&gt;&#x0a;Pattern: &lt;b&gt;(?i)(abc).*?(\d{7,8})&lt;/b&gt;&#x0a;Captures (abc, 12345678) from both &lt;b&gt;abc-12345678.jpg&lt;/b&gt; and &lt;b&gt;bla bla abc 12345678.png&lt;/b&gt; → grouped together.&#x0a;&#x0a;&lt;b&gt;Notes&lt;/b&gt;&#x0a;• Files not matching the pattern are skipped&#x0a;• Use &lt;b&gt;(?i)&lt;/b&gt; for case-insensitive matching&#x0a;• Switch back to Base Filters to restore size+hash matching" />
-                            <Border Width="1" Background="#FFB74D" Margin="8,2" />
+                            <Border Width="1" Background="{DynamicResource Legacy.Brush.Warn.Border}" Margin="8,2" />
                         </StackPanel>
 
                         <!-- Pattern -->
                         <StackPanel Orientation="Horizontal" Margin="0,2,0,2" VerticalAlignment="Center">
                             <TextBlock Text="Pattern:" FontWeight="SemiBold" FontSize="11"
-                                       Foreground="#E65100" VerticalAlignment="Center" Margin="0,0,4,0" />
+                                       Foreground="{DynamicResource Legacy.Brush.Warn.Fg}" VerticalAlignment="Center" Margin="0,0,4,0" />
                             <TextBox Text="{Binding DuplicateMatchRegex, UpdateSourceTrigger=PropertyChanged}"
                                      Width="380" Padding="4,3" FontSize="11" VerticalContentAlignment="Center"
                                      FontFamily="Consolas"
@@ -1045,8 +1045,8 @@
                 </Border>
 
                 <!-- Row 1: Extension checkboxes (visible when filters exist) -->
-                <Border Grid.Row="1" Background="#F8F9FC" CornerRadius="4" Padding="8,4" Margin="0,0,0,4"
-                        BorderBrush="#E8E8E8" BorderThickness="1">
+                <Border Grid.Row="1" Background="{DynamicResource Legacy.Brush.Surface.InfoWashAlt}" CornerRadius="4" Padding="8,4" Margin="0,0,0,4"
+                        BorderBrush="{DynamicResource Legacy.Brush.Border.Faint}" BorderThickness="1">
                     <Border.Style>
                         <Style TargetType="Border">
                             <Setter Property="Visibility" Value="Visible" />
@@ -1069,9 +1069,9 @@
                                     <CheckBox.Content>
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock Text="{Binding Extension}" FontWeight="SemiBold"
-                                                       FontSize="11" Foreground="#1565C0" />
+                                                       FontSize="11" Foreground="{DynamicResource Legacy.Brush.Action.Primary}" />
                                             <TextBlock Text="{Binding FileCount, StringFormat=' ({0})'}"
-                                                       FontSize="10" Foreground="#888888" />
+                                                       FontSize="10" Foreground="{DynamicResource Legacy.Brush.Fg.Muted}" />
                                         </StackPanel>
                                     </CheckBox.Content>
                                 </CheckBox>
@@ -1081,18 +1081,18 @@
                 </Border>
 
                 <!-- Row 2: Custom Rule Filter (inline — rule builder + apply/clear) -->
-                <Border Grid.Row="2" Background="#FFFBF0" CornerRadius="4" Padding="8,2" Margin="0,0,0,4"
-                        BorderBrush="#FFE082" BorderThickness="1">
+                <Border Grid.Row="2" Background="{DynamicResource Legacy.Brush.Help.RuleBg}" CornerRadius="4" Padding="8,2" Margin="0,0,0,4"
+                        BorderBrush="{DynamicResource Legacy.Brush.Help.RuleBorder}" BorderThickness="1">
                     <StackPanel>
                         <!-- Rule builder row -->
                         <WrapPanel Orientation="Horizontal">
                             <!-- Label -->
                             <StackPanel Orientation="Horizontal" Margin="0,2,0,2" VerticalAlignment="Center">
-                                <TextBlock Text="Custom Rules" FontSize="11" FontWeight="Bold" Foreground="#E65100"
+                                <TextBlock Text="Custom Rules" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource Legacy.Brush.Warn.Fg}"
                                            VerticalAlignment="Center" Margin="0,0,4,0" />
                                 <ToggleButton Style="{StaticResource HelpButtonStyle}"
                                               Tag="&lt;h&gt;CUSTOM FILTER RULES&lt;/h&gt;&#x0a;Build rules to find or ignore files by pattern.&#x0a;&#x0a;&lt;b&gt;Action:&lt;/b&gt; Include (check matching files) or Exclude (uncheck matching files)&#x0a;&lt;b&gt;Target:&lt;/b&gt; Filename only or full Filepath&#x0a;&lt;b&gt;Pattern:&lt;/b&gt; Text to match against&#x0a;&lt;b&gt;Regex:&lt;/b&gt; Use regular expressions&#x0a;&lt;b&gt;Ignore Case:&lt;/b&gt; Case-insensitive matching&#x0a;&#x0a;&lt;h&gt;How it works:&lt;/h&gt;&#x0a;1. Set action, target, pattern, and options&#x0a;2. Click &lt;b&gt;+ Add&lt;/b&gt; to add the rule to the list&#x0a;3. Repeat to add more rules&#x0a;4. Click &lt;b&gt;&#x25b6; Apply&lt;/b&gt; to run the rules&#x0a;&#x0a;&lt;w&gt;First match wins.&lt;/w&gt; Rules are tried top-down; the first enabled rule that matches decides the file and later rules are not applied to it. Reorder rules to change precedence." />
-                                <Border Width="1" Background="#E0D0A0" Margin="8,2" />
+                                <Border Width="1" Background="{DynamicResource Legacy.Brush.Help.Divider}" Margin="8,2" />
                             </StackPanel>
 
                             <!-- Rule input controls -->
@@ -1101,13 +1101,13 @@
                                           SelectedItem="{Binding RuleAction}"
                                           Width="70" FontSize="11" VerticalContentAlignment="Center"
                                           Margin="0,0,4,0" />
-                                <TextBlock Text="on" FontSize="10" Foreground="#999999"
+                                <TextBlock Text="on" FontSize="10" Foreground="{DynamicResource Legacy.Brush.Fg.MutedLight}"
                                            VerticalAlignment="Center" Margin="0,0,4,0" />
                                 <ComboBox ItemsSource="{Binding FilterTargets}"
                                           SelectedItem="{Binding RuleTarget}"
                                           Width="80" FontSize="11" VerticalContentAlignment="Center"
                                           Margin="0,0,4,0" />
-                                <TextBlock Text="matching" FontSize="10" Foreground="#999999"
+                                <TextBlock Text="matching" FontSize="10" Foreground="{DynamicResource Legacy.Brush.Fg.MutedLight}"
                                            VerticalAlignment="Center" Margin="0,0,4,0" />
                                 <TextBox Text="{Binding RulePatternText, UpdateSourceTrigger=PropertyChanged}"
                                          Width="180" Padding="4,3" FontSize="11" VerticalContentAlignment="Center"
@@ -1115,13 +1115,13 @@
                                          helpers:TextBoxEnterKeyBehavior.Command="{Binding AddFilterRuleCommand}">
                                     <TextBox.Style>
                                         <Style TargetType="TextBox">
-                                            <Setter Property="BorderBrush" Value="#AAAAAA" />
+                                            <Setter Property="BorderBrush" Value="{DynamicResource Legacy.Brush.Fg.Disabled}" />
                                             <Setter Property="Background" Value="White" />
                                             <Setter Property="FontFamily" Value="Segoe UI" />
                                             <Style.Triggers>
                                                 <DataTrigger Binding="{Binding RuleIsRegex}" Value="True">
-                                                    <Setter Property="BorderBrush" Value="#42A5F5" />
-                                                    <Setter Property="Background" Value="#E1F5FE" />
+                                                    <Setter Property="BorderBrush" Value="{DynamicResource Legacy.Brush.Action.Focus}" />
+                                                    <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Surface.InfoTintAlt}" />
                                                     <Setter Property="FontFamily" Value="Consolas" />
                                                 </DataTrigger>
                                             </Style.Triggers>
@@ -1134,9 +1134,9 @@
                                     <ToggleButton.Style>
                                         <Style TargetType="ToggleButton">
                                             <Setter Property="Content" Value=".* Regex" />
-                                            <Setter Property="Foreground" Value="#555555" />
-                                            <Setter Property="Background" Value="#F5F5F5" />
-                                            <Setter Property="BorderBrush" Value="#CCCCCC" />
+                                            <Setter Property="Foreground" Value="{DynamicResource Legacy.Brush.Fg.Body}" />
+                                            <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Surface.Raised}" />
+                                            <Setter Property="BorderBrush" Value="{DynamicResource Legacy.Brush.Border.Light}" />
                                             <Setter Property="BorderThickness" Value="1" />
                                             <Setter Property="Template">
                                                 <Setter.Value>
@@ -1154,19 +1154,19 @@
                                                 <Trigger Property="IsChecked" Value="True">
                                                     <Setter Property="Content" Value="✦ .* Regex" />
                                                     <Setter Property="Foreground" Value="White" />
-                                                    <Setter Property="Background" Value="#1565C0" />
-                                                    <Setter Property="BorderBrush" Value="#0D47A1" />
+                                                    <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Action.Primary}" />
+                                                    <Setter Property="BorderBrush" Value="{DynamicResource Legacy.Brush.Action.PrimaryDark}" />
                                                     <Setter Property="FontWeight" Value="SemiBold" />
                                                 </Trigger>
                                                 <Trigger Property="IsMouseOver" Value="True">
-                                                    <Setter Property="Background" Value="#E3F2FD" />
+                                                    <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Surface.InfoTint}" />
                                                 </Trigger>
                                                 <MultiTrigger>
                                                     <MultiTrigger.Conditions>
                                                         <Condition Property="IsChecked" Value="True" />
                                                         <Condition Property="IsMouseOver" Value="True" />
                                                     </MultiTrigger.Conditions>
-                                                    <Setter Property="Background" Value="#1976D2" />
+                                                    <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Action.PrimaryMid}" />
                                                 </MultiTrigger>
                                             </Style.Triggers>
                                         </Style>
@@ -1180,9 +1180,9 @@
                                     <ToggleButton.Style>
                                         <Style TargetType="ToggleButton">
                                             <Setter Property="Content" Value="Aa" />
-                                            <Setter Property="Foreground" Value="#555555" />
-                                            <Setter Property="Background" Value="#F5F5F5" />
-                                            <Setter Property="BorderBrush" Value="#CCCCCC" />
+                                            <Setter Property="Foreground" Value="{DynamicResource Legacy.Brush.Fg.Body}" />
+                                            <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Surface.Raised}" />
+                                            <Setter Property="BorderBrush" Value="{DynamicResource Legacy.Brush.Border.Light}" />
                                             <Setter Property="BorderThickness" Value="1" />
                                             <Setter Property="Template">
                                                 <Setter.Value>
@@ -1200,19 +1200,19 @@
                                                 <Trigger Property="IsChecked" Value="True">
                                                     <Setter Property="Content" Value="✦ Aa" />
                                                     <Setter Property="Foreground" Value="White" />
-                                                    <Setter Property="Background" Value="#E65100" />
-                                                    <Setter Property="BorderBrush" Value="#BF360C" />
+                                                    <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Warn.Fg}" />
+                                                    <Setter Property="BorderBrush" Value="{DynamicResource Legacy.Brush.Danger.Dark}" />
                                                     <Setter Property="FontWeight" Value="SemiBold" />
                                                 </Trigger>
                                                 <Trigger Property="IsMouseOver" Value="True">
-                                                    <Setter Property="Background" Value="#FFF3E0" />
+                                                    <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Warn.Tint}" />
                                                 </Trigger>
                                                 <MultiTrigger>
                                                     <MultiTrigger.Conditions>
                                                         <Condition Property="IsChecked" Value="True" />
                                                         <Condition Property="IsMouseOver" Value="True" />
                                                     </MultiTrigger.Conditions>
-                                                    <Setter Property="Background" Value="#F4511E" />
+                                                    <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Danger.Strong}" />
                                                 </MultiTrigger>
                                             </Style.Triggers>
                                         </Style>
@@ -1223,25 +1223,25 @@
 
                                 <Button Content="+ Add" Command="{Binding AddFilterRuleCommand}"
                                         Padding="8,3" Margin="4,0,0,0" FontSize="11" Cursor="Hand"
-                                        FontWeight="SemiBold" Foreground="#2E7D32"
+                                        FontWeight="SemiBold" Foreground="{DynamicResource Legacy.Brush.Success.FgDark}"
                                         ToolTip="Add this rule to the list" />
-                                <Border Width="1" Background="#E0D0A0" Margin="8,2" />
+                                <Border Width="1" Background="{DynamicResource Legacy.Brush.Help.Divider}" Margin="8,2" />
                             </StackPanel>
 
                             <!-- All / None | Apply -->
                             <StackPanel Orientation="Horizontal" Margin="0,2,0,2" VerticalAlignment="Center">
                                 <Button Content="✓ All" Command="{Binding EnableAllRulesCommand}"
                                         Padding="6,3" FontSize="11" Cursor="Hand"
-                                        Foreground="#2E7D32"
+                                        Foreground="{DynamicResource Legacy.Brush.Success.FgDark}"
                                         ToolTip="Enable all rules" />
                                 <Button Content="✕ None" Command="{Binding DisableAllRulesCommand}"
                                         Padding="6,3" Margin="4,0,0,0" FontSize="11" Cursor="Hand"
-                                        Foreground="#888888"
+                                        Foreground="{DynamicResource Legacy.Brush.Fg.Muted}"
                                         ToolTip="Disable all rules" />
-                                <Border Width="1" Background="#E0D0A0" Margin="8,2" />
+                                <Border Width="1" Background="{DynamicResource Legacy.Brush.Help.Divider}" Margin="8,2" />
                                 <Button Content="▶ Apply" Command="{Binding ApplyFilterRulesCommand}"
                                         Padding="6,3" FontSize="11" Cursor="Hand"
-                                        FontWeight="SemiBold" Foreground="#1565C0"
+                                        FontWeight="SemiBold" Foreground="{DynamicResource Legacy.Brush.Action.Primary}"
                                         ToolTip="Apply all enabled rules" />
                             </StackPanel>
                         </WrapPanel>
@@ -1258,18 +1258,18 @@
                                     <Border Margin="0,0,6,4" Padding="6,3" CornerRadius="4">
                                         <Border.Style>
                                             <Style TargetType="Border">
-                                                <Setter Property="Background" Value="#E3F2FD" />
-                                                <Setter Property="BorderBrush" Value="#42A5F5" />
+                                                <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Surface.InfoTint}" />
+                                                <Setter Property="BorderBrush" Value="{DynamicResource Legacy.Brush.Action.Focus}" />
                                                 <Setter Property="BorderThickness" Value="1" />
                                                 <Setter Property="Opacity" Value="1" />
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding Action}" Value="Exclude">
-                                                        <Setter Property="Background" Value="#E1F5FE" />
-                                                        <Setter Property="BorderBrush" Value="#29B6F6" />
+                                                        <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Surface.InfoTintAlt}" />
+                                                        <Setter Property="BorderBrush" Value="{DynamicResource Legacy.Brush.Action.InfoLight}" />
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding IsEnabled}" Value="False">
-                                                        <Setter Property="Background" Value="#EEEEEE" />
-                                                        <Setter Property="BorderBrush" Value="#D0D0D0" />
+                                                        <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Surface.Sunken}" />
+                                                        <Setter Property="BorderBrush" Value="{DynamicResource Legacy.Brush.Border.Panel}" />
                                                         <Setter Property="Opacity" Value="0.6" />
                                                     </DataTrigger>
                                                 </Style.Triggers>
@@ -1285,16 +1285,16 @@
                                                     VerticalAlignment="Center" Width="20">
                                                 <Border.Style>
                                                     <Style TargetType="Border">
-                                                        <Setter Property="Background" Value="#424242" />
+                                                        <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Fg.StrongAlt}" />
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding IsEnabled}" Value="False">
-                                                                <Setter Property="Background" Value="#BDBDBD" />
+                                                                <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Border.MidAlt}" />
                                                             </DataTrigger>
                                                         </Style.Triggers>
                                                     </Style>
                                                 </Border.Style>
                                                 <TextBlock Text="{Binding Priority}" FontSize="9" FontWeight="Bold"
-                                                           Foreground="White" HorizontalAlignment="Center" />
+                                                           Foreground="{DynamicResource Legacy.Brush.Surface.White}" HorizontalAlignment="Center" />
                                             </Border>
                                             <!-- Move up/down -->
                                             <StackPanel Orientation="Horizontal" Margin="0,0,4,0" VerticalAlignment="Center">
@@ -1302,14 +1302,14 @@
                                                         CommandParameter="{Binding}" Cursor="Hand" ToolTip="Move up (higher priority)">
                                                     <Button.Template>
                                                         <ControlTemplate TargetType="Button">
-                                                            <Border x:Name="UpBorder" Background="#E0E0E0" CornerRadius="2,0,0,2"
+                                                            <Border x:Name="UpBorder" Background="{DynamicResource Legacy.Brush.Border.Default}" CornerRadius="2,0,0,2"
                                                                     Padding="3,1" BorderThickness="0">
-                                                                <TextBlock Text="▲" FontSize="8" Foreground="#555555"
+                                                                <TextBlock Text="▲" FontSize="8" Foreground="{DynamicResource Legacy.Brush.Fg.Body}"
                                                                            HorizontalAlignment="Center" VerticalAlignment="Center" />
                                                             </Border>
                                                             <ControlTemplate.Triggers>
                                                                 <Trigger Property="IsMouseOver" Value="True">
-                                                                    <Setter TargetName="UpBorder" Property="Background" Value="#1565C0" />
+                                                                    <Setter TargetName="UpBorder" Property="Background" Value="{DynamicResource Legacy.Brush.Action.Primary}" />
                                                                 </Trigger>
                                                             </ControlTemplate.Triggers>
                                                         </ControlTemplate>
@@ -1319,14 +1319,14 @@
                                                         CommandParameter="{Binding}" Cursor="Hand" ToolTip="Move down (lower priority)">
                                                     <Button.Template>
                                                         <ControlTemplate TargetType="Button">
-                                                            <Border x:Name="DownBorder" Background="#E0E0E0" CornerRadius="0,2,2,0"
+                                                            <Border x:Name="DownBorder" Background="{DynamicResource Legacy.Brush.Border.Default}" CornerRadius="0,2,2,0"
                                                                     Padding="3,1" BorderThickness="0">
-                                                                <TextBlock Text="▼" FontSize="8" Foreground="#555555"
+                                                                <TextBlock Text="▼" FontSize="8" Foreground="{DynamicResource Legacy.Brush.Fg.Body}"
                                                                            HorizontalAlignment="Center" VerticalAlignment="Center" />
                                                             </Border>
                                                             <ControlTemplate.Triggers>
                                                                 <Trigger Property="IsMouseOver" Value="True">
-                                                                    <Setter TargetName="DownBorder" Property="Background" Value="#1565C0" />
+                                                                    <Setter TargetName="DownBorder" Property="Background" Value="{DynamicResource Legacy.Brush.Action.Primary}" />
                                                                 </Trigger>
                                                             </ControlTemplate.Triggers>
                                                         </ControlTemplate>
@@ -1347,7 +1347,7 @@
                                             <TextBox Text="{Binding Pattern, UpdateSourceTrigger=LostFocus}"
                                                      MinWidth="80" MaxWidth="200" Padding="4,2" FontSize="11"
                                                      FontWeight="SemiBold" VerticalContentAlignment="Center"
-                                                     BorderThickness="0,0,0,1.5" BorderBrush="#42A5F5"
+                                                     BorderThickness="0,0,0,1.5" BorderBrush="{DynamicResource Legacy.Brush.Action.Focus}"
                                                      Background="Transparent" Margin="0,0,2,0"
                                                      ToolTip="Click to edit pattern" />
                                             <!-- Regex toggle button (same style as toolbar) -->
@@ -1357,9 +1357,9 @@
                                                 <ToggleButton.Style>
                                                     <Style TargetType="ToggleButton">
                                                         <Setter Property="Content" Value=".*" />
-                                                        <Setter Property="Foreground" Value="#999999" />
-                                                        <Setter Property="Background" Value="#F0F0F0" />
-                                                        <Setter Property="BorderBrush" Value="#D0D0D0" />
+                                                        <Setter Property="Foreground" Value="{DynamicResource Legacy.Brush.Fg.MutedLight}" />
+                                                        <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Border.Hairline}" />
+                                                        <Setter Property="BorderBrush" Value="{DynamicResource Legacy.Brush.Border.Panel}" />
                                                         <Setter Property="BorderThickness" Value="1" />
                                                         <Setter Property="FontFamily" Value="Consolas" />
                                                         <Setter Property="Template">
@@ -1378,19 +1378,19 @@
                                                             <Trigger Property="IsChecked" Value="True">
                                                                 <Setter Property="Content" Value="✦ .*" />
                                                                 <Setter Property="Foreground" Value="White" />
-                                                                <Setter Property="Background" Value="#1565C0" />
-                                                                <Setter Property="BorderBrush" Value="#0D47A1" />
+                                                                <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Action.Primary}" />
+                                                                <Setter Property="BorderBrush" Value="{DynamicResource Legacy.Brush.Action.PrimaryDark}" />
                                                                 <Setter Property="FontWeight" Value="SemiBold" />
                                                             </Trigger>
                                                             <Trigger Property="IsMouseOver" Value="True">
-                                                                <Setter Property="Background" Value="#E3F2FD" />
+                                                                <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Surface.InfoTint}" />
                                                             </Trigger>
                                                             <MultiTrigger>
                                                                 <MultiTrigger.Conditions>
                                                                     <Condition Property="IsChecked" Value="True" />
                                                                     <Condition Property="IsMouseOver" Value="True" />
                                                                 </MultiTrigger.Conditions>
-                                                                <Setter Property="Background" Value="#1976D2" />
+                                                                <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Action.PrimaryMid}" />
                                                             </MultiTrigger>
                                                         </Style.Triggers>
                                                     </Style>
@@ -1403,9 +1403,9 @@
                                                 <ToggleButton.Style>
                                                     <Style TargetType="ToggleButton">
                                                         <Setter Property="Content" Value="Aa" />
-                                                        <Setter Property="Foreground" Value="#999999" />
-                                                        <Setter Property="Background" Value="#F0F0F0" />
-                                                        <Setter Property="BorderBrush" Value="#D0D0D0" />
+                                                        <Setter Property="Foreground" Value="{DynamicResource Legacy.Brush.Fg.MutedLight}" />
+                                                        <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Border.Hairline}" />
+                                                        <Setter Property="BorderBrush" Value="{DynamicResource Legacy.Brush.Border.Panel}" />
                                                         <Setter Property="BorderThickness" Value="1" />
                                                         <Setter Property="FontFamily" Value="Consolas" />
                                                         <Setter Property="Template">
@@ -1424,19 +1424,19 @@
                                                             <Trigger Property="IsChecked" Value="True">
                                                                 <Setter Property="Content" Value="✦ Aa" />
                                                                 <Setter Property="Foreground" Value="White" />
-                                                                <Setter Property="Background" Value="#E65100" />
-                                                                <Setter Property="BorderBrush" Value="#BF360C" />
+                                                                <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Warn.Fg}" />
+                                                                <Setter Property="BorderBrush" Value="{DynamicResource Legacy.Brush.Danger.Dark}" />
                                                                 <Setter Property="FontWeight" Value="SemiBold" />
                                                             </Trigger>
                                                             <Trigger Property="IsMouseOver" Value="True">
-                                                                <Setter Property="Background" Value="#FFF3E0" />
+                                                                <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Warn.Tint}" />
                                                             </Trigger>
                                                             <MultiTrigger>
                                                                 <MultiTrigger.Conditions>
                                                                     <Condition Property="IsChecked" Value="True" />
                                                                     <Condition Property="IsMouseOver" Value="True" />
                                                                 </MultiTrigger.Conditions>
-                                                                <Setter Property="Background" Value="#F4511E" />
+                                                                <Setter Property="Background" Value="{DynamicResource Legacy.Brush.Danger.Strong}" />
                                                             </MultiTrigger>
                                                         </Style.Triggers>
                                                     </Style>
@@ -1450,15 +1450,15 @@
                                                 <Button.Template>
                                                     <ControlTemplate TargetType="Button">
                                                         <Border x:Name="RemoveBorder" Width="16" Height="16" CornerRadius="8"
-                                                                Background="#E0E0E0" BorderThickness="0">
+                                                                Background="{DynamicResource Legacy.Brush.Border.Default}" BorderThickness="0">
                                                             <TextBlock x:Name="RemoveText" Text="✕" FontSize="9" FontWeight="Bold"
-                                                                       Foreground="#757575"
+                                                                       Foreground="{DynamicResource Legacy.Brush.Fg.SecondaryAlt}"
                                                                        HorizontalAlignment="Center" VerticalAlignment="Center"
                                                                        Margin="0,-1,0,0" />
                                                         </Border>
                                                         <ControlTemplate.Triggers>
                                                             <Trigger Property="IsMouseOver" Value="True">
-                                                                <Setter TargetName="RemoveBorder" Property="Background" Value="#EF5350" />
+                                                                <Setter TargetName="RemoveBorder" Property="Background" Value="{DynamicResource Legacy.Brush.Danger.Mid}" />
                                                                 <Setter TargetName="RemoveText" Property="Foreground" Value="White" />
                                                             </Trigger>
                                                         </ControlTemplate.Triggers>
@@ -1474,21 +1474,21 @@
                 </Border>
 
                 <!-- Action Section (inline) -->
-                <Border Grid.Row="3" Background="#FFF3E0" CornerRadius="4" Padding="8,2" Margin="0,0,0,4">
+                <Border Grid.Row="3" Background="{DynamicResource Legacy.Brush.Warn.Tint}" CornerRadius="4" Padding="8,2" Margin="0,0,0,4">
                     <WrapPanel Orientation="Horizontal">
                         <!-- Label + count -->
                         <StackPanel Orientation="Horizontal" Margin="0,2,0,2" VerticalAlignment="Center">
-                            <TextBlock Text="Action" FontSize="11" FontWeight="Bold" Foreground="#E65100"
+                            <TextBlock Text="Action" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource Legacy.Brush.Warn.Fg}"
                                        VerticalAlignment="Center" Margin="0,0,4,0" />
                             <ToggleButton Style="{StaticResource HelpButtonStyle}"
                                           Tag="&lt;h&gt;TAKE ACTION on selected files&lt;/h&gt;&#x0a;&#x0a;&lt;b&gt;Delete&lt;/b&gt;&#x0a;Sends checked files to the Recycle Bin.&#x0a;Undo from the History tab restores them, unless the Recycle Bin has been emptied.&#x0a;&#x0a;&lt;b&gt;Move&lt;/b&gt;&#x0a;Relocates checked files to the target folder.&#x0a;Filenames are preserved. Original files are removed.&#x0a;&#x0a;&lt;w&gt;Both actions affect ALL checked files across ALL groups.&lt;/w&gt; Double-check your selection before proceeding." />
-                            <TextBlock FontSize="10" Foreground="#555555" Margin="8,0,0,0"
+                            <TextBlock FontSize="10" Foreground="{DynamicResource Legacy.Brush.Fg.Body}" Margin="8,0,0,0"
                                        VerticalAlignment="Center">
                                 <TextBlock.Text>
                                     <Binding Path="SelectedFileCount" StringFormat="{}{0} files selected" />
                                 </TextBlock.Text>
                             </TextBlock>
-                            <Border Width="1" Background="#E0D0A0" Margin="8,2" />
+                            <Border Width="1" Background="{DynamicResource Legacy.Brush.Help.Divider}" Margin="8,2" />
                         </StackPanel>
 
                         <!-- Quick Select buttons -->
@@ -1504,24 +1504,24 @@
                                     ToolTip="Select older duplicates (keep newest unselected)" />
                             <Button Content="✕ Clear" Command="{Binding ClearFileSelectionCommand}"
                                     Padding="6,3" FontSize="11" Cursor="Hand"
-                                    Foreground="#888888"
+                                    Foreground="{DynamicResource Legacy.Brush.Fg.Muted}"
                                     ToolTip="Clear all file selections" />
-                            <Border Width="1" Background="#E0D0A0" Margin="8,2" />
+                            <Border Width="1" Background="{DynamicResource Legacy.Brush.Help.Divider}" Margin="8,2" />
                         </StackPanel>
 
                         <!-- Delete / Move -->
                         <StackPanel Orientation="Horizontal" Margin="0,2,0,2" VerticalAlignment="Center">
                             <Button Content="🗑 Delete" Command="{Binding DeleteSelectedFilesCommand}"
                                     Padding="6,3" Margin="0,0,0,0" FontSize="11" Cursor="Hand"
-                                    Foreground="#C62828"
+                                    Foreground="{DynamicResource Legacy.Brush.Danger.Fg}"
                                     ToolTip="Send selected files to Recycle Bin" />
                             <Button Content="↶" Command="{Binding UndoLastActionCommand}"
                                     ToolTip="{Binding UndoTooltip}"
                                     Padding="6,3" Margin="4,0,0,0" FontSize="13" Cursor="Hand"
-                                    FontWeight="Bold" Foreground="#388E3C" />
-                            <Border Width="1" Background="#E0D0A0" Margin="8,2" />
+                                    FontWeight="Bold" Foreground="{DynamicResource Legacy.Brush.Success.Fg}" />
+                            <Border Width="1" Background="{DynamicResource Legacy.Brush.Help.Divider}" Margin="8,2" />
                             <TextBlock Text="Move to:" FontSize="11" FontWeight="SemiBold"
-                                       VerticalAlignment="Center" Foreground="#E65100" Margin="0,0,4,0" />
+                                       VerticalAlignment="Center" Foreground="{DynamicResource Legacy.Brush.Warn.Fg}" Margin="0,0,4,0" />
                             <TextBox Text="{Binding MoveTargetPath, UpdateSourceTrigger=PropertyChanged}"
                                      Width="200" Padding="4,3" FontSize="11" VerticalContentAlignment="Center" />
                             <Button Content="..." Command="{Binding BrowseMoveTargetCommand}"
@@ -1529,12 +1529,12 @@
                                     ToolTip="Browse for target folder" />
                             <Button Content="📁 Move" Command="{Binding MoveSelectedFilesCommand}"
                                     Padding="6,3" FontSize="11" Cursor="Hand"
-                                    Foreground="#1565C0"
+                                    Foreground="{DynamicResource Legacy.Brush.Action.Primary}"
                                     ToolTip="Move all selected files to the target folder" />
                             <Button Content="↶" Command="{Binding UndoLastActionCommand}"
                                     ToolTip="{Binding UndoTooltip}"
                                     Padding="6,3" Margin="4,0,0,0" FontSize="13" Cursor="Hand"
-                                    FontWeight="Bold" Foreground="#388E3C" />
+                                    FontWeight="Bold" Foreground="{DynamicResource Legacy.Brush.Success.Fg}" />
                         </StackPanel>
                     </WrapPanel>
                 </Border>
@@ -1557,40 +1557,40 @@
                     </ListView.ItemContainerStyle>
                     <ListView.ItemTemplate>
                         <DataTemplate>
-                            <Border BorderBrush="#DDDDDD" BorderThickness="0,0,0,1"
+                            <Border BorderBrush="{DynamicResource Legacy.Brush.Border.Subtle}" BorderThickness="0,0,0,1"
                                     Padding="4,8" Margin="0,0,0,4">
                                 <StackPanel>
                                     <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
                                         <TextBlock FontWeight="SemiBold"
                                                    Text="{Binding Count, StringFormat='{}{0} files'}" />
-                                        <TextBlock Text=" — " Foreground="Gray" />
-                                        <TextBlock Text="{Binding FormattedFileSize}" Foreground="#1565C0" />
-                                        <TextBlock Text=" each — " Foreground="Gray" />
+                                        <TextBlock Text=" — " Foreground="{DynamicResource Legacy.Brush.Fg.Gray}" />
+                                        <TextBlock Text="{Binding FormattedFileSize}" Foreground="{DynamicResource Legacy.Brush.Action.Primary}" />
+                                        <TextBlock Text=" each — " Foreground="{DynamicResource Legacy.Brush.Fg.Gray}" />
                                         <TextBlock Text="{Binding FormattedWastedSize, StringFormat='wasted: {0}'}"
-                                                   Foreground="#C62828" FontWeight="SemiBold" />
+                                                   Foreground="{DynamicResource Legacy.Brush.Danger.Fg}" FontWeight="SemiBold" />
                                         <Button Content="✓ Select All"
                                                 Command="{Binding DataContext.SelectAllInGroupCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                 CommandParameter="{Binding}"
                                                 Padding="6,2" Margin="12,0,4,0"
                                                 FontSize="11" Cursor="Hand"
-                                                Foreground="#2E7D32" />
+                                                Foreground="{DynamicResource Legacy.Brush.Success.FgDark}" />
                                         <Button Content="✕ Clear"
                                                 Command="{Binding DataContext.ClearSelectionInGroupCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                 CommandParameter="{Binding}"
                                                 Padding="6,2" Margin="0,0,4,0"
                                                 FontSize="11" Cursor="Hand"
-                                                Foreground="#888888" />
+                                                Foreground="{DynamicResource Legacy.Brush.Fg.Muted}" />
                                         <Button Content="{Binding DeleteAllLabel}"
                                                 Command="{Binding DataContext.DeleteAllInGroupCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                 CommandParameter="{Binding}"
                                                 Padding="6,2" Margin="4,0,0,0"
                                                 FontSize="11" Cursor="Hand"
-                                                Foreground="#C62828" FontWeight="SemiBold" />
+                                                Foreground="{DynamicResource Legacy.Brush.Danger.Fg}" FontWeight="SemiBold" />
                                     </StackPanel>
 
                                     <!-- Mini Inline Preview -->
                                     <Border Margin="16,2,0,6" Padding="6" CornerRadius="4"
-                                            Background="#F5F7FA" BorderBrush="#E8E8E8" BorderThickness="1"
+                                            Background="{DynamicResource Legacy.Brush.Surface.Cool}" BorderBrush="{DynamicResource Legacy.Brush.Border.Faint}" BorderThickness="1"
                                             HorizontalAlignment="Left"
                                             Visibility="{Binding DataContext.IsMiniPreview, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisibility}}">
                                         <StackPanel Orientation="Horizontal">
@@ -1628,8 +1628,8 @@
                                             <StackPanel VerticalAlignment="Center">
                                                 <TextBlock Text="{Binding FirstFileName}" FontSize="11" FontWeight="SemiBold"
                                                            TextTrimming="CharacterEllipsis" MaxWidth="300" />
-                                                <TextBlock Text="{Binding FileExtension}" FontSize="10" Foreground="#1565C0" />
-                                                <TextBlock Text="{Binding FormattedFileSize}" FontSize="10" Foreground="#888888" />
+                                                <TextBlock Text="{Binding FileExtension}" FontSize="10" Foreground="{DynamicResource Legacy.Brush.Action.Primary}" />
+                                                <TextBlock Text="{Binding FormattedFileSize}" FontSize="10" Foreground="{DynamicResource Legacy.Brush.Fg.Muted}" />
                                             </StackPanel>
                                         </StackPanel>
                                     </Border>
@@ -1657,23 +1657,23 @@
                                                                 CommandParameter="{Binding FilePath}"
                                                                 Padding="6,2" Margin="0,0,4,0"
                                                                 FontSize="11" Cursor="Hand"
-                                                                Foreground="#1565C0"
+                                                                Foreground="{DynamicResource Legacy.Brush.Action.Primary}"
                                                                 ToolTip="Show this file in the File Preview panel" />
                                                         <Button Content="🗑 Delete"
                                                                 Command="{Binding DataContext.DeleteFileCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                                 CommandParameter="{Binding}"
                                                                 Padding="6,2" Margin="0,0,8,0"
                                                                 FontSize="11" Cursor="Hand"
-                                                                Foreground="#C62828"
+                                                                Foreground="{DynamicResource Legacy.Brush.Danger.Fg}"
                                                                 ToolTip="Move this file to the Recycle Bin" />
                                                     </StackPanel>
                                                     <TextBlock Grid.Column="1" Text="{Binding FilePath}"
-                                                               Foreground="#333333" FontSize="12"
+                                                               Foreground="{DynamicResource Legacy.Brush.Fg.Strong}" FontSize="12"
                                                                VerticalAlignment="Center"
                                                                TextTrimming="CharacterEllipsis"
                                                                ToolTip="{Binding FilePath}" />
                                                     <TextBlock Grid.Column="2" Text="{Binding FormattedSize}"
-                                                               Foreground="#1565C0" FontSize="11" FontWeight="SemiBold"
+                                                               Foreground="{DynamicResource Legacy.Brush.Action.Primary}" FontSize="11" FontWeight="SemiBold"
                                                                VerticalAlignment="Center"
                                                                Margin="12,0,4,0"
                                                                MinWidth="60" TextAlignment="Right"
@@ -1691,18 +1691,18 @@
             </Grid>
 
             <!-- Row 2: Status Bar + Resource Monitor -->
-            <Border Grid.Row="2" Background="#F5F5F5" Padding="8,4" Margin="0,8,0,0"
+            <Border Grid.Row="2" Background="{DynamicResource Legacy.Brush.Surface.Raised}" Padding="8,4" Margin="0,8,0,0"
                     CornerRadius="4">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="{Binding StatusMessage}" Foreground="#666666" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="0" Text="{Binding StatusMessage}" Foreground="{DynamicResource Legacy.Brush.Fg.Secondary}" VerticalAlignment="Center" />
                     <StackPanel Grid.Column="1" Orientation="Horizontal">
-                        <TextBlock Text="{Binding ResourceMemory}" Foreground="#1565C0" FontSize="11" Margin="0,0,12,0" VerticalAlignment="Center" />
-                        <TextBlock Text="{Binding ResourceCpu}" Foreground="#E65100" FontSize="11" Margin="0,0,12,0" VerticalAlignment="Center" />
-                        <TextBlock Text="{Binding ResourceThreads}" Foreground="#666666" FontSize="11" VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding ResourceMemory}" Foreground="{DynamicResource Legacy.Brush.Action.Primary}" FontSize="11" Margin="0,0,12,0" VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding ResourceCpu}" Foreground="{DynamicResource Legacy.Brush.Warn.Fg}" FontSize="11" Margin="0,0,12,0" VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding ResourceThreads}" Foreground="{DynamicResource Legacy.Brush.Fg.Secondary}" FontSize="11" VerticalAlignment="Center" />
                     </StackPanel>
                 </Grid>
             </Border>
@@ -1712,9 +1712,9 @@
             </TabItem>
 
             <!-- Tab 3: History (global — gold accent) -->
-            <TabItem Background="#FFF8DC" BorderBrush="#DAA520">
+            <TabItem Background="{DynamicResource Legacy.Brush.History.Bg}" BorderBrush="{DynamicResource Legacy.Brush.History.Border}">
                 <TabItem.Header>
-                    <TextBlock Text="🕘 History" Foreground="#B8860B" FontWeight="Bold" />
+                    <TextBlock Text="🕘 History" Foreground="{DynamicResource Legacy.Brush.History.Fg}" FontWeight="Bold" />
                 </TabItem.Header>
                 <Grid Margin="8">
                     <Grid.RowDefinitions>
@@ -1724,28 +1724,28 @@
                     </Grid.RowDefinitions>
 
                     <!-- Analytics strip -->
-                    <Border Grid.Row="0" Background="#E8EAF6" CornerRadius="4" Padding="12,8"
-                            BorderBrush="#C5CAE9" BorderThickness="1" Margin="0,0,0,6">
+                    <Border Grid.Row="0" Background="{DynamicResource Legacy.Brush.Surface.Accent}" CornerRadius="4" Padding="12,8"
+                            BorderBrush="{DynamicResource Legacy.Brush.Border.Accent}" BorderThickness="1" Margin="0,0,0,6">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="📊 Analytics" FontSize="12" FontWeight="Bold"
-                                       Foreground="#1565C0" VerticalAlignment="Center" Margin="0,0,20,0" />
+                                       Foreground="{DynamicResource Legacy.Brush.Action.Primary}" VerticalAlignment="Center" Margin="0,0,20,0" />
 
                             <StackPanel Margin="0,0,24,0">
-                                <TextBlock FontSize="18" FontWeight="Bold" Foreground="#1565C0">
+                                <TextBlock FontSize="18" FontWeight="Bold" Foreground="{DynamicResource Legacy.Brush.Action.Primary}">
                                     <TextBlock.Text>
                                         <Binding Path="HistoryTotalEntries" StringFormat="{}{0}" />
                                     </TextBlock.Text>
                                 </TextBlock>
-                                <TextBlock Text="Operations" FontSize="10" Foreground="#666666" />
+                                <TextBlock Text="Operations" FontSize="10" Foreground="{DynamicResource Legacy.Brush.Fg.Secondary}" />
                             </StackPanel>
 
                             <StackPanel Margin="0,0,24,0">
-                                <TextBlock FontSize="18" FontWeight="Bold" Foreground="#388E3C">
+                                <TextBlock FontSize="18" FontWeight="Bold" Foreground="{DynamicResource Legacy.Brush.Success.Fg}">
                                     <TextBlock.Text>
                                         <Binding Path="HistoryMoveItemCount" StringFormat="{}{0}" />
                                     </TextBlock.Text>
                                 </TextBlock>
-                                <TextBlock FontSize="10" Foreground="#666666">
+                                <TextBlock FontSize="10" Foreground="{DynamicResource Legacy.Brush.Fg.Secondary}">
                                     <TextBlock.Text>
                                         <Binding Path="HistoryMoveOperationCount" StringFormat="files moved ({0} ops)" />
                                     </TextBlock.Text>
@@ -1753,12 +1753,12 @@
                             </StackPanel>
 
                             <StackPanel Margin="0,0,24,0">
-                                <TextBlock FontSize="18" FontWeight="Bold" Foreground="#C62828">
+                                <TextBlock FontSize="18" FontWeight="Bold" Foreground="{DynamicResource Legacy.Brush.Danger.Fg}">
                                     <TextBlock.Text>
                                         <Binding Path="HistoryRecycleFileItemCount" StringFormat="{}{0}" />
                                     </TextBlock.Text>
                                 </TextBlock>
-                                <TextBlock FontSize="10" Foreground="#666666">
+                                <TextBlock FontSize="10" Foreground="{DynamicResource Legacy.Brush.Fg.Secondary}">
                                     <TextBlock.Text>
                                         <Binding Path="HistoryRecycleFileOperationCount" StringFormat="files recycled ({0} ops)" />
                                     </TextBlock.Text>
@@ -1766,12 +1766,12 @@
                             </StackPanel>
 
                             <StackPanel Margin="0,0,24,0">
-                                <TextBlock FontSize="18" FontWeight="Bold" Foreground="#C62828">
+                                <TextBlock FontSize="18" FontWeight="Bold" Foreground="{DynamicResource Legacy.Brush.Danger.Fg}">
                                     <TextBlock.Text>
                                         <Binding Path="HistoryRecycleDirItemCount" StringFormat="{}{0}" />
                                     </TextBlock.Text>
                                 </TextBlock>
-                                <TextBlock FontSize="10" Foreground="#666666">
+                                <TextBlock FontSize="10" Foreground="{DynamicResource Legacy.Brush.Fg.Secondary}">
                                     <TextBlock.Text>
                                         <Binding Path="HistoryRecycleDirOperationCount" StringFormat="subfolders recycled ({0} ops)" />
                                     </TextBlock.Text>
@@ -1783,19 +1783,19 @@
                     <!-- Header actions -->
                     <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,6">
                         <TextBlock Text="Transaction History" FontSize="13" FontWeight="Bold"
-                                   Foreground="#333333" VerticalAlignment="Center" Margin="0,0,16,0" />
+                                   Foreground="{DynamicResource Legacy.Brush.Fg.Strong}" VerticalAlignment="Center" Margin="0,0,16,0" />
                         <Button Content="↶ Undo Last" Command="{Binding UndoLastActionCommand}"
                                 ToolTip="{Binding UndoTooltip}"
                                 Padding="10,4" Margin="0,0,6,0" FontSize="11" Cursor="Hand"
-                                FontWeight="SemiBold" Foreground="#388E3C" />
+                                FontWeight="SemiBold" Foreground="{DynamicResource Legacy.Brush.Success.Fg}" />
                         <Button Content="🗑 Clear History" Command="{Binding ClearHistoryCommand}"
                                 Padding="10,4" FontSize="11" Cursor="Hand"
-                                Foreground="#888888"
+                                Foreground="{DynamicResource Legacy.Brush.Fg.Muted}"
                                 ToolTip="Remove all entries from this list. Files are NOT affected." />
                     </StackPanel>
 
                     <!-- History list -->
-                    <Border Grid.Row="2" BorderBrush="#E0E0E0" BorderThickness="1" CornerRadius="4">
+                    <Border Grid.Row="2" BorderBrush="{DynamicResource Legacy.Brush.Border.Default}" BorderThickness="1" CornerRadius="4">
                         <ListView ItemsSource="{Binding ActionHistory}" BorderThickness="0"
                                   ScrollViewer.CanContentScroll="True"
                                   VirtualizingPanel.IsVirtualizing="True"
@@ -1826,7 +1826,7 @@
                                                         Command="{Binding DataContext.UndoSpecificActionCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                         CommandParameter="{Binding}"
                                                         Padding="6,2" FontSize="10" Cursor="Hand"
-                                                        FontWeight="SemiBold" Foreground="#388E3C"
+                                                        FontWeight="SemiBold" Foreground="{DynamicResource Legacy.Brush.Success.Fg}"
                                                         ToolTip="Undo this specific action" />
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
@@ -1842,8 +1842,8 @@
         </Grid>
 
         <!-- Column 1: Analytics Dashboard (full window height, toggleable) -->
-        <Border Grid.Column="1" Background="#FAFAFA" CornerRadius="6"
-                BorderBrush="#E0E0E0" BorderThickness="1" Padding="12" Margin="4,4,4,4"
+        <Border Grid.Column="1" Background="{DynamicResource Legacy.Brush.Surface.Card}" CornerRadius="6"
+                BorderBrush="{DynamicResource Legacy.Brush.Border.Default}" BorderThickness="1" Padding="12" Margin="4,4,4,4"
                 Width="320"
                 Visibility="{Binding IsAnalyticsVisible, Converter={StaticResource BoolToVisibility}}">
             <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
@@ -1855,15 +1855,15 @@
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <TextBlock Text="Analytics" FontSize="16" FontWeight="Bold"
-                                   Foreground="#1A237E" VerticalAlignment="Center" />
+                                   Foreground="{DynamicResource Legacy.Brush.Accent.Deepest}" VerticalAlignment="Center" />
                         <Button Grid.Column="1" Content="✕ Close" Padding="8,4"
-                                FontSize="11" Cursor="Hand" Foreground="#666666"
+                                FontSize="11" Cursor="Hand" Foreground="{DynamicResource Legacy.Brush.Fg.Secondary}"
                                 Click="CloseAnalytics_Click" />
                     </Grid>
 
                     <!-- Summary Cards -->
-                    <Border Background="White" CornerRadius="4" Padding="10" Margin="0,0,0,8"
-                            BorderBrush="#E0E0E0" BorderThickness="1">
+                    <Border Background="{DynamicResource Legacy.Brush.Surface.White}" CornerRadius="4" Padding="10" Margin="0,0,0,8"
+                            BorderBrush="{DynamicResource Legacy.Brush.Border.Default}" BorderThickness="1">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
@@ -1876,43 +1876,43 @@
                             </Grid.RowDefinitions>
 
                             <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,0,8">
-                                <TextBlock Text="Total Files" Foreground="#999999" FontSize="10" />
-                                <TextBlock Text="{Binding TotalFiles, StringFormat=N0}" FontSize="20" FontWeight="Bold" Foreground="#333333" />
+                                <TextBlock Text="Total Files" Foreground="{DynamicResource Legacy.Brush.Fg.MutedLight}" FontSize="10" />
+                                <TextBlock Text="{Binding TotalFiles, StringFormat=N0}" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource Legacy.Brush.Fg.Strong}" />
                             </StackPanel>
                             <StackPanel Grid.Row="0" Grid.Column="1" Margin="0,0,0,8">
-                                <TextBlock Text="Duplicates" Foreground="#999999" FontSize="10" />
-                                <TextBlock Text="{Binding TotalDuplicates, StringFormat=N0}" FontSize="20" FontWeight="Bold" Foreground="#C62828" />
+                                <TextBlock Text="Duplicates" Foreground="{DynamicResource Legacy.Brush.Fg.MutedLight}" FontSize="10" />
+                                <TextBlock Text="{Binding TotalDuplicates, StringFormat=N0}" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource Legacy.Brush.Danger.Fg}" />
                             </StackPanel>
 
                             <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,0,0,8">
-                                <TextBlock Text="Groups" Foreground="#999999" FontSize="10" />
-                                <TextBlock Text="{Binding DuplicateGroups, StringFormat=N0}" FontSize="20" FontWeight="Bold" Foreground="#1565C0" />
+                                <TextBlock Text="Groups" Foreground="{DynamicResource Legacy.Brush.Fg.MutedLight}" FontSize="10" />
+                                <TextBlock Text="{Binding DuplicateGroups, StringFormat=N0}" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource Legacy.Brush.Action.Primary}" />
                             </StackPanel>
                             <StackPanel Grid.Row="1" Grid.Column="1" Margin="0,0,0,8">
-                                <TextBlock Text="Scan Time" Foreground="#999999" FontSize="10" />
-                                <TextBlock Text="{Binding Duration, StringFormat='{}{0:mm\\:ss\\.f}'}" FontSize="20" FontWeight="Bold" Foreground="#333333" />
+                                <TextBlock Text="Scan Time" Foreground="{DynamicResource Legacy.Brush.Fg.MutedLight}" FontSize="10" />
+                                <TextBlock Text="{Binding Duration, StringFormat='{}{0:mm\\:ss\\.f}'}" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource Legacy.Brush.Fg.Strong}" />
                             </StackPanel>
 
                             <StackPanel Grid.Row="2" Grid.Column="0">
-                                <TextBlock Text="Wasted Space" Foreground="#999999" FontSize="10" />
-                                <TextBlock Text="{Binding FormattedWastedSize}" FontSize="20" FontWeight="Bold" Foreground="#C62828" />
+                                <TextBlock Text="Wasted Space" Foreground="{DynamicResource Legacy.Brush.Fg.MutedLight}" FontSize="10" />
+                                <TextBlock Text="{Binding FormattedWastedSize}" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource Legacy.Brush.Danger.Fg}" />
                             </StackPanel>
                             <StackPanel Grid.Row="2" Grid.Column="1">
-                                <TextBlock Text="Duplicate %" Foreground="#999999" FontSize="10" />
-                                <TextBlock Text="{Binding DuplicatePercentage, StringFormat='{}{0:F1}%'}" FontSize="20" FontWeight="Bold" Foreground="#E65100" />
+                                <TextBlock Text="Duplicate %" Foreground="{DynamicResource Legacy.Brush.Fg.MutedLight}" FontSize="10" />
+                                <TextBlock Text="{Binding DuplicatePercentage, StringFormat='{}{0:F1}%'}" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource Legacy.Brush.Warn.Fg}" />
                             </StackPanel>
                         </Grid>
                     </Border>
 
                     <!-- Wasted Space Bar -->
-                    <Border Background="White" CornerRadius="4" Padding="10" Margin="0,0,0,8"
-                            BorderBrush="#E0E0E0" BorderThickness="1">
+                    <Border Background="{DynamicResource Legacy.Brush.Surface.White}" CornerRadius="4" Padding="10" Margin="0,0,0,8"
+                            BorderBrush="{DynamicResource Legacy.Brush.Border.Default}" BorderThickness="1">
                         <StackPanel>
                             <TextBlock Text="Wasted vs Total" FontWeight="SemiBold" FontSize="11"
-                                       Foreground="#555555" Margin="0,0,0,6" />
+                                       Foreground="{DynamicResource Legacy.Brush.Fg.Body}" Margin="0,0,0,6" />
                             <Grid Height="20">
-                                <Border Background="#E8F5E9" CornerRadius="3" />
-                                <Border Background="#EF9A9A" CornerRadius="3"
+                                <Border Background="{DynamicResource Legacy.Brush.Success.Tint}" CornerRadius="3" />
+                                <Border Background="{DynamicResource Legacy.Brush.Danger.Tint}" CornerRadius="3"
                                         HorizontalAlignment="Left">
                                     <Border.Width>
                                         <MultiBinding Converter="{x:Static helpers:PercentToWidthConverter.Instance}">
@@ -1923,20 +1923,20 @@
                                 </Border>
                             </Grid>
                             <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
-                                <Border Width="10" Height="10" Background="#EF9A9A" CornerRadius="2" Margin="0,0,4,0" />
-                                <TextBlock Text="{Binding FormattedWastedSize, StringFormat='Wasted: {0}'}" FontSize="10" Foreground="#666666" Margin="0,0,12,0" />
-                                <Border Width="10" Height="10" Background="#E8F5E9" CornerRadius="2" Margin="0,0,4,0" />
-                                <TextBlock Text="{Binding FormattedTotalSize, StringFormat='Total: {0}'}" FontSize="10" Foreground="#666666" />
+                                <Border Width="10" Height="10" Background="{DynamicResource Legacy.Brush.Danger.Tint}" CornerRadius="2" Margin="0,0,4,0" />
+                                <TextBlock Text="{Binding FormattedWastedSize, StringFormat='Wasted: {0}'}" FontSize="10" Foreground="{DynamicResource Legacy.Brush.Fg.Secondary}" Margin="0,0,12,0" />
+                                <Border Width="10" Height="10" Background="{DynamicResource Legacy.Brush.Success.Tint}" CornerRadius="2" Margin="0,0,4,0" />
+                                <TextBlock Text="{Binding FormattedTotalSize, StringFormat='Total: {0}'}" FontSize="10" Foreground="{DynamicResource Legacy.Brush.Fg.Secondary}" />
                             </StackPanel>
                         </StackPanel>
                     </Border>
 
                     <!-- Top Extensions -->
-                    <Border Background="White" CornerRadius="4" Padding="10" Margin="0,0,0,8"
-                            BorderBrush="#E0E0E0" BorderThickness="1">
+                    <Border Background="{DynamicResource Legacy.Brush.Surface.White}" CornerRadius="4" Padding="10" Margin="0,0,0,8"
+                            BorderBrush="{DynamicResource Legacy.Brush.Border.Default}" BorderThickness="1">
                         <StackPanel>
                             <TextBlock Text="Top Duplicate Types" FontWeight="SemiBold" FontSize="11"
-                                       Foreground="#555555" Margin="0,0,0,6" />
+                                       Foreground="{DynamicResource Legacy.Brush.Fg.Body}" Margin="0,0,0,6" />
                             <ItemsControl ItemsSource="{Binding TopExtensions}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
@@ -1946,16 +1946,16 @@
                                                 <ColumnDefinition Width="Auto" />
                                                 <ColumnDefinition Width="*" />
                                             </Grid.ColumnDefinitions>
-                                            <Border Grid.Column="0" Background="#E3F2FD" CornerRadius="3"
+                                            <Border Grid.Column="0" Background="{DynamicResource Legacy.Brush.Surface.InfoTint}" CornerRadius="3"
                                                     Padding="4,2" HorizontalAlignment="Left">
                                                 <TextBlock Text="{Binding Extension}" FontSize="10"
-                                                           FontWeight="SemiBold" Foreground="#1565C0" />
+                                                           FontWeight="SemiBold" Foreground="{DynamicResource Legacy.Brush.Action.Primary}" />
                                             </Border>
                                             <TextBlock Grid.Column="1" Text="{Binding FileCount, StringFormat='{}{0} files'}"
-                                                       FontSize="10" Foreground="#888888" Margin="8,0,0,0"
+                                                       FontSize="10" Foreground="{DynamicResource Legacy.Brush.Fg.Muted}" Margin="8,0,0,0"
                                                        VerticalAlignment="Center" />
                                             <TextBlock Grid.Column="2" Text="{Binding FormattedSize}"
-                                                       FontSize="10" Foreground="#666666"
+                                                       FontSize="10" Foreground="{DynamicResource Legacy.Brush.Fg.Secondary}"
                                                        HorizontalAlignment="Right" VerticalAlignment="Center" />
                                         </Grid>
                                     </DataTemplate>
@@ -1965,11 +1965,11 @@
                     </Border>
 
                     <!-- Size Distribution -->
-                    <Border Background="White" CornerRadius="4" Padding="10"
-                            BorderBrush="#E0E0E0" BorderThickness="1">
+                    <Border Background="{DynamicResource Legacy.Brush.Surface.White}" CornerRadius="4" Padding="10"
+                            BorderBrush="{DynamicResource Legacy.Brush.Border.Default}" BorderThickness="1">
                         <StackPanel>
                             <TextBlock Text="Size Distribution" FontWeight="SemiBold" FontSize="11"
-                                       Foreground="#555555" Margin="0,0,0,6" />
+                                       Foreground="{DynamicResource Legacy.Brush.Fg.Body}" Margin="0,0,0,6" />
                             <ItemsControl ItemsSource="{Binding SizeDistribution}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
@@ -1979,12 +1979,12 @@
                                                 <RowDefinition Height="Auto" />
                                             </Grid.RowDefinitions>
                                             <StackPanel Grid.Row="0" Orientation="Horizontal">
-                                                <TextBlock Text="{Binding Label}" FontSize="10" Foreground="#666666" />
-                                                <TextBlock Text="{Binding FileCount, StringFormat=' ({0})'}" FontSize="10" Foreground="#999999" />
+                                                <TextBlock Text="{Binding Label}" FontSize="10" Foreground="{DynamicResource Legacy.Brush.Fg.Secondary}" />
+                                                <TextBlock Text="{Binding FileCount, StringFormat=' ({0})'}" FontSize="10" Foreground="{DynamicResource Legacy.Brush.Fg.MutedLight}" />
                                             </StackPanel>
                                             <Grid Grid.Row="1" Height="8" Margin="0,2,0,0">
-                                                <Border Background="#EEEEEE" CornerRadius="2" />
-                                                <Border Background="#7986CB" CornerRadius="2"
+                                                <Border Background="{DynamicResource Legacy.Brush.Surface.Sunken}" CornerRadius="2" />
+                                                <Border Background="{DynamicResource Legacy.Brush.Accent.Mid}" CornerRadius="2"
                                                         HorizontalAlignment="Left">
                                                     <Border.Width>
                                                         <MultiBinding Converter="{x:Static helpers:PercentToWidthConverter.Instance}">
@@ -2006,45 +2006,45 @@
         </Border>
 
         <!-- Column 1: Folder Action Panel (shown when Folder Control tab is active) -->
-        <Border Grid.Column="1" Background="#FAFAFA" CornerRadius="6"
-                BorderBrush="#E0E0E0" BorderThickness="1" Padding="12" Margin="4,4,4,4"
+        <Border Grid.Column="1" Background="{DynamicResource Legacy.Brush.Surface.Card}" CornerRadius="6"
+                BorderBrush="{DynamicResource Legacy.Brush.Border.Default}" BorderThickness="1" Padding="12" Margin="4,4,4,4"
                 Width="640"
                 Visibility="{Binding IsFolderControlActive, Converter={StaticResource BoolToVisibility}}">
             <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                 <StackPanel>
                     <!-- Header -->
                     <TextBlock Text="Folder Action" FontSize="16" FontWeight="Bold"
-                               Foreground="#E65100" Margin="0,0,0,12" />
+                               Foreground="{DynamicResource Legacy.Brush.Warn.Fg}" Margin="0,0,0,12" />
 
                     <!-- Selection summary -->
-                    <Border Background="White" CornerRadius="4" Padding="10" Margin="0,0,0,8"
-                            BorderBrush="#E0E0E0" BorderThickness="1">
+                    <Border Background="{DynamicResource Legacy.Brush.Surface.White}" CornerRadius="4" Padding="10" Margin="0,0,0,8"
+                            BorderBrush="{DynamicResource Legacy.Brush.Border.Default}" BorderThickness="1">
                         <StackPanel>
                             <TextBlock Text="Selection" FontSize="12" FontWeight="SemiBold"
-                                       Foreground="#333333" Margin="0,0,0,6" />
-                            <TextBlock FontSize="24" FontWeight="Bold" Foreground="#E65100" Margin="0,0,0,4">
+                                       Foreground="{DynamicResource Legacy.Brush.Fg.Strong}" Margin="0,0,0,6" />
+                            <TextBlock FontSize="24" FontWeight="Bold" Foreground="{DynamicResource Legacy.Brush.Warn.Fg}" Margin="0,0,0,4">
                                 <TextBlock.Text>
                                     <Binding Path="SelectedFolderCount" StringFormat="{}{0}" />
                                 </TextBlock.Text>
                             </TextBlock>
-                            <TextBlock Text="folders selected" FontSize="11" Foreground="#888888" Margin="0,0,0,8" />
+                            <TextBlock Text="folders selected" FontSize="11" Foreground="{DynamicResource Legacy.Brush.Fg.Muted}" Margin="0,0,0,8" />
                             <StackPanel Orientation="Horizontal">
                                 <Button Content="✓ All" Command="{Binding SelectAllFoldersCommand}"
                                         Padding="8,4" Margin="0,0,6,0" FontSize="11" Cursor="Hand" />
                                 <Button Content="✕ Clear" Command="{Binding ClearFolderSelectionCommand}"
-                                        Padding="8,4" FontSize="11" Cursor="Hand" Foreground="#888888" />
+                                        Padding="8,4" FontSize="11" Cursor="Hand" Foreground="{DynamicResource Legacy.Brush.Fg.Muted}" />
                             </StackPanel>
                         </StackPanel>
                     </Border>
 
                     <!-- Scan Action -->
-                    <Border Background="White" CornerRadius="4" Padding="10" Margin="0,0,0,8"
-                            BorderBrush="#E0E0E0" BorderThickness="1">
+                    <Border Background="{DynamicResource Legacy.Brush.Surface.White}" CornerRadius="4" Padding="10" Margin="0,0,0,8"
+                            BorderBrush="{DynamicResource Legacy.Brush.Border.Default}" BorderThickness="1">
                         <StackPanel>
                             <TextBlock Text="Scan Action" FontSize="12" FontWeight="SemiBold"
-                                       Foreground="#C62828" Margin="0,0,0,4" />
+                                       Foreground="{DynamicResource Legacy.Brush.Danger.Fg}" Margin="0,0,0,4" />
                             <TextBlock Text="Click Scan Folders to discover subfolder names and file types inside selected result folders. Select items and clear them."
-                                       FontSize="10" Foreground="#888888" TextWrapping="Wrap" Margin="0,0,0,8" />
+                                       FontSize="10" Foreground="{DynamicResource Legacy.Brush.Fg.Muted}" TextWrapping="Wrap" Margin="0,0,0,8" />
 
                             <!-- Include subdirectories toggle -->
                             <CheckBox IsChecked="{Binding FolderSearchIncludeSubdirectories}"
@@ -2061,7 +2061,7 @@
                                 <Button Grid.Column="0"
                                         Command="{Binding ScanSubfoldersCommand}"
                                         Padding="10,6" FontSize="11" Cursor="Hand"
-                                        FontWeight="SemiBold" Foreground="#1565C0"
+                                        FontWeight="SemiBold" Foreground="{DynamicResource Legacy.Brush.Action.Primary}"
                                         HorizontalAlignment="Stretch"
                                         ToolTip="Discover subfolders and file types inside the selected result folders">
                                     <Button.Style>
@@ -2070,7 +2070,7 @@
                                             <Style.Triggers>
                                                 <DataTrigger Binding="{Binding IsScanningFolders}" Value="True">
                                                     <Setter Property="Content" Value="⏳ Scanning…" />
-                                                    <Setter Property="Foreground" Value="#999999" />
+                                                    <Setter Property="Foreground" Value="{DynamicResource Legacy.Brush.Fg.MutedLight}" />
                                                 </DataTrigger>
                                             </Style.Triggers>
                                         </Style>
@@ -2086,11 +2086,11 @@
                             <TextBlock FontSize="10" TextWrapping="Wrap" Margin="0,0,0,8">
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock">
-                                        <Setter Property="Foreground" Value="#666666" />
+                                        <Setter Property="Foreground" Value="{DynamicResource Legacy.Brush.Fg.Secondary}" />
                                         <Setter Property="Text" Value="{Binding ClearSubfolderStatus}" />
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding IsScanningFolders}" Value="True">
-                                                <Setter Property="Foreground" Value="#1565C0" />
+                                                <Setter Property="Foreground" Value="{DynamicResource Legacy.Brush.Action.Primary}" />
                                                 <Setter Property="FontWeight" Value="SemiBold" />
                                             </DataTrigger>
                                         </Style.Triggers>
@@ -2100,7 +2100,7 @@
 
                             <!-- ── Subfolders section ── -->
                             <TextBlock Text="Subfolders" FontSize="11" FontWeight="SemiBold"
-                                       Foreground="#1565C0" Margin="0,0,0,4" />
+                                       Foreground="{DynamicResource Legacy.Brush.Action.Primary}" Margin="0,0,0,4" />
 
                             <!-- Filter input -->
                             <Grid Margin="0,0,0,6">
@@ -2109,7 +2109,7 @@
                                          Padding="6,4" FontSize="11"
                                          VerticalContentAlignment="Center" />
                                 <TextBlock Text="🔍 Filter subfolder names..."
-                                           Padding="8,5" FontSize="11" Foreground="#AAAAAA"
+                                           Padding="8,5" FontSize="11" Foreground="{DynamicResource Legacy.Brush.Fg.Disabled}"
                                            VerticalAlignment="Center" IsHitTestVisible="False">
                                     <TextBlock.Style>
                                         <Style TargetType="TextBlock">
@@ -2129,11 +2129,11 @@
                                 <Button Content="✓ All" Command="{Binding SelectAllSubfoldersCommand}"
                                         Padding="8,3" Margin="0,0,6,0" FontSize="10" Cursor="Hand" />
                                 <Button Content="✕ None" Command="{Binding ClearSubfolderSelectionCommand}"
-                                        Padding="8,3" FontSize="10" Cursor="Hand" Foreground="#888888" />
+                                        Padding="8,3" FontSize="10" Cursor="Hand" Foreground="{DynamicResource Legacy.Brush.Fg.Muted}" />
                             </StackPanel>
 
                             <!-- Subfolder list with expandable details (virtualized, pixel-scroll) -->
-                            <Border BorderBrush="#E0E0E0" BorderThickness="1" CornerRadius="3" MaxHeight="280">
+                            <Border BorderBrush="{DynamicResource Legacy.Brush.Border.Default}" BorderThickness="1" CornerRadius="3" MaxHeight="280">
                                 <ItemsControl ItemsSource="{Binding FilteredSubfolders}"
                                               ScrollViewer.CanContentScroll="True"
                                               ScrollViewer.VerticalScrollBarVisibility="Auto"
@@ -2154,24 +2154,24 @@
                                     </ItemsControl.ItemsPanel>
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <Border Padding="4,2" BorderBrush="#F0F0F0" BorderThickness="0,0,0,1">
+                                            <Border Padding="4,2" BorderBrush="{DynamicResource Legacy.Brush.Border.Hairline}" BorderThickness="0,0,0,1">
                                                 <Expander IsExpanded="False">
                                                     <Expander.Header>
                                                         <StackPanel Orientation="Horizontal">
                                                             <CheckBox IsChecked="{Binding IsSelected}" Cursor="Hand"
                                                                       VerticalAlignment="Center" Margin="0,0,6,0" />
                                                             <TextBlock Text="{Binding Name}" FontSize="11" FontWeight="SemiBold"
-                                                                       Foreground="#333333" VerticalAlignment="Center" />
-                                                            <TextBlock FontSize="10" Foreground="#888888"
+                                                                       Foreground="{DynamicResource Legacy.Brush.Fg.Strong}" VerticalAlignment="Center" />
+                                                            <TextBlock FontSize="10" Foreground="{DynamicResource Legacy.Brush.Fg.Muted}"
                                                                        VerticalAlignment="Center" Margin="6,0,0,0">
                                                                 <TextBlock.Text>
                                                                     <Binding Path="Count" StringFormat="in {0} folders" />
                                                                 </TextBlock.Text>
                                                             </TextBlock>
-                                                            <TextBlock Text="·" FontSize="10" Foreground="#CCCCCC"
+                                                            <TextBlock Text="·" FontSize="10" Foreground="{DynamicResource Legacy.Brush.Border.Light}"
                                                                        VerticalAlignment="Center" Margin="6,0,0,0" />
                                                             <TextBlock Text="{Binding TotalSizeDisplay}" FontSize="10"
-                                                                       Foreground="#1565C0" FontWeight="SemiBold"
+                                                                       Foreground="{DynamicResource Legacy.Brush.Action.Primary}" FontWeight="SemiBold"
                                                                        VerticalAlignment="Center" Margin="6,0,0,0" />
                                                         </StackPanel>
                                                     </Expander.Header>
@@ -2183,7 +2183,7 @@
                                                         <ItemsControl ItemsSource="{Binding PagedLocations}">
                                                             <ItemsControl.ItemTemplate>
                                                                 <DataTemplate>
-                                                                    <TextBlock FontSize="10" Foreground="#666666"
+                                                                    <TextBlock FontSize="10" Foreground="{DynamicResource Legacy.Brush.Fg.Secondary}"
                                                                                TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"
                                                                                Margin="0,1" ToolTip="{Binding FullPath}">
                                                                         <Run Text="📁" /><Run Text=" " /><Run Text="{Binding ParentPath, Mode=OneWay}" />
@@ -2199,7 +2199,7 @@
                                                                     IsEnabled="{Binding CanGoNextPage}"
                                                                     Padding="6,2" Margin="4,0,0,0" FontSize="10" Cursor="Hand" />
                                                             <TextBlock Text="{Binding PageStatus}" FontSize="10"
-                                                                       Foreground="#888888" VerticalAlignment="Center"
+                                                                       Foreground="{DynamicResource Legacy.Brush.Fg.Muted}" VerticalAlignment="Center"
                                                                        Margin="10,0,0,0" />
                                                         </StackPanel>
                                                     </StackPanel>
@@ -2220,13 +2220,13 @@
                                 <Button Grid.Column="0" Content="🗑 Clear Selected Subfolders"
                                         Command="{Binding ClearSelectedSubfoldersCommand}"
                                         Padding="10,6" FontSize="11" Cursor="Hand"
-                                        Foreground="#C62828" FontWeight="SemiBold"
+                                        Foreground="{DynamicResource Legacy.Brush.Danger.Fg}" FontWeight="SemiBold"
                                         HorizontalAlignment="Stretch"
                                         ToolTip="Delete checked subfolders from all selected result folders" />
                                 <Button Grid.Column="1" Content="↶" Command="{Binding UndoLastActionCommand}"
                                         ToolTip="{Binding UndoTooltip}"
                                         Padding="6,3" Margin="4,0,0,0" FontSize="13" Cursor="Hand"
-                                        FontWeight="Bold" Foreground="#388E3C" />
+                                        FontWeight="Bold" Foreground="{DynamicResource Legacy.Brush.Success.Fg}" />
                                 <ToggleButton Grid.Column="2" Style="{StaticResource HelpButtonStyle}"
                                               Margin="6,0,0,0"
                                               Tag="&lt;h&gt;CLEAR SELECTED SUBFOLDERS&lt;/h&gt;&#x0a;Sends every checked subfolder to the Recycle Bin from inside each selected result folder.&#x0a;&#x0a;&lt;b&gt;What it removes:&lt;/b&gt;&#x0a;• The subfolder itself and all its contents (files and nested subfolders)&#x0a;&#x0a;&lt;b&gt;Common uses:&lt;/b&gt;&#x0a;• Clean &lt;b&gt;node_modules&lt;/b&gt; from many projects at once&#x0a;• Wipe &lt;b&gt;bin&lt;/b&gt;, &lt;b&gt;obj&lt;/b&gt;, &lt;b&gt;.vs&lt;/b&gt; from .NET solutions&#x0a;• Remove &lt;b&gt;__pycache__&lt;/b&gt; across Python repos&#x0a;&#x0a;&lt;b&gt;Safety:&lt;/b&gt;&#x0a;• Confirmation dialog shows affected folder count&#x0a;• Skips subfolders that are locked or access-denied&#x0a;&#x0a;&lt;h&gt;Sent to Recycle Bin — restorable from there.&lt;/h&gt;" />
@@ -2242,14 +2242,14 @@
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0" Text="Layers deep:" FontSize="11"
-                                           Foreground="#333333" VerticalAlignment="Center" Margin="0,0,8,0" />
+                                           Foreground="{DynamicResource Legacy.Brush.Fg.Strong}" VerticalAlignment="Center" Margin="0,0,8,0" />
                                 <TextBox Grid.Column="1" Text="{Binding LinkSiblingsLayer, UpdateSourceTrigger=PropertyChanged}"
                                          Padding="6,3" FontSize="11"
                                          VerticalContentAlignment="Center"
                                          PreviewTextInput="IntegerTextBox_PreviewTextInput"
                                          ToolTip="How many layers deep to cross-link. 1 = only immediate children of each selected folder. Minimum 1." />
                                 <TextBlock Grid.Column="2" Text="Prefix:" FontSize="11"
-                                           Foreground="#333333" VerticalAlignment="Center" Margin="12,0,8,0" />
+                                           Foreground="{DynamicResource Legacy.Brush.Fg.Strong}" VerticalAlignment="Center" Margin="12,0,8,0" />
                                 <TextBox Grid.Column="3" Width="110"
                                          Text="{Binding LinkSiblingsPrefix, UpdateSourceTrigger=PropertyChanged}"
                                          Padding="6,3" FontSize="11"
@@ -2265,13 +2265,13 @@
                                 <Button Grid.Column="0" Content="🔗 Link Sibling Subfolders"
                                         Command="{Binding LinkSiblingFoldersCommand}"
                                         Padding="10,6" FontSize="11" Cursor="Hand"
-                                        Foreground="#6A1B9A" FontWeight="SemiBold"
+                                        Foreground="{DynamicResource Legacy.Brush.Accent.Violet}" FontWeight="SemiBold"
                                         HorizontalAlignment="Stretch"
                                         ToolTip="Create .lnk shortcuts linking sibling subfolders inside each selected folder" />
                                 <Button Grid.Column="1" Content="↶" Command="{Binding UndoLastActionCommand}"
                                         ToolTip="{Binding UndoTooltip}"
                                         Padding="6,3" Margin="4,0,0,0" FontSize="13" Cursor="Hand"
-                                        FontWeight="Bold" Foreground="#388E3C" />
+                                        FontWeight="Bold" Foreground="{DynamicResource Legacy.Brush.Success.Fg}" />
                                 <ToggleButton Grid.Column="2" Style="{StaticResource HelpButtonStyle}"
                                               Margin="6,0,0,0"
                                               Tag="&lt;h&gt;LINK SIBLING FOLDERS&lt;/h&gt;&#x0a;Creates Windows shortcuts (.lnk) inside each subfolder pointing to its siblings under the same parent.&#x0a;&#x0a;&lt;b&gt;Optional filter:&lt;/b&gt; Check items in the Subfolders list above to narrow linking to those names only. Unchecked = link all siblings.&#x0a;&#x0a;&lt;b&gt;Example (Layers deep = 1):&lt;/b&gt;&#x0a;Before:&#x0a;  some-folder\1\&#x0a;  some-folder\2\&#x0a;  some-folder\3\&#x0a;&#x0a;After:&#x0a;  some-folder\1\2.lnk&#x0a;  some-folder\1\3.lnk&#x0a;  some-folder\2\1.lnk&#x0a;  some-folder\2\3.lnk&#x0a;  some-folder\3\1.lnk&#x0a;  some-folder\3\2.lnk&#x0a;&#x0a;&lt;b&gt;Layers deep:&lt;/b&gt; How many levels to descend while cross-linking. Shortcuts never cross parent folders — only siblings under the SAME parent get linked.&#x0a;&#x0a;&lt;b&gt;Safety:&lt;/b&gt;&#x0a;• Existing shortcuts with the same name are skipped&#x0a;• Undo (↶) deletes the created .lnk files" />
@@ -2279,7 +2279,7 @@
 
                             <!-- ── File Types section ── -->
                             <TextBlock Text="File Types" FontSize="11" FontWeight="SemiBold"
-                                       Foreground="#1565C0" Margin="0,0,0,4" />
+                                       Foreground="{DynamicResource Legacy.Brush.Action.Primary}" Margin="0,0,0,4" />
 
                             <!-- File type filter -->
                             <Grid Margin="0,0,0,6">
@@ -2288,7 +2288,7 @@
                                          Padding="6,4" FontSize="11"
                                          VerticalContentAlignment="Center" />
                                 <TextBlock Text="🔍 Filter extensions (e.g. .log)..."
-                                           Padding="8,5" FontSize="11" Foreground="#AAAAAA"
+                                           Padding="8,5" FontSize="11" Foreground="{DynamicResource Legacy.Brush.Fg.Disabled}"
                                            VerticalAlignment="Center" IsHitTestVisible="False">
                                     <TextBlock.Style>
                                         <Style TargetType="TextBlock">
@@ -2308,11 +2308,11 @@
                                 <Button Content="✓ All" Command="{Binding SelectAllFileTypesCommand}"
                                         Padding="8,3" Margin="0,0,6,0" FontSize="10" Cursor="Hand" />
                                 <Button Content="✕ None" Command="{Binding ClearFileTypeSelectionCommand}"
-                                        Padding="8,3" FontSize="10" Cursor="Hand" Foreground="#888888" />
+                                        Padding="8,3" FontSize="10" Cursor="Hand" Foreground="{DynamicResource Legacy.Brush.Fg.Muted}" />
                             </StackPanel>
 
                             <!-- File types list with expandable details (virtualized, pixel-scroll) -->
-                            <Border BorderBrush="#E0E0E0" BorderThickness="1" CornerRadius="3" MaxHeight="280">
+                            <Border BorderBrush="{DynamicResource Legacy.Brush.Border.Default}" BorderThickness="1" CornerRadius="3" MaxHeight="280">
                                 <ItemsControl ItemsSource="{Binding FilteredFileTypes}"
                                               ScrollViewer.CanContentScroll="True"
                                               ScrollViewer.VerticalScrollBarVisibility="Auto"
@@ -2333,24 +2333,24 @@
                                     </ItemsControl.ItemsPanel>
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <Border Padding="4,2" BorderBrush="#F0F0F0" BorderThickness="0,0,0,1">
+                                            <Border Padding="4,2" BorderBrush="{DynamicResource Legacy.Brush.Border.Hairline}" BorderThickness="0,0,0,1">
                                                 <Expander IsExpanded="False">
                                                     <Expander.Header>
                                                         <StackPanel Orientation="Horizontal">
                                                             <CheckBox IsChecked="{Binding IsSelected}" Cursor="Hand"
                                                                       VerticalAlignment="Center" Margin="0,0,6,0" />
                                                             <TextBlock Text="{Binding Name}" FontSize="11" FontWeight="SemiBold"
-                                                                       Foreground="#333333" VerticalAlignment="Center" />
-                                                            <TextBlock FontSize="10" Foreground="#888888"
+                                                                       Foreground="{DynamicResource Legacy.Brush.Fg.Strong}" VerticalAlignment="Center" />
+                                                            <TextBlock FontSize="10" Foreground="{DynamicResource Legacy.Brush.Fg.Muted}"
                                                                        VerticalAlignment="Center" Margin="6,0,0,0">
                                                                 <TextBlock.Text>
                                                                     <Binding Path="Count" StringFormat="{}{0} files" />
                                                                 </TextBlock.Text>
                                                             </TextBlock>
-                                                            <TextBlock Text="·" FontSize="10" Foreground="#CCCCCC"
+                                                            <TextBlock Text="·" FontSize="10" Foreground="{DynamicResource Legacy.Brush.Border.Light}"
                                                                        VerticalAlignment="Center" Margin="6,0,0,0" />
                                                             <TextBlock Text="{Binding TotalSizeDisplay}" FontSize="10"
-                                                                       Foreground="#1565C0" FontWeight="SemiBold"
+                                                                       Foreground="{DynamicResource Legacy.Brush.Action.Primary}" FontWeight="SemiBold"
                                                                        VerticalAlignment="Center" Margin="6,0,0,0" />
                                                         </StackPanel>
                                                     </Expander.Header>
@@ -2362,7 +2362,7 @@
                                                         <ItemsControl ItemsSource="{Binding PagedLocations}">
                                                             <ItemsControl.ItemTemplate>
                                                                 <DataTemplate>
-                                                                    <TextBlock FontSize="10" Foreground="#666666"
+                                                                    <TextBlock FontSize="10" Foreground="{DynamicResource Legacy.Brush.Fg.Secondary}"
                                                                                TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"
                                                                                Margin="0,1" ToolTip="{Binding FullPath}">
                                                                         <Run Text="📄" /><Run Text=" " /><Run Text="{Binding FullPath, Mode=OneWay}" />
@@ -2378,7 +2378,7 @@
                                                                     IsEnabled="{Binding CanGoNextPage}"
                                                                     Padding="6,2" Margin="4,0,0,0" FontSize="10" Cursor="Hand" />
                                                             <TextBlock Text="{Binding PageStatus}" FontSize="10"
-                                                                       Foreground="#888888" VerticalAlignment="Center"
+                                                                       Foreground="{DynamicResource Legacy.Brush.Fg.Muted}" VerticalAlignment="Center"
                                                                        Margin="10,0,0,0" />
                                                         </StackPanel>
                                                     </StackPanel>
@@ -2399,13 +2399,13 @@
                                 <Button Grid.Column="0" Content="🗑 Clear Selected Files"
                                         Command="{Binding ClearSelectedFileTypesCommand}"
                                         Padding="10,6" FontSize="11" Cursor="Hand"
-                                        Foreground="#C62828" FontWeight="SemiBold"
+                                        Foreground="{DynamicResource Legacy.Brush.Danger.Fg}" FontWeight="SemiBold"
                                         HorizontalAlignment="Stretch"
                                         ToolTip="Delete all files of checked types inside selected result folders" />
                                 <Button Grid.Column="1" Content="↶" Command="{Binding UndoLastActionCommand}"
                                         ToolTip="{Binding UndoTooltip}"
                                         Padding="6,3" Margin="4,0,0,0" FontSize="13" Cursor="Hand"
-                                        FontWeight="Bold" Foreground="#388E3C" />
+                                        FontWeight="Bold" Foreground="{DynamicResource Legacy.Brush.Success.Fg}" />
                                 <ToggleButton Grid.Column="2" Style="{StaticResource HelpButtonStyle}"
                                               Margin="6,0,0,0"
                                               Tag="&lt;h&gt;CLEAR SELECTED FILES&lt;/h&gt;&#x0a;Sends every file whose extension is checked to the Recycle Bin, from inside each selected result folder.&#x0a;&#x0a;&lt;b&gt;What it removes:&lt;/b&gt;&#x0a;• Each matching file found during &lt;b&gt;Scan Folders&lt;/b&gt;&#x0a;• Only files — subfolders are never touched by this action&#x0a;&#x0a;&lt;b&gt;Scope:&lt;/b&gt;&#x0a;• Follows the same &lt;b&gt;Include Subdirectories&lt;/b&gt; setting used during the scan&#x0a;&#x0a;&lt;b&gt;Common uses:&lt;/b&gt;&#x0a;• Purge &lt;b&gt;.log&lt;/b&gt;, &lt;b&gt;.tmp&lt;/b&gt;, &lt;b&gt;.bak&lt;/b&gt; files across many folders&#x0a;• Remove stray &lt;b&gt;.DS_Store&lt;/b&gt; / &lt;b&gt;Thumbs.db&lt;/b&gt;&#x0a;&#x0a;&lt;b&gt;Safety:&lt;/b&gt;&#x0a;• Confirmation dialog shows exact file count + extension list&#x0a;• Skips files that are locked or access-denied&#x0a;&#x0a;&lt;h&gt;Sent to Recycle Bin — restorable from there.&lt;/h&gt;" />
@@ -2414,20 +2414,20 @@
                     </Border>
 
                     <!-- Flatten Folders (dedicated subfolder file-type scan) -->
-                    <Border Background="White" CornerRadius="4" Padding="10" Margin="0,0,0,8"
-                            BorderBrush="#E0E0E0" BorderThickness="1">
+                    <Border Background="{DynamicResource Legacy.Brush.Surface.White}" CornerRadius="4" Padding="10" Margin="0,0,0,8"
+                            BorderBrush="{DynamicResource Legacy.Brush.Border.Default}" BorderThickness="1">
                         <StackPanel>
                             <TextBlock Text="Flatten Folders" FontSize="12" FontWeight="SemiBold"
-                                       Foreground="#C62828" Margin="0,0,0,4" />
+                                       Foreground="{DynamicResource Legacy.Brush.Danger.Fg}" Margin="0,0,0,4" />
                             <TextBlock Text="Move files from subdirectories up to the root of each selected folder. Name conflicts resolved with (2), (3)."
-                                       FontSize="10" Foreground="#888888" TextWrapping="Wrap" Margin="0,0,0,8" />
+                                       FontSize="10" Foreground="{DynamicResource Legacy.Brush.Fg.Muted}" TextWrapping="Wrap" Margin="0,0,0,8" />
 
                             <CheckBox IsChecked="{Binding FlattenRemoveEmptyFolders}"
                                       Content="Remove empty subfolders after move" FontSize="11"
                                       Cursor="Hand" Margin="0,0,0,4"
                                       ToolTip="When on, deletes now-empty subdirectories after flattening. When off, the directory structure stays intact with only its files moved to the root." />
                             <TextBlock Text="If any file types are checked below, only those are moved. If none are checked, all files move."
-                                       FontSize="10" Foreground="#888888" FontStyle="Italic"
+                                       FontSize="10" Foreground="{DynamicResource Legacy.Brush.Fg.Muted}" FontStyle="Italic"
                                        TextWrapping="Wrap" Margin="0,0,0,8" />
 
                             <!-- Subfolder file-type scan (root files excluded) -->
@@ -2438,7 +2438,7 @@
                                 <Button Grid.Column="0"
                                         Command="{Binding ScanFlattenFileTypesCommand}"
                                         Padding="8,5" FontSize="11" Cursor="Hand"
-                                        FontWeight="SemiBold" Foreground="#1565C0"
+                                        FontWeight="SemiBold" Foreground="{DynamicResource Legacy.Brush.Action.Primary}"
                                         HorizontalAlignment="Stretch"
                                         ToolTip="Discover file types inside subfolders only (root-level files excluded)">
                                     <Button.Style>
@@ -2447,7 +2447,7 @@
                                             <Style.Triggers>
                                                 <DataTrigger Binding="{Binding IsScanningFlattenTypes}" Value="True">
                                                     <Setter Property="Content" Value="⏳ Scanning…" />
-                                                    <Setter Property="Foreground" Value="#999999" />
+                                                    <Setter Property="Foreground" Value="{DynamicResource Legacy.Brush.Fg.MutedLight}" />
                                                 </DataTrigger>
                                             </Style.Triggers>
                                         </Style>
@@ -2460,7 +2460,7 @@
                                          Padding="6,3" FontSize="11"
                                          VerticalContentAlignment="Center" />
                                 <TextBlock Text="🔍 Filter extensions (e.g. .mp4)..."
-                                           Padding="8,5" FontSize="11" Foreground="#AAAAAA"
+                                           Padding="8,5" FontSize="11" Foreground="{DynamicResource Legacy.Brush.Fg.Disabled}"
                                            VerticalAlignment="Center" IsHitTestVisible="False">
                                     <TextBlock.Style>
                                         <Style TargetType="TextBlock">
@@ -2479,10 +2479,10 @@
                                 <Button Content="✓ All" Command="{Binding SelectAllFlattenFileTypesCommand}"
                                         Padding="8,3" Margin="0,0,6,0" FontSize="10" Cursor="Hand" />
                                 <Button Content="✕ None" Command="{Binding ClearFlattenFileTypeSelectionCommand}"
-                                        Padding="8,3" FontSize="10" Cursor="Hand" Foreground="#888888" />
+                                        Padding="8,3" FontSize="10" Cursor="Hand" Foreground="{DynamicResource Legacy.Brush.Fg.Muted}" />
                             </StackPanel>
 
-                            <Border BorderBrush="#E0E0E0" BorderThickness="1" CornerRadius="3" MaxHeight="200" Margin="0,0,0,8">
+                            <Border BorderBrush="{DynamicResource Legacy.Brush.Border.Default}" BorderThickness="1" CornerRadius="3" MaxHeight="200" Margin="0,0,0,8">
                                 <ItemsControl ItemsSource="{Binding FilteredFlattenFileTypes}"
                                               ScrollViewer.CanContentScroll="True"
                                               ScrollViewer.VerticalScrollBarVisibility="Auto"
@@ -2503,21 +2503,21 @@
                                     </ItemsControl.ItemsPanel>
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <Border Padding="4,2" BorderBrush="#F0F0F0" BorderThickness="0,0,0,1">
+                                            <Border Padding="4,2" BorderBrush="{DynamicResource Legacy.Brush.Border.Hairline}" BorderThickness="0,0,0,1">
                                                 <StackPanel Orientation="Horizontal">
                                                     <CheckBox IsChecked="{Binding IsSelected}" Cursor="Hand"
                                                               VerticalAlignment="Center" Margin="0,0,6,0" />
                                                     <TextBlock Text="{Binding Name}" FontSize="11" FontWeight="SemiBold"
-                                                               Foreground="#333333" VerticalAlignment="Center" />
-                                                    <TextBlock FontSize="10" Foreground="#888888" VerticalAlignment="Center" Margin="6,0,0,0">
+                                                               Foreground="{DynamicResource Legacy.Brush.Fg.Strong}" VerticalAlignment="Center" />
+                                                    <TextBlock FontSize="10" Foreground="{DynamicResource Legacy.Brush.Fg.Muted}" VerticalAlignment="Center" Margin="6,0,0,0">
                                                         <TextBlock.Text>
                                                             <Binding Path="Count" StringFormat="{}{0} files" />
                                                         </TextBlock.Text>
                                                     </TextBlock>
-                                                    <TextBlock Text="·" FontSize="10" Foreground="#CCCCCC"
+                                                    <TextBlock Text="·" FontSize="10" Foreground="{DynamicResource Legacy.Brush.Border.Light}"
                                                                VerticalAlignment="Center" Margin="6,0,0,0" />
                                                     <TextBlock Text="{Binding TotalSizeDisplay}" FontSize="10"
-                                                               Foreground="#1565C0" FontWeight="SemiBold"
+                                                               Foreground="{DynamicResource Legacy.Brush.Action.Primary}" FontWeight="SemiBold"
                                                                VerticalAlignment="Center" Margin="6,0,0,0" />
                                                 </StackPanel>
                                             </Border>
@@ -2535,13 +2535,13 @@
                                 <Button Grid.Column="0" Content="📦 Move Files to Root"
                                         Command="{Binding FlattenSelectedFoldersCommand}"
                                         Padding="10,6" FontSize="11" Cursor="Hand"
-                                        Foreground="#C62828" FontWeight="SemiBold"
+                                        Foreground="{DynamicResource Legacy.Brush.Danger.Fg}" FontWeight="SemiBold"
                                         HorizontalAlignment="Stretch"
                                         ToolTip="Move files from subdirectories up to the root of each selected folder" />
                                 <Button Grid.Column="1" Content="↶" Command="{Binding UndoLastActionCommand}"
                                         ToolTip="{Binding UndoTooltip}"
                                         Padding="6,3" Margin="4,0,0,0" FontSize="13" Cursor="Hand"
-                                        FontWeight="Bold" Foreground="#388E3C" />
+                                        FontWeight="Bold" Foreground="{DynamicResource Legacy.Brush.Success.Fg}" />
                                 <ToggleButton Grid.Column="2" Style="{StaticResource HelpButtonStyle}"
                                               Margin="6,0,0,0"
                                               Tag="&lt;h&gt;MOVE FILES TO ROOT&lt;/h&gt;&#x0a;Flattens every selected result folder — moves files from nested subdirectories up to the folder's own root.&#x0a;&#x0a;&lt;b&gt;Example:&lt;/b&gt;&#x0a;Before:&#x0a;  Photos\2024\Jan\a.jpg&#x0a;  Photos\2024\Feb\b.jpg&#x0a;  Photos\2024\Feb\sub\c.jpg&#x0a;&#x0a;After:&#x0a;  Photos\2024\a.jpg&#x0a;  Photos\2024\b.jpg&#x0a;  Photos\2024\c.jpg&#x0a;&#x0a;&lt;b&gt;Options:&lt;/b&gt;&#x0a;• &lt;b&gt;Remove empty subfolders&lt;/b&gt; — deletes empty directories after flattening&#x0a;• &lt;b&gt;Only selected file types&lt;/b&gt; — limits the move to extensions checked in the list above&#x0a;&#x0a;&lt;b&gt;Note:&lt;/b&gt; The file-type list above shows only files found in &lt;b&gt;subfolders&lt;/b&gt; (root-level files are excluded — they stay put anyway).&#x0a;&#x0a;&lt;b&gt;Safety:&lt;/b&gt;&#x0a;• Confirmation dialog shows affected file count + the filter in effect&#x0a;• Skips files that are locked or access-denied&#x0a;• Appends (2), (3) to resolve name conflicts&#x0a;&#x0a;&lt;h&gt;Undo (↶) reverses the last action.&lt;/h&gt;" />
@@ -2550,18 +2550,18 @@
                     </Border>
 
                     <!-- Search info -->
-                    <Border Background="White" CornerRadius="4" Padding="10" Margin="0,0,0,8"
-                            BorderBrush="#E0E0E0" BorderThickness="1">
+                    <Border Background="{DynamicResource Legacy.Brush.Surface.White}" CornerRadius="4" Padding="10" Margin="0,0,0,8"
+                            BorderBrush="{DynamicResource Legacy.Brush.Border.Default}" BorderThickness="1">
                         <StackPanel>
                             <TextBlock Text="Results" FontSize="12" FontWeight="SemiBold"
-                                       Foreground="#333333" Margin="0,0,0,6" />
-                            <TextBlock FontSize="24" FontWeight="Bold" Foreground="#1565C0" Margin="0,0,0,4">
+                                       Foreground="{DynamicResource Legacy.Brush.Fg.Strong}" Margin="0,0,0,6" />
+                            <TextBlock FontSize="24" FontWeight="Bold" Foreground="{DynamicResource Legacy.Brush.Action.Primary}" Margin="0,0,0,4">
                                 <TextBlock.Text>
                                     <Binding Path="FolderSearchCount" StringFormat="{}{0}" />
                                 </TextBlock.Text>
                             </TextBlock>
-                            <TextBlock Text="folders found" FontSize="11" Foreground="#888888" Margin="0,0,0,4" />
-                            <TextBlock Text="{Binding FolderSearchStatus}" FontSize="10" Foreground="#666666"
+                            <TextBlock Text="folders found" FontSize="11" Foreground="{DynamicResource Legacy.Brush.Fg.Muted}" Margin="0,0,0,4" />
+                            <TextBlock Text="{Binding FolderSearchStatus}" FontSize="10" Foreground="{DynamicResource Legacy.Brush.Fg.Secondary}"
                                        TextWrapping="Wrap" />
                         </StackPanel>
                     </Border>
@@ -2570,8 +2570,8 @@
         </Border>
 
         <!-- Column 2: File Preview Panel (full window height) -->
-        <Border Grid.Column="2" Background="#FAFAFA" CornerRadius="6"
-                BorderBrush="#E0E0E0" BorderThickness="1" Padding="12" Margin="4,4,4,4"
+        <Border Grid.Column="2" Background="{DynamicResource Legacy.Brush.Surface.Card}" CornerRadius="6"
+                BorderBrush="{DynamicResource Legacy.Brush.Border.Default}" BorderThickness="1" Padding="12" Margin="4,4,4,4"
                 Width="380"
                 Visibility="{Binding IsPreviewVisible, Converter={StaticResource BoolToVisibility}}">
             <Grid>
@@ -2588,15 +2588,15 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="File Preview" FontSize="16" FontWeight="Bold"
-                               Foreground="#1A237E" VerticalAlignment="Center" />
+                               Foreground="{DynamicResource Legacy.Brush.Accent.Deepest}" VerticalAlignment="Center" />
                     <Button Grid.Column="1" Content="✕ Close" Padding="8,4"
                             Command="{Binding ClosePreviewCommand}"
-                            FontSize="11" Cursor="Hand" Foreground="#666666" />
+                            FontSize="11" Cursor="Hand" Foreground="{DynamicResource Legacy.Brush.Fg.Secondary}" />
                 </Grid>
 
                 <!-- File Info (hidden when no file selected) -->
-                <Border Grid.Row="1" Background="White" CornerRadius="4" Padding="8" Margin="0,0,0,8"
-                        BorderBrush="#E0E0E0" BorderThickness="1">
+                <Border Grid.Row="1" Background="{DynamicResource Legacy.Brush.Surface.White}" CornerRadius="4" Padding="8" Margin="0,0,0,8"
+                        BorderBrush="{DynamicResource Legacy.Brush.Border.Default}" BorderThickness="1">
                     <Border.Style>
                         <Style TargetType="Border">
                             <Setter Property="Visibility" Value="Visible" />
@@ -2611,13 +2611,13 @@
                         <TextBlock Text="{Binding PreviewFileName}" FontWeight="SemiBold" FontSize="12"
                                    TextTrimming="CharacterEllipsis"
                                    ToolTip="{Binding PreviewFileName}" />
-                        <TextBlock Text="{Binding PreviewFileSize}" Foreground="#888888" FontSize="11" Margin="0,2,0,0" />
+                        <TextBlock Text="{Binding PreviewFileSize}" Foreground="{DynamicResource Legacy.Brush.Fg.Muted}" FontSize="11" Margin="0,2,0,0" />
                     </StackPanel>
                 </Border>
 
                 <!-- Preview Content Area -->
-                <Border Grid.Row="2" Background="White" CornerRadius="4"
-                        BorderBrush="#E0E0E0" BorderThickness="1" Padding="4">
+                <Border Grid.Row="2" Background="{DynamicResource Legacy.Brush.Surface.White}" CornerRadius="4"
+                        BorderBrush="{DynamicResource Legacy.Brush.Border.Default}" BorderThickness="1" Padding="4">
                     <Grid>
                         <!-- Empty State (no file selected) -->
                         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -2632,9 +2632,9 @@
                                 </Style>
                             </StackPanel.Style>
                             <TextBlock Text="📄" FontSize="36" HorizontalAlignment="Center" Margin="0,0,0,8" />
-                            <TextBlock Text="No file selected" FontSize="13" Foreground="#AAAAAA"
+                            <TextBlock Text="No file selected" FontSize="13" Foreground="{DynamicResource Legacy.Brush.Fg.Disabled}"
                                        HorizontalAlignment="Center" />
-                            <TextBlock Text="Click a file in the list to preview" FontSize="11" Foreground="#CCCCCC"
+                            <TextBlock Text="Click a file in the list to preview" FontSize="11" Foreground="{DynamicResource Legacy.Brush.Border.Light}"
                                        HorizontalAlignment="Center" Margin="0,4,0,0" />
                         </StackPanel>
                         <!-- Image Preview -->
@@ -2749,7 +2749,7 @@
                             </StackPanel.Style>
                             <TextBlock Text="{Binding PreviewText}" FontSize="14"
                                        HorizontalAlignment="Center" TextAlignment="Center"
-                                       Foreground="#555555" LineHeight="28" />
+                                       Foreground="{DynamicResource Legacy.Brush.Fg.Body}" LineHeight="28" />
                         </StackPanel>
 
                         <!-- Text Preview -->
@@ -2784,7 +2784,7 @@
                             </StackPanel.Style>
                             <TextBlock Text="📄" FontSize="48" HorizontalAlignment="Center" Margin="0,0,0,8" />
                             <TextBlock Text="Preview not available for this file type"
-                                       Foreground="#999999" FontSize="12" HorizontalAlignment="Center" />
+                                       Foreground="{DynamicResource Legacy.Brush.Fg.MutedLight}" FontSize="12" HorizontalAlignment="Center" />
                         </StackPanel>
                     </Grid>
                 </Border>

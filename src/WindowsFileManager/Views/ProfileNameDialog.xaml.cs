@@ -95,7 +95,11 @@ public partial class ProfileNameDialog : Window
     {
         ValidationText.Text = message;
         ValidationText.Visibility = Visibility.Visible;
-        NameInput.BorderBrush = System.Windows.Media.Brushes.IndianRed;
+
+        // Resolved from the palette, with the shipped literal as the fallback so a missing
+        // dictionary degrades to the same red rather than to no border highlight at all.
+        NameInput.BorderBrush = this.TryFindResource("Legacy.Brush.Danger.IndianRed") as System.Windows.Media.Brush
+            ?? System.Windows.Media.Brushes.IndianRed;
         OkButton.IsEnabled = false;
     }
 
