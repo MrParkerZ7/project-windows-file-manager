@@ -105,6 +105,12 @@ version has been tagged yet (`git tag` is empty and no GitHub release exists).
 
 ### Security
 
+- **The Semgrep scan excludes the vendored design canvas** (`docs/design/canvas/`). Its third-party
+  JavaScript and HTML raised 9 blocking findings - wildcard `postMessage` targets, a missing origin
+  check, a prototype-pollution loop, format strings, a missing subresource-integrity hash - none of
+  them reachable from the app: the canvas is frozen design reference, never built or packaged into
+  the MSIX, and may not be edited. Every file the product ships is still scanned, and Semgrep's
+  default ignores are unchanged (`--exclude` is used because a `.semgrepignore` would replace them).
 - **Every GitHub Action is pinned to a commit SHA** rather than a mutable major tag,
   closing 10 blocking Semgrep `github-actions-mutable-action-tag` findings that had kept
   the MSIX pipeline red. `.github/dependabot.yml` keeps the pins current with a weekly

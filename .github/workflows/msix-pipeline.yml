@@ -31,11 +31,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
+      # docs/design/canvas/ is a vendored, byte-exact design canvas (T-013): third-party JavaScript and
+      # HTML kept as frozen design-time reference, SHA-256 pinned, and never built, served or packaged
+      # into the MSIX. docs/design/_index.md forbids editing it, so its findings cannot be fixed in
+      # place. --exclude is used rather than a .semgrepignore because creating that file REPLACES
+      # Semgrep's default ignore template. Everything the product ships is still scanned.
       - name: Run Semgrep (C# + default rules)
         run: >
           semgrep scan
           --config p/default
           --config p/csharp
+          --exclude docs/design/canvas
           --error
           --sarif
           --output semgrep-results.sarif

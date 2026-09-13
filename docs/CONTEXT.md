@@ -415,7 +415,7 @@ in [../CLAUDE.md](../CLAUDE.md). Decision records are indexed in [adr/README.md]
 | **StyleCop.Analyzers 1.1.118 + .NET analyzers** | Style and correctness rules, made fatal by `TreatWarningsAsErrors` in `Directory.Build.props`. Fourteen StyleCop rules are explicitly suppressed in `.editorconfig`, each with a rationale comment. | <https://github.com/DotNetAnalyzers/StyleCopAnalyzers> |
 | **coverlet.collector 6.0.2** | Measures coverage at runtime as the `XPlat Code Coverage` data collector, writing Cobertura to `tests/**/TestResults/<guid>/`. It cannot enforce a threshold — `scripts/Check-Coverage.ps1` does that, failing below 100% line/branch/method. Split apart in ADR-011; `coverlet.msbuild`'s build-time instrumentation raced. | <https://github.com/coverlet-coverage/coverlet> |
 | **xUnit + Moq + FluentAssertions** | The test stack: 217 tests, run fully serially (`xunit.runner.json` disables assembly and collection parallelism). | <https://xunit.net> |
-| **Semgrep (`p/default` + `p/csharp`)** | SAST in the MSIX pipeline; `--error` makes any finding block packaging. Results upload as **SARIF** to the GitHub Security tab. | <https://semgrep.dev> |
+| **Semgrep (`p/default` + `p/csharp`)** | SAST in the MSIX pipeline over every tracked file except the vendored design canvas (`docs/design/canvas/`, frozen and never shipped); `--error` makes any finding block packaging. Results upload as **SARIF** to the GitHub Security tab. | <https://semgrep.dev> |
 
 ### Upstream / downstream
 

@@ -380,7 +380,7 @@ See [ADR-008 in the decision index](adr/README.md).
 ### The pipeline (authoritative)
 
 ```
-security-scan (ubuntu, semgrep p/default + p/csharp --error)
+security-scan (ubuntu, semgrep p/default + p/csharp --error; excludes docs/design/canvas)
         ↓  needs
 build-and-package (windows)
     dotnet restore

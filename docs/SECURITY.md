@@ -421,11 +421,11 @@ direct-dependency-only.
 
 | Gate | Tool | Where | Failure behavior |
 |---|---|---|---|
-| Coverage threshold | `scripts/Check-Coverage.ps1` (100% line, branch, method) over the collector's Cobertura report | `.github/workflows/ci.yml:56-58` and `.github/workflows/msix-pipeline.yml:83-85`, each a `Coverage threshold` step under `shell: pwsh` | `exit 1` — job fails |
+| Coverage threshold | `scripts/Check-Coverage.ps1` (100% line, branch, method) over the collector's Cobertura report | `.github/workflows/ci.yml:56-58` and `.github/workflows/msix-pipeline.yml:89-91`, each a `Coverage threshold` step under `shell: pwsh` | `exit 1` — job fails |
 | Dependency vulnerabilities | `dotnet list package --vulnerable --include-transitive` | `.github/workflows/ci.yml:61-69` (pwsh; greps for `"has the following vulnerable packages"`) | `Write-Error` + `exit 1` — job fails |
-| SAST | Semgrep, rulesets **`p/default`** + **`p/csharp`** | `.github/workflows/msix-pipeline.yml:34-42`, in the `semgrep/semgrep` container on `ubuntu-latest` | `--error` ⇒ any finding fails the job |
-| SAST reporting | SARIF upload | `msix-pipeline.yml:44-48` — `github/codeql-action/upload-sarif`, SHA-pinned, `if: always()`, `sarif_file: semgrep-results.sarif` | Results land in the GitHub Security tab (requires the `security-events: write` permission declared at `msix-pipeline.yml:16-18`) |
-| Store certification | WACK `appcert.exe` | `msix-pipeline.yml:219-224` (job `wack-validation`) | Non-zero exit fails the job |
+| SAST | Semgrep, rulesets **`p/default`** + **`p/csharp`** | `.github/workflows/msix-pipeline.yml:39-48`, in the `semgrep/semgrep` container on `ubuntu-latest`, over every tracked file except `docs/design/canvas/` | `--error` ⇒ any finding fails the job |
+| SAST reporting | SARIF upload | `msix-pipeline.yml:50-54` — `github/codeql-action/upload-sarif`, SHA-pinned, `if: always()`, `sarif_file: semgrep-results.sarif` | Results land in the GitHub Security tab (requires the `security-events: write` permission declared at `msix-pipeline.yml:16-18`) |
+| Store certification | WACK `appcert.exe` | `msix-pipeline.yml:225-230` (job `wack-validation`) | Non-zero exit fails the job |
 
 **The `security-scan` job is a hard gate on packaging.** `build-and-package` declares
 `needs: security-scan`, and `wack-validation` declares `needs: build-and-package`. A Semgrep
@@ -437,6 +437,15 @@ finding therefore blocks the MSIX build *and* certification.
 > **Rule 22 — do not silence a Semgrep finding with an inline `nosemgrep` comment unless the
 > comment states why the finding is a false positive in this context.** An unexplained
 > suppression is indistinguishable from a bug.
+
+> **The same standard applies to a path exclusion.** The Semgrep invocation carries exactly one
+> `--exclude`: `docs/design/canvas/`, the vendored design canvas frozen by T-013. Its 9 findings were real
+> rule hits in third-party JavaScript and HTML, not false positives, but that code is never built, served
+> or packaged into the MSIX, and `docs/design/_index.md` forbids editing it, so it cannot be fixed in place.
+> The reason sits beside the flag in the workflow. A second exclusion needs its own stated reason, and
+> widening this one to anything the product ships would turn the gate decorative, which Rule 21 exists to
+> prevent. `--exclude` is used rather than a `.semgrepignore` because creating that file replaces Semgrep's
+> default ignore template.
 
 ### Action pinning
 
