@@ -1,5 +1,6 @@
 using System.Text.RegularExpressions;
 using System.Windows;
+using System.Windows.Automation.Peers;
 using System.Windows.Controls;
 using WindowsFileManager.Views.Chrome;
 using WindowsFileManager.Views.Panels;
@@ -69,7 +70,7 @@ public class XamlLoadTests
     /// run names every broken control rather than only the first.
     /// </summary>
     [Fact]
-    public void EveryDecomposedControl_ParsesWithoutError()
+    public void EveryDecomposedControl_ParsesAndAddsNoAutomationNode()
     {
         var failures = RunOnStaThread(() =>
         {
@@ -81,7 +82,15 @@ public class XamlLoadTests
             {
                 try
                 {
-                    create();
+                    var control = create();
+
+                    // LFK-1: a UserControl creates a UserControlAutomationPeer, which would put an
+                    // unnamed "Custom" node into the accessibility tree that the Grid/Border each one
+                    // replaced never had. Every control overrides OnCreateAutomationPeer to stay out of it.
+                    if (UIElementAutomationPeer.CreatePeerForElement(control) is not null)
+                    {
+                        errors.Add($"{name}: creates an automation peer, so assistive technology sees an extra unnamed node");
+                    }
                 }
                 catch (Exception ex)
                 {

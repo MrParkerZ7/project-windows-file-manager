@@ -25,6 +25,10 @@ version has been tagged yet (`git tag` is empty and no GitHub release exists).
   players by naming them — is now an explicit `GroupSelectionChanged` event routed through the
   composition root to `PreviewPanel.StopMedia()`, instead of one code-behind reaching across
   what are now sibling controls.
+- The nine new controls stay out of the UI Automation tree. Each creates no automation peer, so
+  Inspect, Narrator and NVDA walk exactly the tree they walked before the split - measured on both
+  builds, identical node-for-node in the Control view on all three tabs. Without it the split would
+  have added nine unnamed "custom" nodes for a screen-reader user to step through.
 - Code-behind moved to sit beside the markup it serves. `MainWindow.xaml.cs` drops from 421
   lines to 128 (window geometry, tab state, that one event wire); the media transport, column
   sorting, profile dialogs and subfolder paging each moved into their own control, and the

@@ -82,6 +82,8 @@ internal MainViewModel(DuplicateScannerService scannerService,
 
 **One coupling could not be expressed in markup.** The Duplication list's `SelectionChanged` used to stop the preview players by naming `VideoPlayer`/`AudioPlayer` directly. Those are sibling controls now, so `DuplicatesScreen` raises `GroupSelectionChanged` and `MainWindow` — the only place that legitimately knows about both — calls `PreviewPanel.StopMedia()`. The trigger is deliberately a `SelectionChanged` and not a property change.
 
+**The nine controls stay out of the UI Automation tree.** A `UserControl` creates a `UserControlAutomationPeer`, so the split would have inserted nine unnamed `Custom` nodes into the tree that Inspect, Narrator and NVDA walk - nodes the `Grid`/`Border` each control replaced never had. Each control therefore overrides `OnCreateAutomationPeer` to return no peer, which keeps the accessibility tree exactly as it was: measured on the pre-split and post-split builds, the Control view is identical node-for-node on the Folder, Duplication and History tabs. **T-011 owns replacing this** - when it names a region with `AutomationProperties.Name` or `HeadingLevel`, that region's override must be removed in the same change, or the name is discarded silently along with the peer.
+
 **Coverage split.** Only three files in this module are inside the coverage boundary: `Converters.cs`, `RelayCommand.cs`, `ViewModelBase.cs`. Everything else in `Helpers/` and `ViewModels/` is marked `[ExcludeFromCodeCoverage]`, and the entire `Views` namespace is pattern-excluded. See [Testing](#testing).
 
 ## Key types
@@ -392,7 +394,7 @@ Four test classes under `tests/WindowsFileManager.Tests/Helpers/` cover this mod
 | `PercentToWidthConverterTests` | `PercentToWidthConverter` — normal case, both clamps, too-few values, wrong types, zero container width, `ProvideValue`, `ConvertBack` |
 | `RelayCommandTests` | `Execute`, `CanExecute` with and without a predicate, the `ArgumentNullException` on a null `execute`, `RaiseCanExecuteChanged`, and `CanExecuteChanged` add/remove |
 | `ViewModelBaseTests` | `SetProperty` changed vs unchanged, the returned bool, and `[CallerMemberName]` propagation |
-| `XamlLoadTests` | That all nine decomposed `UserControl`s parse against the shipped `App.xaml` dictionaries, and that the shell composes exactly those nine (so a tenth cannot be added untested). Does not add coverage — the `Views` namespace is pattern-excluded — it is a regression net, not a coverage contributor. |
+| `XamlLoadTests` | That all nine decomposed `UserControl`s parse against the shipped `App.xaml` dictionaries and **create no automation peer** (so the split adds no unnamed node to the accessibility tree), and that the shell composes exactly those nine (so a tenth cannot be added untested). Does not add coverage — the `Views` namespace is pattern-excluded — it is a regression net, not a coverage contributor. |
 
 **Nothing is mocked** in these tests — the covered types have no dependencies. The test project sets `<UseWPF>true</UseWPF>` because these types derive from WPF interfaces (`IValueConverter`, `ICommand`, `MarkupExtension`); they are instantiated directly.
 
