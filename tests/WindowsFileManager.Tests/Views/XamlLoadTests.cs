@@ -22,11 +22,12 @@ namespace WindowsFileManager.Tests.Views;
 /// catch that; this can.
 /// </para>
 /// <para>
-/// This is therefore the only place in the suite that starts an
+/// This is therefore one of the two places in the suite that use an
 /// <see cref="Application"/> — a deliberate, scoped exception to the "never start an
 /// Application or open a window" rule in docs/modules/ui.md § Testing. No window is
-/// shown and no message loop is run: all nine controls are built on one private STA
-/// thread this fixture owns, then dropped. See T-002 fork 2.
+/// shown and no message loop is run: all nine controls are built on the STA thread of
+/// <see cref="WpfAppHost"/>, which owns the suite's single application, then dropped.
+/// See T-002 fork 2.
 /// </para>
 /// </remarks>
 public class XamlLoadTests
@@ -64,19 +65,16 @@ public class XamlLoadTests
     }
 
     /// <summary>
-    /// All nine are built on a single STA thread — one thread, so the controls are always
-    /// constructed on the same thread that owns the <see cref="Application"/> whose
-    /// resources they resolve against. Every failure is collected before asserting, so one
-    /// run names every broken control rather than only the first.
+    /// All nine are built on the host's STA thread — the thread that owns the
+    /// <see cref="Application"/> whose resources they resolve against. Every failure is
+    /// collected before asserting, so one run names every broken control rather than only
+    /// the first.
     /// </summary>
     [Fact]
     public void EveryDecomposedControl_ParsesAndAddsNoAutomationNode()
     {
-        var failures = RunOnStaThread(() =>
+        var failures = WpfAppHost.Run(() =>
         {
-            var app = new App();
-            app.InitializeComponent();
-
             var errors = new List<string>();
             foreach (var (name, create) in Decomposed)
             {
@@ -124,34 +122,5 @@ public class XamlLoadTests
         var listed = Decomposed.Select(d => d.Name).OrderBy(n => n, StringComparer.Ordinal).ToArray();
 
         Assert.Equal(listed, composed);
-    }
-
-    private static List<string> RunOnStaThread(Func<List<string>> action)
-    {
-        var result = new List<string>();
-        Exception? failure = null;
-
-        var thread = new Thread(() =>
-        {
-            try
-            {
-                result = action();
-            }
-            catch (Exception ex)
-            {
-                failure = ex;
-            }
-        });
-
-        thread.SetApartmentState(ApartmentState.STA);
-        thread.Start();
-        thread.Join();
-
-        if (failure is not null)
-        {
-            throw new InvalidOperationException("The STA test thread threw before it could report.", failure);
-        }
-
-        return result;
     }
 }

@@ -35,6 +35,9 @@
                      and a UserControl is parsed as its own root, so these must be app-scoped or
                      the decomposed controls cannot find them. -->
                 <ResourceDictionary Source="Themes/Legacy.Shell.xaml" />
+                <!-- T-003: the Broadsheet component style library. Keyed and unconsumed on landing -
+                     nothing renders differently until a view opts in with Style="{StaticResource ...}". -->
+                <ResourceDictionary Source="Themes/Broadsheet.Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

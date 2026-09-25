@@ -25,10 +25,14 @@ WindowsFileManager/
     MiniPreviewConverter.cs 208   thumbnails via BitmapImage or IShellItemImageFactory
     FormattedTextBehavior.cs 213  the help-popup markup grammar
     TextBoxEnterKeyBehavior.cs 67 attached Enter-key command
+    BroadsheetSlots.cs      74    typed template slots: TrailingContent, Placeholder (T-003)
     ShortcutHelper.cs       34    .lnk creation via WScript.Shell
   Themes/                         resource dictionaries, merged in App.xaml (added by T-001)
-    Broadsheet.Tokens.xaml  123   the design system 3a is drawn in - 35 Colors + 35 brushes,
-                                  12 frame metrics, type scale, radii, space; consumed by nothing yet
+    Broadsheet.Tokens.xaml  244   the design system 3a is drawn in - 41 Colors + 41 brushes
+                                  (incl. T-003's six interaction overlays), 12 frame metrics, type
+                                  scale, radii, space, 4 font families (incl. the glyph face)
+    Broadsheet.Styles.xaml 1380   the component library (T-003): 49 keyed styles + 2 templates,
+                                  one dictionary in four sections; consumed by nothing yet
     Legacy.Palette.xaml     277   the 76 colours actually in use today, verbatim, each with its
                                   use count and the Broadsheet key it is destined for
     Legacy.Metrics.xaml      31   the 7 radii, 4 thicknesses, 16 font sizes and 2 families in use
@@ -86,6 +90,59 @@ internal MainViewModel(DuplicateScannerService scannerService,
 
 **Coverage split.** Only three files in this module are inside the coverage boundary: `Converters.cs`, `RelayCommand.cs`, `ViewModelBase.cs`. Everything else in `Helpers/` and `ViewModels/` is marked `[ExcludeFromCodeCoverage]`, and the entire `Views` namespace is pattern-excluded. See [Testing](#testing).
 
+## The Broadsheet component library
+
+`Themes/Broadsheet.Styles.xaml` (T-003) is the 3a IDE frame read as a parts list: one keyed style per part that recurs across the artboard, built on the token dictionary, so the tasks that rebuild each surface (T-004…T-011) **compose** the frame instead of restyling it. It lands **keyed and unconsumed** — nothing references a style yet, so the running app is pixel-identical to the build before it (measured, see T-003's build log). App.xaml merges it once, after the tokens.
+
+**The catalogue.** Keys follow T-001's reserved shape `Broadsheet.Style.<Part>[.<Variant>]`; two shared control templates are `Broadsheet.Template.*`.
+
+| Section | Keys | Target | Consumed by |
+|---|---|---|---|
+| Frame | `FocusVisual` · `.Inset` · `.TabUnderline` · `.Splitter.Vertical` · `.Splitter.Horizontal` | `Control` | every interactive style (T-011a's focus-visual contract); T-011 audits |
+| | `ToolWindow.Header` · `.HeaderTitle` · `.HeaderActions` | `Border` · `TextBlock` · `StackPanel` | T-005…T-008 |
+| | `Rule.Hairline` · `.Row` · `.Vertical` | `Border` | T-005, T-007 |
+| | `Band.Title` · `.TabStrip` · `.Toolbar` · `.SubToolbar` · `.ActionBar` (34 · 38 · 36 · 32 · 40 px) | `Border` | T-004, T-007…T-009 |
+| | `PaneSplitter.Vertical` · `.Horizontal` | `GridSplitter` | T-005, T-008 |
+| | `StatusBar` · `StatusBarItem` | `StatusBar` · `StatusBarItem` | T-009 |
+| | `Tab.Editor` · `TabControl.EditorStrip` | `TabItem` · `TabControl` | T-004 |
+| Text | `Text.Kicker` · `.Caption` · `.MetaValue` · `.Code` · `.Glyph` · `.GroupTitle` | `TextBlock` | T-006…T-009 |
+| | `Tag.Accent` · `Tag.Neutral` | `Border` | T-007, T-008 |
+| | `Toggle.Glyph` | `ToggleButton` | T-007 (and 3b's panels) |
+| Buttons | `Button.Primary` · `.Secondary` · `.Ghost` · `.Icon` · `.Link` · `.LinkMuted` | `Button` | T-004, T-006…T-009 |
+| Inputs | `TextBox` · `TextBox.Numeric` | `TextBox` | T-007, T-008 |
+| | `ComboBox` · `ComboBoxItem` | `ComboBox` · `ComboBoxItem` | T-007, T-008 |
+| | `CheckBox` · `KeepRadio` | `CheckBox` · `ToggleButton` (so a `RadioButton` too) | T-006…T-008 |
+| | `Segment.Group` · `.Option` · `.OptionFirst` | `Border` · `RadioButton` | T-006 |
+| | `ListBoxItem.Row` · `ListViewItem.Row` (the results list's group container) · `CopyRow` (the 30 px copy row inside it) | `ListBoxItem` · `ListViewItem` · `Border` | T-006, T-007 |
+
+**Conventions a consumer must know** — none of them is caught by a compiler:
+
+1. **Slots are typed attached properties** (`Helpers/BroadsheetSlots.cs`, decision D1-B): `BroadsheetSlots.TrailingContent` on the tab control carries the right-aligned Scan cluster; `BroadsheetSlots.Placeholder` on a text field carries its hint. A misspelled slot fails the XAML build. ⚠ **Content in `TrailingContent` is keyboard-reachable but not in the UI Automation tree** — WPF's `TabControlAutomationPeer` exposes only the tab items, so a Scan button placed there is invisible to Narrator and NVDA (measured). T-004 either places Scan as a sibling of the `TabControl` (T-011's requirement) or gives the tab control an automation peer that appends the trailing host's children.
+2. **`ComboBox.ItemContainerStyle` is not automatic.** Write `ItemContainerStyle="{StaticResource Broadsheet.Style.ComboBoxItem}"` on every ComboBox — no implicit style ships, because one would restyle every ComboBox in the process.
+3. **Do not set `Content` on a `Toggle.Glyph`.** The style supplies ▶/▼ from its `IsChecked` trigger; markup `Content` wins and freezes the glyph.
+4. **`StackPanel` has no gap.** Inside `ToolWindow.HeaderActions`, give every action but the last `Margin="0,0,12,0"`, and dock the actions before the title so the title ellipsises first.
+5. **Data text in a button-family control goes in a `TextBlock`.** Checkbox, radio and button templates recognise access keys (as WPF's own do), so a bare `node_modules` renders as `nodemodules`. Captions are strings; names from data are `<TextBlock Text="{Binding …}"/>`.
+6. **Status-bar gaps are the consumer's margins.** `StatusBar`'s items panel is a `DockPanel` with `LastChildFill=False` and every item gets `StatusBarItem` (padding 0, centred); give every item `Margin="0,0,18,0"` except the outermost on each side, which takes none.
+7. **The results list: `ListViewItem.Row` on the group container, `CopyRow` on each copy.** One `ListViewItem` holds a whole group (T-007), so the container sizes to its content; the 30 px copy row with its 6 % rule is a `Border` in the copy-row template.
+8. **Reference kind follows the declared type.** Brushes and colours are `DynamicResource`; radii, thicknesses, sizes, font families, styles and templates are `StaticResource` — so a typo in a structural value throws on first use instead of silently defaulting.
+
+**Why it is one dictionary.** The library was first built as four family files merged by one aggregator. Every XML check passed and the build was green — and at runtime each style's `FocusVisualStyle` resolved to nothing and the drop-down template threw *Cannot find resource*, because **WPF does not resolve a `{StaticResource}` from one merged dictionary into a sibling merged beside it**. References into `Broadsheet.Tokens.xaml` do resolve, because App.xaml merges the tokens directly and first. So the families are sections of one file, ordered so every internal reference points upward; `BroadsheetComponentDictionaryTests` BCL-07 keeps it that way, and `BroadsheetStyleRuntimeTests` applies every style to a live control so the same class of failure fails the suite. **A later task that `BasedOn`s or references a library style from its own dictionary must merge that dictionary in App.xaml after this one** — never beside it inside another aggregator.
+
+**Knowing deviations from the artboard:**
+
+- **No letter-spacing on the uppercase kickers.** WPF's `TextBlock` has no tracking property; the alternatives destroy screen-reader text.
+- **The glyph face is pinned** — `Broadsheet.FontFamily.Glyph` = Segoe UI Symbol, Segoe UI. Cambria lacks most of 3a's chrome glyphs (▾ ▼ ▶ ✓ ✕ ⋯ ↶), and Segoe Fluent Icons is Windows 11 only.
+- **Compact metrics.** The design system's `.btn` / `.input` ship at 36 px / 14 px; 3a overrides every one to 28 px / 12.5–13 px, and the styles carry 3a's numbers.
+- **Typed attached-property slots**, not `Tag` (decision D1-B).
+- **Links are underlined at rest** and darken to Accent600 on hover, as the design system draws `<a>`; WPF has no inheritable text decoration, so the underline is a 1 px rule at the bottom of the line box (about the system's 3 px under the baseline).
+- **The checked checkbox draws a tick** the artboard omits — without one, checked is indistinguishable from disabled in high contrast.
+- **The placeholder uses the design system's 65 % ink** (4.8:1 on Surface), not Neutral600 (about 3.5:1).
+- **Text is on T-011a's option-A steps** (the user's Fork 1 answer): secondary text — kickers, captions, the status bar, inactive tab labels, muted links — is `Neutral700`, link and ghost text `Accent700` (hover `Accent800`), because `Neutral600` and `Accent` fail AA at 11–13 px. `Accent` and `Neutral600` stay for non-text marks: the tab underline, fills, the disclosure glyph, focus rings.
+- **Control boundaries clear 3:1.** The text field, the pill dropdown and the unchecked checkbox are outlined in `Neutral600`, not the design system's divider hairline (1.4:1), because a field is recognised by its boundary (WCAG 1.4.11). Hairlines that only separate stay hairlines.
+- **Focus follows T-011a's contract**: a 2 px Accent ring 1 px outside buttons, fields, checkboxes and the Keep mark; an inset two-tone ring on list rows and segments, where an outer ring would be clipped; the tab underline thickening to 3 px; a 3 px Accent band on a splitter. A selected row carries a 2 px Accent left edge, since its Accent100 wash is only 1.03:1.
+- **The Keep dot is ink**, as the artboard draws it, not accent.
+- **Tags are two fixed keys** at `Radius.Sm`; per-file-type tinting is turn 4 and out of scope.
+
 ## Key types
 
 | Type | File | Responsibility |
@@ -101,6 +158,7 @@ internal MainViewModel(DuplicateScannerService scannerService,
 | `MiniPreviewConverter` | `Helpers/MiniPreviewConverter.cs` | Path → 80 px `ImageSource`, via `BitmapImage` for 15 native formats and the Windows shell thumbnail extractor for everything else. Static unbounded cache. |
 | `FormattedTextBehavior` | `Helpers/FormattedTextBehavior.cs` | Attached `FormattedText` property that parses the help-popup markup into `TextBlock` inlines. |
 | `TextBoxEnterKeyBehavior` | `Helpers/TextBoxEnterKeyBehavior.cs` | Attached `Command` property that updates the binding then executes on Enter. |
+| `BroadsheetSlots` | `Helpers/BroadsheetSlots.cs` | Typed content slots for the Broadsheet templates (T-003, decision D1-B): attached `TrailingContent` (the tab strip's right-hand content) and `Placeholder` (a text field's hint). Both default to `null`, which the templates render as nothing. `[ExcludeFromCodeCoverage]`, with tests anyway. |
 | `ShortcutHelper` | `Helpers/ShortcutHelper.cs` | `internal static` — creates a `.lnk` via late-bound `WScript.Shell`. |
 | `MainWindow` | `Views/MainWindow.xaml(.cs)` | The single window, and since T-002 a **composition root only**: 91 XAML lines that name the nine controls below, plus the layout they sit in (the `DockPanel`, the 3-column `Grid`, the `TabControl` and its three `TabItem`s, and the three side-panel `Border`s with their `Width`/`Visibility` bindings). |
 | `ProfileBar`, `AppStatusBar`, `ScanScopeBar` | `Views/Chrome/*.xaml(.cs)` | Window chrome: the profile strip, the global status bar, and the target/exclude folder scope row. |
@@ -386,7 +444,7 @@ Modal, `Owner` set by the caller, validates against `reservedNames` live, disabl
 
 ## Testing
 
-Four test classes under `tests/WindowsFileManager.Tests/Helpers/` cover this module. They are the only tests that touch UI code.
+The test classes below cover this module — those under `tests/WindowsFileManager.Tests/Helpers/`, `Views/` and `Themes/`. They are the only tests that touch UI code.
 
 | Test class | Covers |
 |------------|--------|
@@ -394,19 +452,23 @@ Four test classes under `tests/WindowsFileManager.Tests/Helpers/` cover this mod
 | `PercentToWidthConverterTests` | `PercentToWidthConverter` — normal case, both clamps, too-few values, wrong types, zero container width, `ProvideValue`, `ConvertBack` |
 | `RelayCommandTests` | `Execute`, `CanExecute` with and without a predicate, the `ArgumentNullException` on a null `execute`, `RaiseCanExecuteChanged`, and `CanExecuteChanged` add/remove |
 | `ViewModelBaseTests` | `SetProperty` changed vs unchanged, the returned bool, and `[CallerMemberName]` propagation |
+| `BroadsheetSlotsTests` | `BroadsheetSlots` — the `[ExcludeFromCodeCoverage]` guard, both slots default to `null`, and both round-trip and clear on a bare `DependencyObject` (no STA needed) |
+| `DesignTokenContractTests` | The token dictionary (T-001): every `Broadsheet.*` / `Legacy.*` reference resolves (the library's style keys count as declared), sanctioned prefixes, reserved categories empty in the token files, brush values equal the vendored design system, both divider forms, T-003's six interaction overlays equal the colour mixes their source declares, every brush pairs with a `Color`, Cambria pinned, the exact `App.xaml` merge list, and the legacy layer's lifetime |
+| `BroadsheetComponentDictionaryTests` | The component library (T-003), read as XML: the 49-style catalogue with its target types (BCL-01), every reference resolves (02) with the kind its declared type requires (03), no colour literal (04), no implicit style and no `Generic.xaml` (05), only reserved categories (05b), no duplicate key across everything `App.xaml` merges (06), one dictionary merged once after the tokens (07), required template parts (08), `RecognizesAccessKey` in every button template (09), the glyph face (10), every 1 px style snaps (11), links inherit their band's type (12), the slots the templates bind exist on the helper (13), no font property on the tab styles themselves (14), no text in a failing ink - T-011a option A (15) |
+| `BroadsheetStyleRuntimeTests` | Every library style resolved through the real `Application`, applied to a live control of its target type, its template loaded, and every setter landing with the value it declares; plus the placeholder slot's show/hide wiring, the Keep mark on both a `ToggleButton` and a `RadioButton`, and the status bar keeping a right-docked last item at the right edge — the check the XML tests cannot make, and the one that caught the cross-dictionary failure described under [The Broadsheet component library](#the-broadsheet-component-library) |
 | `XamlLoadTests` | That all nine decomposed `UserControl`s parse against the shipped `App.xaml` dictionaries and **create no automation peer** (so the split adds no unnamed node to the accessibility tree), and that the shell composes exactly those nine (so a tenth cannot be added untested). Does not add coverage — the `Views` namespace is pattern-excluded — it is a regression net, not a coverage contributor. |
 
 **Nothing is mocked** in these tests — the covered types have no dependencies. The test project sets `<UseWPF>true</UseWPF>` because these types derive from WPF interfaces (`IValueConverter`, `ICommand`, `MarkupExtension`); they are instantiated directly.
 
-**Starting an `Application` — the one permitted exception.** This document previously stated flatly that the tests *never start an `Application` or open a window*. Since T-002 that is true of every test but one, and the exception is deliberate rather than an erosion.
+**Starting an `Application` — the one permitted exception.** This document previously stated flatly that the tests *never start an `Application` or open a window*. Since T-002 that is true of every test except two classes that share one application, and the exception is deliberate rather than an erosion.
 
 Decomposing `MainWindow.xaml` into nine `UserControl`s created a failure mode that did not exist while everything lived in one file: a `{StaticResource}` that used to resolve against the Window's own `Resources` block must now resolve against `Application.Resources`. When it doesn't, the `XamlParseException` is raised **while that control is parsed** — so for a panel that ships `Collapsed`, it surfaces the first time a user opens the panel and never in a build, a lint, or any other test. Seven of the nine controls carry such references (21 × `HelpButtonStyle` plus the five converters), so this is the module's largest untested surface, not a corner case.
 
-`XamlLoadTests` therefore constructs all nine controls against the real `App` — `new App(); app.InitializeComponent();`, so the test resolves against exactly the dictionaries `App.xaml` merges, in `App.xaml`'s order, and cannot drift from what ships. The bounds that keep this from becoming "the tests open windows":
+`XamlLoadTests` therefore constructs all nine controls against the real `App` — `new App(); app.InitializeComponent();`, so the test resolves against exactly the dictionaries `App.xaml` merges, in `App.xaml`'s order, and cannot drift from what ships. Since T-003, `BroadsheetStyleRuntimeTests` uses the same application for the component library, whose failures are of exactly this kind. WPF allows one `Application` per process, so both run on **`WpfAppHost`** (`tests/.../Views/WpfAppHost.cs`), which starts it once. The bounds that keep this from becoming "the tests open windows":
 
-- **No window is shown and no message loop runs.** Controls are constructed and dropped; `Application.Run()` is never called.
-- **One private STA thread**, owned by the fixture, so the controls are built on the same thread that owns the `Application` whose resources they resolve against.
-- **Scoped to parse-time resolution.** `{DynamicResource}` is deferred and cannot throw here; those keys are checked textually by `DesignTokenContractTests` instead.
+- **No window is shown and no message loop runs.** Controls are constructed and dropped; `Application.Run()` is never called. The host runs queued work items synchronously on its thread.
+- **One STA thread**, owned by `WpfAppHost`, so every control is built on the same thread that owns the `Application` whose resources it resolves against. It is a background thread and never keeps the test process alive.
+- **Scoped to resolution.** `{DynamicResource}` does not throw; `BroadsheetStyleRuntimeTests` checks each dynamic key it applies exists, and `DesignTokenContractTests` checks the rest textually.
 
 Anything beyond that — showing a window, pumping a dispatcher, driving input — still does not belong in this suite.
 

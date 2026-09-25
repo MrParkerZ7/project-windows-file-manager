@@ -86,7 +86,13 @@ public class DesignTokenContractTests
     [Fact]
     public void EveryReferencedResourceKey_IsDeclaredByTheDictionaries()
     {
-        var declared = DeclaredKeys();
+        // The token dictionaries declare values; T-003's component library declares the
+        // Broadsheet.Style/Template keys a view binds to. Both are legitimate targets. The library
+        // files stay in ShellXamlFiles() too, so their own token references are checked here.
+        var declared = DeclaredKeys()
+            .Keys
+            .Concat(StyleLibraryKeys())
+            .ToHashSet(StringComparer.Ordinal);
         var referencePattern = new Regex(@"\{(?:Dynamic|Static)Resource\s+([A-Za-z0-9_.]+)\s*\}", RegexOptions.Compiled);
         var dangling = new List<string>();
 
@@ -105,7 +111,7 @@ public class DesignTokenContractTests
                     continue;
                 }
 
-                if (!declared.ContainsKey(key))
+                if (!declared.Contains(key))
                 {
                     dangling.Add($"{Path.GetFileName(view)} references '{key}', which no dictionary declares");
                 }
@@ -184,6 +190,40 @@ public class DesignTokenContractTests
         BrushColor("Broadsheet.Brush.Divider").Should().Be("#FFD1D0D0");
     }
 
+    /// <summary>5b. The interaction overlays T-003 added are the design system's own colour mixes. WPF has no
+    /// color-mix, so each ships as its alpha form: the source ink with an alpha byte of round(N x 2.55). The
+    /// percentage is read back out of the frozen source, so a transcription that drifts from it fails here.</summary>
+    /// <param name="resourceKey">The dictionary key whose Color attribute is checked.</param>
+    /// <param name="cssInk">The design-system colour the mix is made from, without the leading dashes.</param>
+    /// <param name="percent">The mix percentage the source declares.</param>
+    /// <param name="source">Where the mix is declared: the design system's styles.css, or the 3a artboard.</param>
+    [Theory]
+    [InlineData("Broadsheet.Brush.RowRule", "color-text", 6, "artboard")]
+    [InlineData("Broadsheet.Brush.HoverInk", "color-text", 7, "css")]
+    [InlineData("Broadsheet.Brush.ActiveInk", "color-text", 14, "css")]
+    [InlineData("Broadsheet.Brush.AccentHover", "color-accent", 10, "css")]
+    [InlineData("Broadsheet.Brush.AccentActive", "color-accent", 18, "css")]
+    [InlineData("Broadsheet.Brush.PlaceholderInk", "color-text", 65, "css")]
+    public void InteractionOverlay_IsTheDeclaredColourMix(string resourceKey, string cssInk, int percent, string source)
+    {
+        var canvas = Path.Combine(RepositoryRoot, "docs", "design", "canvas");
+        var cssPath = Path.Combine(canvas, "_ds", "broadsheet-20e204aa-d8f4-4c1f-9771-d781d63fcc9d", "styles.css");
+        var css = File.ReadAllText(cssPath);
+        var declaringText = source == "css"
+            ? css
+            : File.ReadAllText(Path.Combine(canvas, "redesign-explorations.dc.html"));
+
+        declaringText.Should().MatchRegex(
+            $@"color-mix\(in srgb,\s*var\(--{Regex.Escape(cssInk)}\)\s*{percent}%,\s*transparent\)",
+            $"the {source} must declare a {percent}% mix of --{cssInk}");
+
+        var ink = Regex.Match(css, $@"--{Regex.Escape(cssInk)}\s*:\s*#([0-9a-fA-F]{{6}})\s*;").Groups[1].Value;
+        ink.Should().NotBeEmpty($"'{cssInk}' must exist in the vendored styles.css");
+
+        var alpha = (int)Math.Round(percent * 255 / 100.0, MidpointRounding.AwayFromZero);
+        BrushColor(resourceKey).Should().Be("#" + alpha.ToString("X2", System.Globalization.CultureInfo.InvariantCulture) + ink.ToUpperInvariant());
+    }
+
     /// <summary>9. Every Broadsheet brush indirects through a Color of the same name. That pairing is what
     /// lets a value serve both a brush and a Color-typed consumer; a brush with an inline literal would
     /// silently break the second use.</summary>
@@ -222,13 +262,15 @@ public class DesignTokenContractTests
             .ToList();
 
         // Grows by exactly ONE entry per task: T-001 published the token layer's three, T-002
-        // appended a single aggregator for the two families it lifted out of Window.Resources.
-        // A task splicing several entries in here is the deviation this assertion exists to catch.
+        // appended a single aggregator for the two families it lifted out of Window.Resources,
+        // T-003 appended the component library's aggregator. A task splicing several entries in
+        // here is the deviation this assertion exists to catch.
         sources.Should().Equal(
             "Themes/Broadsheet.Tokens.xaml",
             "Themes/Legacy.Palette.xaml",
             "Themes/Legacy.Metrics.xaml",
-            "Themes/Legacy.Shell.xaml");
+            "Themes/Legacy.Shell.xaml",
+            "Themes/Broadsheet.Styles.xaml");
     }
 
     /// <summary>8. The legacy layer is transitional and its retirement is owned. Once no view
@@ -260,6 +302,18 @@ public class DesignTokenContractTests
             "no view references a Legacy.* key any more and no raw hex literals remain, so " +
             "Themes/Legacy.Palette.xaml and Themes/Legacy.Metrics.xaml are dead — T-009 must delete them");
     }
+
+    /// <summary>
+    /// Every key T-003's component library declares (<c>Themes/Broadsheet.Styles.xaml</c>). Kept apart from
+    /// <see cref="DeclaredKeys"/>: that set is the token layer, and assertion 3 requires it to hold no
+    /// Broadsheet.Style.* key.
+    /// </summary>
+    private static IEnumerable<string> StyleLibraryKeys() =>
+        XDocument.Load(Path.Combine(ThemesDirectory, "Broadsheet.Styles.xaml"))
+            .Descendants()
+            .Select(e => e.Attribute(XName.Get("Key", XamlNs))?.Value)
+            .Where(k => k is not null)
+            .Select(k => k!);
 
     /// <summary>Every resource key the dictionaries publish, mapped to the file that declares it.</summary>
     private static Dictionary<string, string> DeclaredKeys()

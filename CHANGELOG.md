@@ -49,10 +49,24 @@ version has been tagged yet (`git tag` is empty and no GitHub release exists).
 
 ### Added
 
+- **Broadsheet component style library** (`Themes/Broadsheet.Styles.xaml`, T-003) — the 3a IDE
+  frame as 49 keyed styles and 2 shared templates (buttons, links, fields, pill dropdown,
+  checkbox, Keep mark, segmented control, row containers, bands, tool-window header, splitters,
+  status bar, underlined tab strip, and the focus visuals T-011a's audit specifies), for
+  T-004…T-011 to compose. Text and control boundaries follow the audit's option A (Neutral700 /
+  Accent700 text, 3:1 boundaries). **Nothing on screen
+  changes yet**: every style is keyed and unreferenced, verified pixel-for-pixel against the
+  previous build. Adds typed template slots (`Helpers/BroadsheetSlots.cs`) and six interaction
+  overlay tokens plus a glyph face to `Broadsheet.Tokens.xaml`.
+- **`BroadsheetComponentDictionaryTests` and `BroadsheetStyleRuntimeTests`** — the library's
+  gates: fifteen structural checks on the XAML, and runtime checks that apply every style to a
+  live control through the real application - so a reference that only fails at runtime, a
+  mis-wired placeholder or a status bar that stops right-aligning fails the suite.
 - **`XamlLoadTests`** — constructs all nine decomposed controls against the shipped `App.xaml`
   dictionaries, so a `{StaticResource}` that stops resolving fails the suite instead of failing
-  the first time a user opens a collapsed panel. It is the suite's only test that starts a WPF
-  `Application`; the scope and reasoning are recorded in `docs/modules/ui.md` § Testing.
+  the first time a user opens a collapsed panel. It and `BroadsheetStyleRuntimeTests` are the
+  suite's only tests that use a WPF `Application` — one, shared through `WpfAppHost`; the scope
+  and reasoning are recorded in `docs/modules/ui.md` § Testing.
 - **Folder Control tab** — search folders by configurable patterns with inline editable
   rule chips, priority reordering, select-all, and an Action section in the sidebar
 - **Six folder match types** — `Include`, `Match`, `Contains`, `Exclude`, `Mismatch`,

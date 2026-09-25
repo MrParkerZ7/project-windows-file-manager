@@ -54,6 +54,43 @@
     <Color x:Key="Broadsheet.Color.Divider">#FFD1D0D0</Color>
     <SolidColorBrush x:Key="Broadsheet.Brush.Divider" Color="{StaticResource Broadsheet.Color.Divider}" po:Freeze="True" />
 
+    <!--
+        Interaction overlays - added by T-003, which needs them and found them missing.
+        Same encoding as Divider.Alpha: the design system states each one as
+            color-mix(in srgb, <ink> N%, transparent)
+        and WPF has no color-mix, so each ships as its alpha form over the source ink.
+        Alpha byte = round(N * 2.55). Translucent on purpose: every one of them is drawn
+        over more than one ground (Bg, Surface, Neutral100), and only the alpha form
+        composites correctly on all of them.
+
+            key            source                                      N     alpha
+            RowRule        3a artboard :188, per-copy row rule          6%    0x0F
+            HoverInk       styles.css .btn-secondary:hover, .seg-opt    7%    0x12
+            ActiveInk      styles.css .btn-secondary:active            14%    0x24
+            AccentHover    styles.css .btn-ghost:hover                 10%    0x1A
+            AccentActive   styles.css .btn-ghost:active                18%    0x2E
+            PlaceholderInk styles.css .input::placeholder              65%    0xA6
+
+        RowRule is NOT the divider. The 6% row rule and the 16% divider are two values in
+        the artboard; do not collapse them.
+
+        PlaceholderInk is deliberately not Neutral600. The design system measured it: the
+        browser's default placeholder grey misses the 4.5:1 small-text bar on the Surface
+        fill, and 65% ink reaches 4.8:1. Neutral600 on Surface is about 3.5:1.
+    -->
+    <Color x:Key="Broadsheet.Color.RowRule">#0F201E1D</Color>
+    <SolidColorBrush x:Key="Broadsheet.Brush.RowRule" Color="{StaticResource Broadsheet.Color.RowRule}" po:Freeze="True" />
+    <Color x:Key="Broadsheet.Color.HoverInk">#12201E1D</Color>
+    <SolidColorBrush x:Key="Broadsheet.Brush.HoverInk" Color="{StaticResource Broadsheet.Color.HoverInk}" po:Freeze="True" />
+    <Color x:Key="Broadsheet.Color.ActiveInk">#24201E1D</Color>
+    <SolidColorBrush x:Key="Broadsheet.Brush.ActiveInk" Color="{StaticResource Broadsheet.Color.ActiveInk}" po:Freeze="True" />
+    <Color x:Key="Broadsheet.Color.AccentHover">#1A0088B0</Color>
+    <SolidColorBrush x:Key="Broadsheet.Brush.AccentHover" Color="{StaticResource Broadsheet.Color.AccentHover}" po:Freeze="True" />
+    <Color x:Key="Broadsheet.Color.AccentActive">#2E0088B0</Color>
+    <SolidColorBrush x:Key="Broadsheet.Brush.AccentActive" Color="{StaticResource Broadsheet.Color.AccentActive}" po:Freeze="True" />
+    <Color x:Key="Broadsheet.Color.PlaceholderInk">#A6201E1D</Color>
+    <SolidColorBrush x:Key="Broadsheet.Brush.PlaceholderInk" Color="{StaticResource Broadsheet.Color.PlaceholderInk}" po:Freeze="True" />
+
     <!-- Neutral ramp -->
     <Color x:Key="Broadsheet.Color.Neutral100">#FFF8F4F4</Color>
     <SolidColorBrush x:Key="Broadsheet.Brush.Neutral100" Color="{StaticResource Broadsheet.Color.Neutral100}" po:Freeze="True" />
@@ -186,13 +223,22 @@
     <FontFamily x:Key="Broadsheet.FontFamily.Heading">Cambria</FontFamily>
     <FontFamily x:Key="Broadsheet.FontFamily.Body">Cambria</FontFamily>
     <FontFamily x:Key="Broadsheet.FontFamily.Mono">Consolas</FontFamily>
+    <!--
+        Glyph face - added by T-003. The design system defines no such family; 3a draws its
+        chrome glyphs (▾ ▼ ▶ ✓ ✕ ⋯ ↶ ≥ ↓ ·) as text, and Cambria lacks most of them, so WPF
+        would substitute them glyph by glyph with mismatched weights and baselines.
+        Segoe UI Symbol first: it ships on every supported Windows. NOT Segoe Fluent Icons,
+        which is Windows 11 only - TargetPlatformMinVersion is 10.0.17763.0.
+    -->
+    <FontFamily x:Key="Broadsheet.FontFamily.Glyph">Segoe UI Symbol, Segoe UI</FontFamily>
     <sys:Double x:Key="Broadsheet.FontWeight.Heading">600</sys:Double><!-- css: font-heading-weight -->
 
     <!--
         RESERVED, INTENTIONALLY EMPTY: Broadsheet.Style.*, Broadsheet.Template.*,
         Broadsheet.Converter.*. These categories are published by T-001 as the naming
-        contract and defined by T-003. T-001 authoring one would put a rendered-surface
-        change in the task whose whole purpose is to change nothing.
+        contract and defined by T-003 - in Broadsheet.Styles.xaml (one dictionary; its header
+        says why it is not split), never here. T-001 authoring one would put a rendered-surface change in the task
+        whose whole purpose is to change nothing.
     -->
 
 </ResourceDictionary>

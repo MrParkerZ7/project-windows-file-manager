@@ -1,0 +1,1380 @@
+<!--
+    Broadsheet component library (T-003) - the single App.xaml entry T-003 adds.
+
+    WHAT THIS IS. The 3a IDE frame read as a parts list: one keyed style per recurring part, over
+    the token dictionary (Broadsheet.Tokens.xaml), so the tasks that rebuild each surface compose
+    it rather than restyle it. Keys follow T-001's reserved shape Broadsheet.Style.<Part>[.<Variant>]
+    (styles) and Broadsheet.Template.<Part> (shared control templates). The catalogue, the consumer
+    conventions and the knowing deviations from the artboard are in docs/modules/ui.md.
+
+    ZERO VISUAL CHANGE ON LANDING. Every style is keyed and nothing references one yet, so the app
+    renders exactly as it did before this entry was merged.
+
+    ONE FILE, FOUR SECTIONS - Frame, Text, Buttons, Inputs - and deliberately not four merged
+    files. WPF does not resolve a StaticResource from one merged dictionary into a sibling merged
+    under the same aggregator: split into families, every FocusVisualStyle came back unset and the
+    dropdown template threw "Cannot find resource" at runtime, with a green build and green XML
+    tests. References into Broadsheet.Tokens.xaml do resolve, because the tokens are merged into
+    App.xaml directly, ahead of this file. Keep it one dictionary.
+
+    ORDER IS LOAD-BEARING. A StaticResource can only reference a key defined above it in this
+    file, so the focus visual, the bands and the glyph text style come before their users.
+
+    KEYED ONLY. An implicit TargetType-only style here would restyle every instance of that type
+    in the process - the 21 help popups and ProfileNameDialog included.
+
+    REFERENCE KIND follows the declared type (T-001 contract 3): brushes and colours are
+    DynamicResource, so a future theme can swap the token dictionary; radii, thicknesses,
+    doubles, font families, styles and templates are StaticResource, so a typo throws on first
+    use instead of silently rendering the property default.
+
+    HAIRLINES use Broadsheet.Brush.Divider.Alpha - the design system's own 16% ink mix, which
+    composites correctly over every ground the frame draws on. Every 1px element snaps.
+-->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:helpers="clr-namespace:WindowsFileManager.Helpers">
+
+    <!-- ===================================================================================
+        FRAME - the shapes the 3a IDE frame is assembled from: the focus visual every interactive
+        style shares, the 30px tool-window header, the four bands, the three rules, the two pane
+        splitters, the status bar and the underlined editor tab strip.
+         =================================================================================== -->
+    <!--
+        Focus visuals - the focus-visual contract T-011a set for this library (_T-011a-audit.md 3c):
+        a 2px Accent ring for controls, an inset ring where an outer one would be clipped, the tab
+        underline thickening to 3px, and a 3px Accent band on a splitter. Focus is never signalled by
+        colour alone - each one changes shape or thickness. WPF draws a FocusVisualStyle only after
+        keyboard interaction, which is exactly :focus-visible, so none of them appears on a click.
+
+        FocusVisual: the ring sits 1px outside the control. A Rectangle's stroke is drawn inside its
+        bounds, so Margin -3 with a 2px stroke leaves a 1px gap, then the 2px ring.
+    -->
+    <Style x:Key="Broadsheet.Style.FocusVisual" TargetType="Control">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Control">
+                    <Rectangle Margin="-3"
+                               StrokeThickness="2"
+                               Stroke="{DynamicResource Broadsheet.Brush.Accent}"
+                               SnapsToDevicePixels="True" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--
+        FocusVisual.Inset: drawn INSIDE the control, for the places an outer ring is clipped - a row
+        in a ScrollViewer, a segment inside its ClipToBounds group. Two-tone, so it reads on both
+        grounds: the 2px Accent ring shows on a light row, the 1px Bg line inside it shows on an
+        Accent-filled checked segment, where an Accent ring alone would vanish.
+    -->
+    <Style x:Key="Broadsheet.Style.FocusVisual.Inset" TargetType="Control">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Control">
+                    <Grid SnapsToDevicePixels="True">
+                        <Rectangle Margin="1" StrokeThickness="2" Stroke="{DynamicResource Broadsheet.Brush.Accent}" />
+                        <Rectangle Margin="3" StrokeThickness="1" Stroke="{DynamicResource Broadsheet.Brush.Bg}" />
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- FocusVisual.TabUnderline: the tab's 2px underline thickens to 3px (it hangs 1px onto the strip rule, like the underline). -->
+    <Style x:Key="Broadsheet.Style.FocusVisual.TabUnderline" TargetType="Control">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Control">
+                    <Border Height="3"
+                            Margin="0,0,0,-1"
+                            VerticalAlignment="Bottom"
+                            Background="{DynamicResource Broadsheet.Brush.Accent}"
+                            SnapsToDevicePixels="True" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- FocusVisual.Splitter.*: a 3px Accent band along a focused pane splitter - a 1px line with a ring is invisible. -->
+    <Style x:Key="Broadsheet.Style.FocusVisual.Splitter.Vertical" TargetType="Control">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Control">
+                    <Rectangle Width="3" HorizontalAlignment="Center" Fill="{DynamicResource Broadsheet.Brush.Accent}" SnapsToDevicePixels="True" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="Broadsheet.Style.FocusVisual.Splitter.Horizontal" TargetType="Control">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Control">
+                    <Rectangle Height="3" VerticalAlignment="Center" Fill="{DynamicResource Broadsheet.Brush.Accent}" SnapsToDevicePixels="True" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ===================================================================================
+         Tool-window header - three composable keys (T-003 S4). The consumer writes
+             <Border Style=ToolWindow.Header>
+               <DockPanel LastChildFill="False">
+                 <StackPanel DockPanel.Dock="Right" Style=ToolWindow.HeaderActions> ... </StackPanel>
+                 <TextBlock  DockPanel.Dock="Left"  Style=ToolWindow.HeaderTitle Text="Scope" />
+               </DockPanel>
+             </Border>
+         Dock the actions FIRST so they measure before the title and the title ellipsises at a
+         narrow pane instead of pushing the actions out. StackPanel has no gap: give every action
+         but the last Margin="0,0,12,0" (the artboard's gap:12px).
+         =================================================================================== -->
+    <Style x:Key="Broadsheet.Style.ToolWindow.Header" TargetType="Border">
+        <Setter Property="Height" Value="{StaticResource Broadsheet.Metric.ToolWindowHeader.Height}" />
+        <Setter Property="Padding" Value="12,0" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Broadsheet.Brush.Divider.Alpha}" />
+        <Setter Property="BorderThickness" Value="0,0,0,1" />
+        <Setter Property="TextElement.FontSize" Value="{StaticResource Broadsheet.FontSize.Body}" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+    </Style>
+
+    <Style x:Key="Broadsheet.Style.ToolWindow.HeaderTitle" TargetType="TextBlock">
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+    </Style>
+
+    <Style x:Key="Broadsheet.Style.ToolWindow.HeaderActions" TargetType="StackPanel">
+        <Setter Property="Orientation" Value="Horizontal" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="HorizontalAlignment" Value="Right" />
+        <Setter Property="TextElement.FontSize" Value="{StaticResource Broadsheet.FontSize.Chrome}" />
+    </Style>
+
+    <!-- ===================================================================================
+         Rules. Row is the 6% per-copy rule and is NOT the 16% divider - do not collapse them.
+         =================================================================================== -->
+    <Style x:Key="Broadsheet.Style.Rule.Hairline" TargetType="Border">
+        <Setter Property="Height" Value="1" />
+        <Setter Property="Background" Value="{DynamicResource Broadsheet.Brush.Divider.Alpha}" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+    </Style>
+
+    <Style x:Key="Broadsheet.Style.Rule.Row" TargetType="Border">
+        <Setter Property="Height" Value="1" />
+        <Setter Property="Background" Value="{DynamicResource Broadsheet.Brush.RowRule}" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+    </Style>
+
+    <!-- The results toolbar's Mark-group separator (artboard: width 1, height 20, margin 0 6). -->
+    <Style x:Key="Broadsheet.Style.Rule.Vertical" TargetType="Border">
+        <Setter Property="Width" Value="1" />
+        <Setter Property="Height" Value="20" />
+        <Setter Property="Margin" Value="6,0" />
+        <Setter Property="Background" Value="{DynamicResource Broadsheet.Brush.Divider.Alpha}" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+    </Style>
+
+    <!-- ===================================================================================
+         Bands - 3a's four row heights and grounds, carried once. A band sets TextElement.FontSize,
+         .FontFamily and .Foreground; the component styles inside it OMIT FontSize so they inherit
+         it. That is what lets one Link style render at 12px in a header and 12.5px in the toolbar.
+         The Rules sub-toolbar is Band.SubToolbar (32px, 12px type).
+         =================================================================================== -->
+    <Style x:Key="Broadsheet.Style.Band.Title" TargetType="Border">
+        <Setter Property="Height" Value="{StaticResource Broadsheet.Metric.TitleBar.Height}" />
+        <Setter Property="Padding" Value="14,0" />
+        <Setter Property="Background" Value="{DynamicResource Broadsheet.Brush.Surface}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Broadsheet.Brush.Divider.Alpha}" />
+        <Setter Property="BorderThickness" Value="0,0,0,1" />
+        <Setter Property="TextElement.FontSize" Value="{StaticResource Broadsheet.FontSize.Body}" />
+        <Setter Property="TextElement.FontFamily" Value="{StaticResource Broadsheet.FontFamily.Body}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource Broadsheet.Brush.Text}" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+    </Style>
+
+    <Style x:Key="Broadsheet.Style.Band.TabStrip" TargetType="Border">
+        <Setter Property="Height" Value="{StaticResource Broadsheet.Metric.TabStrip.Height}" />
+        <Setter Property="Padding" Value="14,0" />
+        <Setter Property="Background" Value="{DynamicResource Broadsheet.Brush.Bg}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Broadsheet.Brush.Divider.Alpha}" />
+        <Setter Property="BorderThickness" Value="0,0,0,1" />
+        <!-- 13, not 14: the artboard sizes only the tab LABELS at 14px (Tab.Editor does that); the
+             strip itself, and the Scan caption on it, are the frame's 13px. -->
+        <Setter Property="TextElement.FontSize" Value="{StaticResource Broadsheet.FontSize.Body}" />
+        <Setter Property="TextElement.FontFamily" Value="{StaticResource Broadsheet.FontFamily.Body}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource Broadsheet.Brush.Text}" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+    </Style>
+
+    <Style x:Key="Broadsheet.Style.Band.Toolbar" TargetType="Border">
+        <Setter Property="Height" Value="{StaticResource Broadsheet.Metric.ResultsToolbar.Height}" />
+        <Setter Property="Padding" Value="12,0" />
+        <Setter Property="Background" Value="{DynamicResource Broadsheet.Brush.Neutral100}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Broadsheet.Brush.Divider.Alpha}" />
+        <Setter Property="BorderThickness" Value="0,0,0,1" />
+        <Setter Property="TextElement.FontSize" Value="{StaticResource Broadsheet.FontSize.Toolbar}" />
+        <Setter Property="TextElement.FontFamily" Value="{StaticResource Broadsheet.FontFamily.Body}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource Broadsheet.Brush.Text}" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+    </Style>
+
+    <!-- The Rules sub-toolbar (artboard :209): the toolbar band at 32px and the chrome's 12px. -->
+    <Style x:Key="Broadsheet.Style.Band.SubToolbar" TargetType="Border" BasedOn="{StaticResource Broadsheet.Style.Band.Toolbar}">
+        <Setter Property="Height" Value="32" />
+        <Setter Property="TextElement.FontSize" Value="{StaticResource Broadsheet.FontSize.Chrome}" />
+    </Style>
+
+    <Style x:Key="Broadsheet.Style.Band.ActionBar" TargetType="Border">
+        <Setter Property="Height" Value="{StaticResource Broadsheet.Metric.ActionBar.Height}" />
+        <Setter Property="Padding" Value="12,0" />
+        <Setter Property="Background" Value="{DynamicResource Broadsheet.Brush.Neutral100}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Broadsheet.Brush.Divider.Alpha}" />
+        <Setter Property="BorderThickness" Value="0,1,0,0" />
+        <Setter Property="TextElement.FontSize" Value="{StaticResource Broadsheet.FontSize.Body}" />
+        <Setter Property="TextElement.FontFamily" Value="{StaticResource Broadsheet.FontFamily.Body}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource Broadsheet.Brush.Text}" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+    </Style>
+
+    <!-- ===================================================================================
+         Pane splitters (T-003 owns these; T-005 builds the grids and places the elements).
+         3a's body is  260px 1px 1fr 1px 360px  and the right stack is  1fr 1px 1fr.
+
+         The splitter sits in its own 1px track but is 9px wide, pulled back over its
+         neighbours by the -4 margin. That is the grab area: a 1px target is unusable with a
+         mouse. It is done with the margin rather than by overhanging the template, because WPF
+         layout-clips an element to its slot when it is larger than the slot - an overhanging
+         template root would be clipped back to 1px and stop being hit-testable. The margin
+         enlarges the slot itself, so nothing is clipped. ZIndex 1 keeps the grab strip above
+         the pane drawn after it. Hover darkens the line and a drag turns it 2px Accent (T-005 relies on
+         both); keyboard focus draws a 3px Accent band, since a ring around 1px is invisible.
+
+         Background must be Transparent, not unset: a null background is not hit-testable.
+         ResizeBehavior must be PreviousAndNext: the default would try to resize the splitter's
+         own fixed 1px track.
+         =================================================================================== -->
+    <Style x:Key="Broadsheet.Style.PaneSplitter.Vertical" TargetType="GridSplitter">
+        <Setter Property="Width" Value="9" />
+        <Setter Property="Margin" Value="-4,0" />
+        <Setter Property="Panel.ZIndex" Value="1" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="VerticalAlignment" Value="Stretch" />
+        <Setter Property="ResizeDirection" Value="Columns" />
+        <Setter Property="ResizeBehavior" Value="PreviousAndNext" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Cursor" Value="SizeWE" />
+        <Setter Property="Focusable" Value="True" />
+        <Setter Property="KeyboardIncrement" Value="8" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource Broadsheet.Style.FocusVisual.Splitter.Vertical}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="GridSplitter">
+                    <Grid Background="{TemplateBinding Background}">
+                        <Border x:Name="Line"
+                                Width="1"
+                                HorizontalAlignment="Center"
+                                Background="{DynamicResource Broadsheet.Brush.Divider.Alpha}"
+                                SnapsToDevicePixels="True" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Line" Property="Background" Value="{DynamicResource Broadsheet.Brush.Neutral600}" />
+                        </Trigger>
+                        <Trigger Property="IsDragging" Value="True">
+                            <Setter TargetName="Line" Property="Width" Value="2" />
+                            <Setter TargetName="Line" Property="Background" Value="{DynamicResource Broadsheet.Brush.Accent}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="Broadsheet.Style.PaneSplitter.Horizontal" TargetType="GridSplitter">
+        <Setter Property="Height" Value="9" />
+        <Setter Property="Margin" Value="0,-4" />
+        <Setter Property="Panel.ZIndex" Value="1" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="ResizeDirection" Value="Rows" />
+        <Setter Property="ResizeBehavior" Value="PreviousAndNext" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Cursor" Value="SizeNS" />
+        <Setter Property="Focusable" Value="True" />
+        <Setter Property="KeyboardIncrement" Value="8" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource Broadsheet.Style.FocusVisual.Splitter.Horizontal}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="GridSplitter">
+                    <Grid Background="{TemplateBinding Background}">
+                        <Border x:Name="Line"
+                                Height="1"
+                                VerticalAlignment="Center"
+                                Background="{DynamicResource Broadsheet.Brush.Divider.Alpha}"
+                                SnapsToDevicePixels="True" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Line" Property="Background" Value="{DynamicResource Broadsheet.Brush.Neutral600}" />
+                        </Trigger>
+                        <Trigger Property="IsDragging" Value="True">
+                            <Setter TargetName="Line" Property="Height" Value="2" />
+                            <Setter TargetName="Line" Property="Background" Value="{DynamicResource Broadsheet.Brush.Accent}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ===================================================================================
+         Status bar (artboard: height 26, padding 0 12, gap 18, 12px, surface, 1px top rule).
+         Text is Neutral700, not the artboard's neutral-600 (T-011a Fork 1 = option A: neutral-600
+         fails AA for 12px text).
+         The items panel is a DockPanel with LastChildFill=False - StatusBar's own default fills
+         with its LAST child, which would drag a right-docked RAM / CPU / threads group to the
+         left - so T-009 right-aligns that group with DockPanel.Dock="Right". Every item gets
+         StatusBarItem (padding 0, centred); the 18px gaps are the consumer's own margins, and the
+         outermost item on each side takes none.
+         =================================================================================== -->
+    <Style x:Key="Broadsheet.Style.StatusBarItem" TargetType="StatusBarItem">
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+
+    <Style x:Key="Broadsheet.Style.StatusBar" TargetType="StatusBar">
+        <Setter Property="Height" Value="{StaticResource Broadsheet.Metric.StatusBar.Height}" />
+        <Setter Property="Padding" Value="12,0" />
+        <Setter Property="FontSize" Value="{StaticResource Broadsheet.FontSize.Chrome}" />
+        <Setter Property="FontFamily" Value="{StaticResource Broadsheet.FontFamily.Body}" />
+        <Setter Property="Foreground" Value="{DynamicResource Broadsheet.Brush.Neutral700}" />
+        <Setter Property="Background" Value="{DynamicResource Broadsheet.Brush.Surface}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Broadsheet.Brush.Divider.Alpha}" />
+        <Setter Property="BorderThickness" Value="0,1,0,0" />
+        <Setter Property="ItemContainerStyle" Value="{StaticResource Broadsheet.Style.StatusBarItem}" />
+        <Setter Property="ItemsPanel">
+            <Setter.Value>
+                <ItemsPanelTemplate>
+                    <DockPanel LastChildFill="False" />
+                </ItemsPanelTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="StatusBar">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            Padding="{TemplateBinding Padding}"
+                            SnapsToDevicePixels="True">
+                        <ItemsPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ===================================================================================
+         Underlined editor tab strip. Keys use T-004's nouns (Tab.Editor, TabControl.EditorStrip)
+         so its diff is a consume-instead-of-define change; the right-hand content arrives through
+         the typed slot helpers:BroadsheetSlots.TrailingContent (decision D1-B).
+
+         NO HeaderTemplate, deliberately. A string Header stays a string, because tab dispatch in
+         the view layer still reads Header as a string until T-004 moves it onto Tag.
+
+         The 2px underline hangs 1px below the tab (Margin 0,0,0,-1) so it lies ON the strip's
+         1px hairline, as the artboard's margin-bottom:-1px does. Do not set ClipToBounds on the
+         strip band - it would cut the underline.
+         =================================================================================== -->
+    <!--
+        Height 37 = the 38px strip minus its 1px hairline. TabPanel sizes a row to its tallest
+        tab's DESIRED height, not to the strip, so without it a tab is only as tall as its label
+        and the underline floats above the hairline instead of lying on it.
+    -->
+    <Style x:Key="Broadsheet.Style.Tab.Editor" TargetType="TabItem">
+        <Setter Property="Height" Value="37" />
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="Padding" Value="16,0" />
+        <!-- The LABEL's type is set on the template's TabRoot, never on the TabItem: a TabItem is the
+             logical parent of its page, so a FontSize / FontWeight / FontFamily set here is inherited by
+             the whole page - the Duplicates screen would render in 14px SemiBold heading type. The one
+             value the page SHOULD inherit is the ink, so Foreground stays on the TabItem. -->
+        <Setter Property="Foreground" Value="{DynamicResource Broadsheet.Brush.Text}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Cursor" Value="Hand" />
+        <!-- Stretch, not Center: TabControl copies the SELECTED tab's content alignment onto the page
+             presenter, so Center here would centre the whole editor page under the strip. The header
+             is centred by its own presenter below. -->
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="VerticalContentAlignment" Value="Stretch" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource Broadsheet.Style.FocusVisual.TabUnderline}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TabItem">
+                    <Border x:Name="TabRoot"
+                            Margin="0,0,0,-1"
+                            Padding="{TemplateBinding Padding}"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="Transparent"
+                            BorderThickness="{StaticResource Broadsheet.Thickness.TabUnderline}"
+                            TextElement.FontSize="{StaticResource Broadsheet.FontSize.Title}"
+                            TextElement.FontFamily="{StaticResource Broadsheet.FontFamily.Heading}"
+                            TextElement.FontWeight="Normal"
+                            TextElement.Foreground="{DynamicResource Broadsheet.Brush.Neutral700}"
+                            SnapsToDevicePixels="True"
+                            UseLayoutRounding="True">
+                        <ContentPresenter x:Name="HeaderHost"
+                                          ContentSource="Header"
+                                          VerticalAlignment="Center"
+                                          RecognizesAccessKey="True" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="TabRoot" Property="BorderBrush" Value="{DynamicResource Broadsheet.Brush.Accent}" />
+                            <Setter TargetName="TabRoot" Property="TextElement.Foreground" Value="{DynamicResource Broadsheet.Brush.Text}" />
+                            <Setter TargetName="TabRoot" Property="TextElement.FontWeight" Value="SemiBold" />
+                            <Setter Property="Panel.ZIndex" Value="1" />
+                        </Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsSelected" Value="False" />
+                                <Condition Property="IsMouseOver" Value="True" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="TabRoot" Property="TextElement.Foreground" Value="{DynamicResource Broadsheet.Brush.Text}" />
+                        </MultiTrigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.45" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--
+        The strip docks its trailing content (Scan + caption) FIRST, so the tabs take what is left
+        and can never overlap it. Tab order still runs tabs -> trailing content -> page, set with
+        KeyboardNavigation.TabIndex exactly as WPF's own TabControl template does.
+        IsItemsHost="True" on the TabPanel is mandatory - without it the strip shows no tabs.
+        PART_SelectedContentHost is WPF's own part name for the page presenter; keep it.
+    -->
+    <Style x:Key="Broadsheet.Style.TabControl.EditorStrip" TargetType="TabControl">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TabControl">
+                    <DockPanel KeyboardNavigation.TabNavigation="Local"
+                               Background="{TemplateBinding Background}">
+                        <Border DockPanel.Dock="Top" Style="{StaticResource Broadsheet.Style.Band.TabStrip}">
+                            <DockPanel LastChildFill="False">
+                                <Border x:Name="StripRightHost"
+                                        DockPanel.Dock="Right"
+                                        VerticalAlignment="Center"
+                                        KeyboardNavigation.TabIndex="2"
+                                        KeyboardNavigation.TabNavigation="Local">
+                                    <ContentPresenter Content="{Binding Path=(helpers:BroadsheetSlots.TrailingContent), RelativeSource={RelativeSource TemplatedParent}}" />
+                                </Border>
+                                <TabPanel x:Name="HeaderPanel"
+                                          DockPanel.Dock="Left"
+                                          IsItemsHost="True"
+                                          Panel.ZIndex="1"
+                                          KeyboardNavigation.TabIndex="1" />
+                            </DockPanel>
+                        </Border>
+                        <Border x:Name="ContentHost"
+                                Padding="{TemplateBinding Padding}"
+                                KeyboardNavigation.TabIndex="3"
+                                KeyboardNavigation.TabNavigation="Local"
+                                KeyboardNavigation.DirectionalNavigation="Contained">
+                            <ContentPresenter x:Name="PART_SelectedContentHost"
+                                              ContentSource="SelectedContent"
+                                              SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                        </Border>
+                    </DockPanel>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.45" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ===================================================================================
+        TEXT - the type scale, the two tags and the disclosure toggle.
+
+        KNOWING DEVIATIONS from the artboard, recorded here and in docs/modules/ui.md:
+          - letter-spacing:.08em on the uppercase kickers is DROPPED. WPF's TextBlock has no
+            character-spacing property (CharacterSpacing is WinUI); the alternatives destroy
+            screen-reader text. Kickers ship uppercase in the source string, 11px, Neutral700.
+          - Tags are two fixed keys. The artboard tints the extension tag per file type; that is
+            turn 4's colour-as-meaning layer and is out of scope.
+          - The tag radius is Broadsheet.Radius.Sm (1px); the design system's .tag uses 0.75 of
+            radius-md (1.5px), which has no token.
+
+        TEXT COLOUR: secondary text is Neutral700, not the artboard's neutral-600 - T-011a Fork 1 was
+        answered option A, because neutral-600 fails AA contrast at 11-13px. Neutral600 stays for
+        non-text marks (the disclosure glyph).
+
+        FONT SIZE: a style here sets FontSize only where 3a pins that text away from its band.
+        Everything else inherits from the band it sits in (see the FRAME section).
+
+        DISCLOSURE TOGGLE - do not set Content on it. The style supplies the glyph (collapsed ▶,
+        expanded ▼) through its IsChecked trigger; a Content set in markup wins over any style
+        setter and freezes the glyph.
+         =================================================================================== -->
+    <!-- Uppercase section labels and the results column-header row (artboard :152, :184). -->
+    <Style x:Key="Broadsheet.Style.Text.Kicker" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="{StaticResource Broadsheet.FontSize.Label}" />
+        <Setter Property="Foreground" Value="{DynamicResource Broadsheet.Brush.Neutral700}" />
+        <Setter Property="Margin" Value="0,4,0,4" />
+    </Style>
+
+    <!-- Secondary text at its band's size: "last scan 10:12 · 4.2 s", "first match wins", "2 sub". -->
+    <Style x:Key="Broadsheet.Style.Text.Caption" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{DynamicResource Broadsheet.Brush.Neutral700}" />
+    </Style>
+
+    <!-- Preview metadata values (artboard :203). -->
+    <Style x:Key="Broadsheet.Style.Text.MetaValue" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="{StaticResource Broadsheet.FontSize.Toolbar}" />
+        <Setter Property="Foreground" Value="{DynamicResource Broadsheet.Brush.Neutral700}" />
+    </Style>
+
+    <!-- Paths and patterns: \Originals\, ^IMG_\d+ \(\d\). -->
+    <Style x:Key="Broadsheet.Style.Text.Code" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource Broadsheet.FontFamily.Mono}" />
+        <Setter Property="FontSize" Value="{StaticResource Broadsheet.FontSize.Chrome}" />
+    </Style>
+
+    <!-- Chrome glyphs drawn as text: ▾ ✓ ✕ ⋯ ↶ ≥ ↓ · -->
+    <Style x:Key="Broadsheet.Style.Text.Glyph" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource Broadsheet.FontFamily.Glyph}" />
+    </Style>
+
+    <!-- Group names, tool-window names, "4 marked". -->
+    <Style x:Key="Broadsheet.Style.Text.GroupTitle" TargetType="TextBlock">
+        <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+
+    <!-- The extension tag on a group row (artboard: font-size 10px, padding 1px 6px). -->
+    <Style x:Key="Broadsheet.Style.Tag.Accent" TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource Broadsheet.Brush.Accent100}" />
+        <Setter Property="CornerRadius" Value="{StaticResource Broadsheet.Radius.Sm}" />
+        <Setter Property="Padding" Value="6,1" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource Broadsheet.Brush.Accent800}" />
+        <Setter Property="TextElement.FontSize" Value="10" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+    </Style>
+
+    <!-- The Aa / .* rule-type tags. -->
+    <Style x:Key="Broadsheet.Style.Tag.Neutral" TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource Broadsheet.Brush.Neutral100}" />
+        <Setter Property="CornerRadius" Value="{StaticResource Broadsheet.Radius.Sm}" />
+        <Setter Property="Padding" Value="6,1" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource Broadsheet.Brush.Neutral800}" />
+        <Setter Property="TextElement.FontSize" Value="10" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+    </Style>
+
+    <!--
+        Disclosure toggle - the ▼ / ▶ in the 28px first column of every duplicate-group row
+        (artboard :186: 10px, neutral-600) and on 3b's collapsed Action tool-windows.
+    -->
+    <Style x:Key="Broadsheet.Style.Toggle.Glyph" TargetType="ToggleButton">
+        <Setter Property="Content" Value="▶" />
+        <Setter Property="FontFamily" Value="{StaticResource Broadsheet.FontFamily.Glyph}" />
+        <Setter Property="FontSize" Value="10" />
+        <Setter Property="Foreground" Value="{DynamicResource Broadsheet.Brush.Neutral600}" />
+        <Setter Property="Width" Value="28" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Focusable" Value="True" />
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource Broadsheet.Style.FocusVisual}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ToggleButton">
+                    <Border x:Name="Bd"
+                            Background="{TemplateBinding Background}"
+                            Padding="{TemplateBinding Padding}"
+                            SnapsToDevicePixels="True">
+                        <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                          RecognizesAccessKey="True" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Broadsheet.Brush.HoverInk}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.45" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsChecked" Value="True">
+                <Setter Property="Content" Value="▼" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- ===================================================================================
+        BUTTONS - six button styles over two shared templates. Primary / Secondary / Ghost / Icon are the design
+        system's .btn family; Link / LinkMuted are its <a> links, which 3a uses 17 times as flat accent
+        actions (+ Folder, Expand all, Apply, ...).
+
+        COMPACT METRICS. The design system ships .btn at padding 10px 18px / 14px. 3a overrides every
+        button inline - min-height 28px, padding 0 14px (Scan) / 0 12px (action bar), 13px - so these
+        styles carry 3a's numbers, not the design system's marketing defaults.
+
+        LINKS are underlined at rest, as the design system draws them (<a> keeps the browser underline,
+        and the system sets text-underline-offset:3px), and darken one ramp step on hover (the artboard's
+        a:hover). Link and ghost text is Accent700, muted links Neutral700: T-011a Fork 1 = option A,
+        because accent and neutral-600 fail AA contrast at these sizes. Accent itself stays for fills
+        and marks. WPF has no inheritable text decoration, so the underline is a 1px rule drawn at the
+        bottom of the text's line box - which lands about 3px under the baseline at these sizes, the
+        same offset the system asks for. LinkMuted keeps its colour on hover: in the artboard the
+        muted colour is an inline style, which outranks a:hover.
+
+        EVERY ContentPresenter in a ButtonBase template sets RecognizesAccessKey="True", so an
+        underscore in a caption is an access key rather than a literal character (T-011 relies on it).
+
+        Link and LinkMuted set NO FontSize and NO FontFamily: they inherit the band they sit in, which
+        is how one key renders at 12px in a tool-window header and at 12.5px in the results toolbar.
+         =================================================================================== -->
+    <!-- The .btn shape: one Border, the content centred. States are set by each style's triggers
+         on Background, which the Border reads through TemplateBinding. -->
+    <ControlTemplate x:Key="Broadsheet.Template.Button" TargetType="ButtonBase">
+        <Border x:Name="Bd"
+                Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                CornerRadius="{StaticResource Broadsheet.Radius.Md}"
+                Padding="{TemplateBinding Padding}"
+                SnapsToDevicePixels="True">
+            <ContentPresenter x:Name="Content"
+                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                              RecognizesAccessKey="True" />
+        </Border>
+    </ControlTemplate>
+
+    <!-- The <a> shape: the content with a 1px underline in its own colour. -->
+    <ControlTemplate x:Key="Broadsheet.Template.Button.Link" TargetType="ButtonBase">
+        <Border Background="Transparent" Padding="{TemplateBinding Padding}">
+            <Grid HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                  VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
+                <ContentPresenter x:Name="Content" RecognizesAccessKey="True" />
+                <Border x:Name="Underline"
+                        Height="1"
+                        VerticalAlignment="Bottom"
+                        Background="{TemplateBinding Foreground}"
+                        SnapsToDevicePixels="True"
+                        UseLayoutRounding="True" />
+            </Grid>
+        </Border>
+    </ControlTemplate>
+
+    <!-- Scan; Recycle 4 files. -->
+    <Style x:Key="Broadsheet.Style.Button.Primary" TargetType="Button">
+        <Setter Property="Template" Value="{StaticResource Broadsheet.Template.Button}" />
+        <Setter Property="Background" Value="{DynamicResource Broadsheet.Brush.Accent}" />
+        <Setter Property="Foreground" Value="{DynamicResource Broadsheet.Brush.Bg}" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="MinHeight" Value="28" />
+        <Setter Property="Padding" Value="14,0" />
+        <Setter Property="FontSize" Value="{StaticResource Broadsheet.FontSize.Body}" />
+        <Setter Property="FontFamily" Value="{StaticResource Broadsheet.FontFamily.Heading}" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource Broadsheet.Style.FocusVisual}" />
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{DynamicResource Broadsheet.Brush.Accent600}" />
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="{DynamicResource Broadsheet.Brush.Accent700}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.45" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- Move to...; Rules Add. -->
+    <Style x:Key="Broadsheet.Style.Button.Secondary" TargetType="Button">
+        <Setter Property="Template" Value="{StaticResource Broadsheet.Template.Button}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource Broadsheet.Brush.Text}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Broadsheet.Brush.Divider.Alpha}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="MinHeight" Value="28" />
+        <Setter Property="Padding" Value="12,0" />
+        <Setter Property="FontSize" Value="{StaticResource Broadsheet.FontSize.Body}" />
+        <Setter Property="FontFamily" Value="{StaticResource Broadsheet.FontFamily.Heading}" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource Broadsheet.Style.FocusVisual}" />
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{DynamicResource Broadsheet.Brush.HoverInk}" />
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="{DynamicResource Broadsheet.Brush.ActiveInk}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.45" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- Low-emphasis accent actions; the base of Icon. -->
+    <Style x:Key="Broadsheet.Style.Button.Ghost" TargetType="Button">
+        <Setter Property="Template" Value="{StaticResource Broadsheet.Template.Button}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource Broadsheet.Brush.Accent700}" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="MinHeight" Value="28" />
+        <Setter Property="Padding" Value="5,0" />
+        <Setter Property="FontSize" Value="{StaticResource Broadsheet.FontSize.Body}" />
+        <Setter Property="FontFamily" Value="{StaticResource Broadsheet.FontFamily.Heading}" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource Broadsheet.Style.FocusVisual}" />
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{DynamicResource Broadsheet.Brush.AccentHover}" />
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="{DynamicResource Broadsheet.Brush.AccentActive}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.45" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- A 28px square glyph button (— ▢ ✕). -->
+    <Style x:Key="Broadsheet.Style.Button.Icon" TargetType="Button" BasedOn="{StaticResource Broadsheet.Style.Button.Ghost}">
+        <Setter Property="Width" Value="28" />
+        <Setter Property="Height" Value="28" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="FontFamily" Value="{StaticResource Broadsheet.FontFamily.Glyph}" />
+        <Setter Property="FontWeight" Value="Normal" />
+    </Style>
+
+    <!-- The 17 flat accent actions of 3a. -->
+    <Style x:Key="Broadsheet.Style.Button.Link" TargetType="Button">
+        <Setter Property="Template" Value="{StaticResource Broadsheet.Template.Button.Link}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource Broadsheet.Brush.Accent700}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource Broadsheet.Style.FocusVisual}" />
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Foreground" Value="{DynamicResource Broadsheet.Brush.Accent800}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.45" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- The three neutral-600 links: ⋯, None, the Preview ✕. -->
+    <Style x:Key="Broadsheet.Style.Button.LinkMuted" TargetType="Button" BasedOn="{StaticResource Broadsheet.Style.Button.Link}">
+        <Setter Property="Foreground" Value="{DynamicResource Broadsheet.Brush.Neutral700}" />
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Foreground" Value="{DynamicResource Broadsheet.Brush.Neutral700}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- ===================================================================================
+        INPUTS - text fields, the pill dropdown, the 14px accent checkbox, the Keep radio, the two-way segmented
+        control, and the two selectable row containers.
+
+        CONVENTIONS a consumer must know (they are not enforced by any analyzer):
+          - PLACEHOLDER comes from the typed slot helpers:BroadsheetSlots.Placeholder (decision D1-B),
+            not from Tag. Unset, nothing renders.
+          - COMBOBOX ITEMS are not styled automatically. Every ComboBox consumer writes
+            ItemContainerStyle="{StaticResource Broadsheet.Style.ComboBoxItem}" itself - an implicit
+            ComboBoxItem style would restyle every ComboBox in the process, so none ships. Forget it
+            and the drop-down shows WPF's default chrome, with no error anywhere.
+          - The TextBox.Numeric style adds no validation. Digits-only input stays with the existing
+            PreviewTextInput handler.
+          - DATA TEXT in a checkbox, radio or button goes in a TextBlock, never a bare string. These
+            templates recognise access keys (as WPF's own do), so a bare "node_modules" renders as
+            "nodemodules" - the underscore is taken as an access-key marker. Captions you write
+            (Include _subfolders) are strings; names that come from data (folder names, file names,
+            rule text) are <TextBlock Text="{Binding ...}" />.
+
+        COMPACT METRICS: the design system's .input is min-height 36px / 14px; 3a overrides it to
+        28px / 12.5px, and these styles carry 3a's numbers.
+
+        BOUNDARIES that identify a control - the text field, the pill dropdown, the unchecked checkbox -
+        are Neutral600 (3.5-3.9:1), not the design system's divider hairline (1.4:1): WCAG 1.4.11 needs
+        3:1 for a boundary the control is recognised by, and T-011a keeps Neutral600 for exactly such
+        non-text marks. Hover darkens to Neutral700; keyboard focus turns the border Accent and adds the
+        focus ring. Hairlines that only separate (bands, rules, segment dividers) stay hairlines.
+
+        KNOWING ADDITION: the checked checkbox draws a tick. The artboard shows a solid accent square
+        with no visible tick at 14px; without one a checked box is indistinguishable from a disabled
+        one in high contrast.
+         =================================================================================== -->
+    <!-- ===================================================================================
+         Text field - the Rules compose input (text or /regex/).
+         PART_ContentHost is a required part name: TextBoxBase finds its editing surface by that
+         literal string and renders an empty, uneditable box without it.
+         =================================================================================== -->
+    <Style x:Key="Broadsheet.Style.TextBox" TargetType="TextBox">
+        <Setter Property="MinHeight" Value="28" />
+        <Setter Property="Padding" Value="8,4" />
+        <Setter Property="FontSize" Value="{StaticResource Broadsheet.FontSize.Toolbar}" />
+        <Setter Property="Background" Value="{DynamicResource Broadsheet.Brush.Surface}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Broadsheet.Brush.Neutral600}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Foreground" Value="{DynamicResource Broadsheet.Brush.Text}" />
+        <Setter Property="CaretBrush" Value="{DynamicResource Broadsheet.Brush.Accent}" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource Broadsheet.Style.FocusVisual}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TextBox">
+                    <Border x:Name="Bd"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{StaticResource Broadsheet.Radius.Md}"
+                            SnapsToDevicePixels="True">
+                        <Grid>
+                            <TextBlock x:Name="PART_Placeholder"
+                                       Text="{Binding Path=(helpers:BroadsheetSlots.Placeholder), RelativeSource={RelativeSource TemplatedParent}}"
+                                       Foreground="{DynamicResource Broadsheet.Brush.PlaceholderInk}"
+                                       Margin="{TemplateBinding Padding}"
+                                       Padding="2,0"
+                                       VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                       IsHitTestVisible="False"
+                                       Visibility="Collapsed" />
+                            <ScrollViewer x:Name="PART_ContentHost"
+                                          Focusable="False"
+                                          HorizontalScrollBarVisibility="Hidden"
+                                          VerticalScrollBarVisibility="Hidden" />
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="Text" Value="">
+                            <Setter TargetName="PART_Placeholder" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                        <!-- An unset slot takes the placeholder out of layout entirely (declared after the
+                             Text trigger so it wins when both hold). -->
+                        <Trigger Property="helpers:BroadsheetSlots.Placeholder" Value="{x:Null}">
+                            <Setter TargetName="PART_Placeholder" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource Broadsheet.Brush.Neutral700}" />
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource Broadsheet.Brush.Accent}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.45" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- The toolbar's Copies >= [2] field (artboard: width 22px + padding, centred). -->
+    <Style x:Key="Broadsheet.Style.TextBox.Numeric" TargetType="TextBox" BasedOn="{StaticResource Broadsheet.Style.TextBox}">
+        <Setter Property="Width" Value="34" />
+        <Setter Property="Padding" Value="4,4" />
+        <Setter Property="TextAlignment" Value="Center" />
+    </Style>
+
+    <!-- ===================================================================================
+         Pill dropdown - All ▾, 0 MB ▾, Wasted space ↓ ▾, Mark ▾, name ▾
+         (artboard: 1px divider border, radius-md, padding 2px 8px, Bg ground).
+         The selection box sits OUTSIDE the toggle, over it, so it can bind the ComboBox's own
+         SelectionBoxItem - WPF's standard shape. It does not recognise access keys: it shows item
+         data, and an underscore in a file or folder name must stay an underscore.
+         The drop-down border uses the OPAQUE divider: a popup edge sits over whatever is beneath
+         the window, where the translucent form would not composite against a known ground.
+         =================================================================================== -->
+    <Style x:Key="Broadsheet.Style.ComboBox" TargetType="ComboBox">
+        <Setter Property="MinHeight" Value="24" />
+        <Setter Property="Padding" Value="8,2,4,2" />
+        <Setter Property="FontSize" Value="{StaticResource Broadsheet.FontSize.Toolbar}" />
+        <Setter Property="Background" Value="{DynamicResource Broadsheet.Brush.Bg}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Broadsheet.Brush.Neutral600}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Foreground" Value="{DynamicResource Broadsheet.Brush.Text}" />
+        <Setter Property="IsEditable" Value="False" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="ScrollViewer.CanContentScroll" Value="True" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource Broadsheet.Style.FocusVisual}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ComboBox">
+                    <Grid SnapsToDevicePixels="True">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <ToggleButton x:Name="PART_ToggleButton"
+                                      Grid.ColumnSpan="2"
+                                      Focusable="False"
+                                      ClickMode="Press"
+                                      IsChecked="{Binding Path=IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                      Background="{TemplateBinding Background}"
+                                      BorderBrush="{TemplateBinding BorderBrush}"
+                                      BorderThickness="{TemplateBinding BorderThickness}">
+                            <ToggleButton.Template>
+                                <ControlTemplate TargetType="ToggleButton">
+                                    <Border Background="{TemplateBinding Background}"
+                                            BorderBrush="{TemplateBinding BorderBrush}"
+                                            BorderThickness="{TemplateBinding BorderThickness}"
+                                            CornerRadius="{StaticResource Broadsheet.Radius.Md}"
+                                            SnapsToDevicePixels="True" />
+                                </ControlTemplate>
+                            </ToggleButton.Template>
+                        </ToggleButton>
+                        <ContentPresenter x:Name="ContentSite"
+                                          Grid.Column="0"
+                                          Margin="{TemplateBinding Padding}"
+                                          HorizontalAlignment="Left"
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                          IsHitTestVisible="False"
+                                          Content="{TemplateBinding SelectionBoxItem}"
+                                          ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                          ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                                          ContentStringFormat="{TemplateBinding SelectionBoxItemStringFormat}" />
+                        <TextBlock x:Name="Chevron"
+                                   Grid.Column="1"
+                                   Text="▾"
+                                   Style="{StaticResource Broadsheet.Style.Text.Glyph}"
+                                   FontSize="9"
+                                   Margin="0,0,8,0"
+                                   VerticalAlignment="Center"
+                                   IsHitTestVisible="False" />
+                        <Popup x:Name="PART_Popup"
+                               Grid.ColumnSpan="2"
+                               IsOpen="{Binding Path=IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                               Placement="Bottom"
+                               AllowsTransparency="True"
+                               Focusable="False"
+                               PopupAnimation="{DynamicResource {x:Static SystemParameters.ComboBoxPopupAnimationKey}}">
+                            <Border x:Name="DropDownBorder"
+                                    Background="{DynamicResource Broadsheet.Brush.Bg}"
+                                    BorderBrush="{DynamicResource Broadsheet.Brush.Divider}"
+                                    BorderThickness="1"
+                                    CornerRadius="{StaticResource Broadsheet.Radius.Md}"
+                                    MinWidth="{Binding Path=ActualWidth, RelativeSource={RelativeSource TemplatedParent}}"
+                                    MaxHeight="{TemplateBinding MaxDropDownHeight}"
+                                    SnapsToDevicePixels="True">
+                                <ScrollViewer x:Name="DropDownScrollViewer">
+                                    <ItemsPresenter x:Name="ItemsPresenter"
+                                                    KeyboardNavigation.DirectionalNavigation="Contained"
+                                                    SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                </ScrollViewer>
+                            </Border>
+                        </Popup>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="PART_ToggleButton" Property="BorderBrush" Value="{DynamicResource Broadsheet.Brush.Neutral700}" />
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                            <Setter TargetName="PART_ToggleButton" Property="BorderBrush" Value="{DynamicResource Broadsheet.Brush.Accent}" />
+                        </Trigger>
+                        <Trigger Property="IsDropDownOpen" Value="True">
+                            <Setter TargetName="PART_ToggleButton" Property="BorderBrush" Value="{DynamicResource Broadsheet.Brush.Accent}" />
+                        </Trigger>
+                        <Trigger Property="HasItems" Value="False">
+                            <Setter TargetName="DropDownBorder" Property="MinHeight" Value="20" />
+                        </Trigger>
+                        <Trigger Property="IsGrouping" Value="True">
+                            <Setter Property="ScrollViewer.CanContentScroll" Value="False" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.45" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="Broadsheet.Style.ComboBoxItem" TargetType="ComboBoxItem">
+        <Setter Property="Padding" Value="8,4" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource Broadsheet.Brush.Text}" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ComboBoxItem">
+                    <Border x:Name="Bd"
+                            Background="{TemplateBinding Background}"
+                            Padding="{TemplateBinding Padding}"
+                            SnapsToDevicePixels="True">
+                        <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsHighlighted" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Broadsheet.Brush.Accent100}" />
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Broadsheet.Brush.Accent}" />
+                            <Setter Property="Foreground" Value="{DynamicResource Broadsheet.Brush.Bg}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.45" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ===================================================================================
+         Checkbox - the 14px accent square, 8 times in 3a (artboard :153-155, :213-214):
+         1.5px border, radius-md (2px, not 1px), solid accent when on, neutral-500 border when off.
+         =================================================================================== -->
+    <Style x:Key="Broadsheet.Style.CheckBox" TargetType="CheckBox">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource Broadsheet.Brush.Text}" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource Broadsheet.Style.FocusVisual}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="CheckBox">
+                    <Grid Background="{TemplateBinding Background}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Border x:Name="Box"
+                                Width="14"
+                                Height="14"
+                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                CornerRadius="{StaticResource Broadsheet.Radius.Md}"
+                                BorderThickness="1.5"
+                                BorderBrush="{DynamicResource Broadsheet.Brush.Neutral600}"
+                                Background="Transparent"
+                                SnapsToDevicePixels="True">
+                            <Path x:Name="Tick"
+                                  Data="M 1.5,5.5 L 4,8 L 9,2.5"
+                                  Stroke="{DynamicResource Broadsheet.Brush.Bg}"
+                                  StrokeThickness="1.6"
+                                  StrokeStartLineCap="Round"
+                                  StrokeEndLineCap="Round"
+                                  StrokeLineJoin="Round"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center"
+                                  Visibility="Collapsed" />
+                        </Border>
+                        <ContentPresenter x:Name="Content"
+                                          Grid.Column="1"
+                                          Margin="8,0,0,0"
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          RecognizesAccessKey="True" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="HasContent" Value="False">
+                            <Setter TargetName="Content" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Box" Property="BorderBrush" Value="{DynamicResource Broadsheet.Brush.Accent}" />
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="Box" Property="Background" Value="{DynamicResource Broadsheet.Brush.Accent}" />
+                            <Setter TargetName="Box" Property="BorderBrush" Value="{DynamicResource Broadsheet.Brush.Accent}" />
+                            <Setter TargetName="Tick" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="{x:Null}">
+                            <Setter TargetName="Box" Property="Background" Value="{DynamicResource Broadsheet.Brush.Neutral400}" />
+                            <Setter TargetName="Tick" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.45" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ===================================================================================
+         Keep mark - the results editor's Keep column (artboard :189): a 15px ink ring, 1.5px, with
+         a 7px ink dot when kept. Ink, not accent: the column reads as data.
+         Targets ToggleButton, so one key serves both of T-007's open D1 shapes - a free ToggleButton
+         per copy (a click toggles), or a RadioButton group (RadioButton derives from ToggleButton).
+         A lone ungrouped RadioButton could be set but never cleared by clicking.
+         =================================================================================== -->
+    <Style x:Key="Broadsheet.Style.KeepRadio" TargetType="ToggleButton">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource Broadsheet.Style.FocusVisual}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ToggleButton">
+                    <Grid Background="{TemplateBinding Background}" Width="15" Height="15">
+                        <Ellipse x:Name="Ring"
+                                 Stroke="{DynamicResource Broadsheet.Brush.Text}"
+                                 StrokeThickness="1.5" />
+                        <Ellipse x:Name="Dot"
+                                 Width="7"
+                                 Height="7"
+                                 HorizontalAlignment="Center"
+                                 VerticalAlignment="Center"
+                                 Fill="{DynamicResource Broadsheet.Brush.Text}"
+                                 Visibility="Collapsed" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Ring" Property="Stroke" Value="{DynamicResource Broadsheet.Brush.Accent}" />
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="Dot" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.45" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ===================================================================================
+         Segmented control - Match duplicates by: Content | Name pattern (artboard :165).
+         The consumer puts a horizontal StackPanel inside a Segment.Group Border. WPF has no
+         :first-child, so the first option takes OptionFirst (no left rule) and the rest take
+         Option (a 1px left rule - the CSS .seg-opt + .seg-opt).
+         =================================================================================== -->
+    <Style x:Key="Broadsheet.Style.Segment.Group" TargetType="Border">
+        <Setter Property="BorderBrush" Value="{DynamicResource Broadsheet.Brush.Divider.Alpha}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="{StaticResource Broadsheet.Radius.Md}" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="ClipToBounds" Value="True" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+    </Style>
+
+    <Style x:Key="Broadsheet.Style.Segment.Option" TargetType="RadioButton">
+        <Setter Property="Padding" Value="10,5" />
+        <Setter Property="FontSize" Value="{StaticResource Broadsheet.FontSize.Toolbar}" />
+        <Setter Property="Foreground" Value="{DynamicResource Broadsheet.Brush.Text}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Broadsheet.Brush.Divider.Alpha}" />
+        <Setter Property="BorderThickness" Value="1,0,0,0" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource Broadsheet.Style.FocusVisual.Inset}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="RadioButton">
+                    <Border x:Name="Bd"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            Padding="{TemplateBinding Padding}"
+                            SnapsToDevicePixels="True">
+                        <ContentPresenter HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"
+                                          RecognizesAccessKey="True" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.45" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsChecked" Value="False" />
+                    <Condition Property="IsMouseOver" Value="True" />
+                </MultiTrigger.Conditions>
+                <Setter Property="Background" Value="{DynamicResource Broadsheet.Brush.HoverInk}" />
+            </MultiTrigger>
+            <Trigger Property="IsChecked" Value="True">
+                <Setter Property="Background" Value="{DynamicResource Broadsheet.Brush.Accent}" />
+                <Setter Property="Foreground" Value="{DynamicResource Broadsheet.Brush.Bg}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="Broadsheet.Style.Segment.OptionFirst" TargetType="RadioButton" BasedOn="{StaticResource Broadsheet.Style.Segment.Option}">
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
+
+    <!-- ===================================================================================
+         Row containers. A selected row washes Accent100 (artboard :153), never the system
+         highlight blue, and keeps the wash when its pane loses focus (the IsSelectionActive
+         MultiTrigger) - without it the row greys the moment the user clicks another pane.
+         The wash is 1.03:1 against the page, so it is decorative: a 2px Accent edge on the left
+         carries the selection (T-011a 3c). Keyboard focus draws the INSET ring - an outer ring is
+         clipped by the list's ScrollViewer.
+         ListViewItem.Row is the results list's GROUP container (T-007: one ListViewItem per group,
+         its copies inside), so it sizes to its content; CopyRow is the 30px copy row inside it.
+         =================================================================================== -->
+    <Style x:Key="Broadsheet.Style.ListBoxItem.Row" TargetType="ListBoxItem">
+        <Setter Property="Padding" Value="6,5" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource Broadsheet.Style.FocusVisual.Inset}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ListBoxItem">
+                    <Grid SnapsToDevicePixels="True">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        </Border>
+                        <Rectangle x:Name="Edge" Width="2" HorizontalAlignment="Left" Fill="Transparent" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Broadsheet.Brush.HoverInk}" />
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Broadsheet.Brush.Accent100}" />
+                            <Setter TargetName="Edge" Property="Fill" Value="{DynamicResource Broadsheet.Brush.Accent}" />
+                        </Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsSelected" Value="True" />
+                                <Condition Property="Selector.IsSelectionActive" Value="False" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Broadsheet.Brush.Accent100}" />
+                            <Setter TargetName="Edge" Property="Fill" Value="{DynamicResource Broadsheet.Brush.Accent}" />
+                        </MultiTrigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.45" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- The results editor's per-copy row: 30px, a 6%-ink rule under it (artboard :188). -->
+    <Style x:Key="Broadsheet.Style.ListViewItem.Row" TargetType="ListViewItem">
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="VerticalContentAlignment" Value="Stretch" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource Broadsheet.Style.FocusVisual.Inset}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ListViewItem">
+                    <Grid SnapsToDevicePixels="True">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Padding="{TemplateBinding Padding}"
+                                UseLayoutRounding="True">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        </Border>
+                        <Rectangle x:Name="Edge" Width="2" HorizontalAlignment="Left" Fill="Transparent" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Broadsheet.Brush.HoverInk}" />
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Broadsheet.Brush.Accent100}" />
+                            <Setter TargetName="Edge" Property="Fill" Value="{DynamicResource Broadsheet.Brush.Accent}" />
+                        </Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsSelected" Value="True" />
+                                <Condition Property="Selector.IsSelectionActive" Value="False" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Broadsheet.Brush.Accent100}" />
+                            <Setter TargetName="Edge" Property="Fill" Value="{DynamicResource Broadsheet.Brush.Accent}" />
+                        </MultiTrigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.45" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- One per-copy row inside a group (artboard :188): 30px, a 6%-ink rule under it. A Border for
+         the copy-row DataTemplate, since the copies are not list items of their own. -->
+    <Style x:Key="Broadsheet.Style.CopyRow" TargetType="Border">
+        <Setter Property="Height" Value="{StaticResource Broadsheet.Metric.CopyRow.Height}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Broadsheet.Brush.RowRule}" />
+        <Setter Property="BorderThickness" Value="0,0,0,1" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+    </Style>
+
+</ResourceDictionary>
